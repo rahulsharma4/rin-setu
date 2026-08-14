@@ -17,9 +17,9 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
 export default function Settings() {
-  const { token } = useAuth();
+  const { token, admin, updateAdmin } = useAuth();
   
-  // Tab State: 'config' | 'audit' | 'backup'
+  // Tab State: 'config' | 'audit' | 'backup' | 'profile'
   const [activeTab, setActiveTab] = useState('config');
 
   const [settings, setSettings] = useState(null);
@@ -29,6 +29,26 @@ export default function Settings() {
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
+  // Profile Edit State
+  const [profileData, setProfileData] = useState({
+    businessName: admin?.businessName || '',
+    name: admin?.name || '',
+    username: admin?.username || '',
+    password: ''
+  });
+  const [profileLoading, setProfileLoading] = useState(false);
+
+  useEffect(() => {
+    if (admin) {
+      setProfileData({
+        businessName: admin.businessName || '',
+        name: admin.name || '',
+        username: admin.username || '',
+        password: ''
+      });
+    }
+  }, [admin]);
+
   // Priority dragging/moving state
   const [priority, setPriority] = useState([]);
 
@@ -37,6 +57,28 @@ export default function Settings() {
   const [loadingAudits, setLoadingAudits] = useState(false);
 
   const headers = { Authorization: `Bearer ${token}` };
+
+  const handleProfileSave = async (e) => {
+    e.preventDefault();
+    setProfileLoading(true);
+    setSuccess('');
+    setError('');
+
+    try {
+      const res = await axios.put(
+        'http://localhost:5001/api/auth/profile', 
+        profileData, 
+        { headers }
+      );
+      updateAdmin(res.data.token, res.data.admin);
+      setSuccess('Profile updated successfully!');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update admin profile details.');
+    } finally {
+      setProfileLoading(false);
+    }
+  };
 
   const fetchSettings = async () => {
     setLoading(true);
@@ -201,6 +243,16 @@ export default function Settings() {
         >
           <span>Backup & Data Exports</span>
           {activeTab === 'backup' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-accent animate-scale-x" />}
+        </button>
+
+        <button 
+          onClick={() => setActiveTab('profile')}
+          className={`pb-3 relative transition outline-none ${
+            activeTab === 'profile' ? 'text-brand-accent' : 'text-brand-dim hover:text-white'
+          }`}
+        >
+          <span>Admin Profile Settings</span>
+          {activeTab === 'profile' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-accent animate-scale-x" />}
         </button>
       </div>
 
@@ -481,6 +533,88 @@ export default function Settings() {
           </div>
 
         </div>
+      )}
+
+      {/* 4. Tab Profile: Admin Profile settings */}
+      {activeTab === 'profile' && (
+        <form onSubmit={handleProfileSave} className="space-y-6">
+          <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-4">
+            <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
+              <ShieldCheck className="w-4 h-4 text-brand-accent" />
+              <h3 className="text-xs font-bold text-brand-text dark:text-white uppercase tracking-wider">Admin Profile & Login Credentials</h3>
+            </div>
+            
+            <p className="text-[11px] text-brand-dim leading-relaxed">
+              Edit your money lending business/company name, leader admin name, username, and secure password.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
+              
+              {/* Business Name */}
+              <div className="space-y-1.5 md:col-span-2">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Lending Business / Company Name</label>
+                <input
+                  type="text"
+                  value={profileData.businessName}
+                  onChange={(e) => setProfileData(prev => ({ ...prev, businessName: e.target.value }))}
+                  placeholder="e.g. RinSetu Micro Finance"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                  required
+                />
+              </div>
+
+              {/* Leader/Admin Name */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Leader / Admin Name</label>
+                <input
+                  type="text"
+                  value={profileData.name}
+                  onChange={(e) => setProfileData(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="e.g. Rahul Sharma"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                  required
+                />
+              </div>
+
+              {/* Username */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Login Username</label>
+                <input
+                  type="text"
+                  value={profileData.username}
+                  onChange={(e) => setProfileData(prev => ({ ...prev, username: e.target.value }))}
+                  placeholder="e.g. rahul_admin"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                  required
+                />
+              </div>
+
+              {/* Password */}
+              <div className="space-y-1.5 md:col-span-2">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Change Password (Leave blank to keep current password)</label>
+                <input
+                  type="password"
+                  value={profileData.password}
+                  onChange={(e) => setProfileData(prev => ({ ...prev, password: e.target.value }))}
+                  placeholder="Enter new secure password"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                />
+              </div>
+
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-2">
+            <button
+              type="submit"
+              disabled={profileLoading}
+              className="flex items-center space-x-1.5 px-6 py-3.5 rounded-xl bg-brand-accent hover:bg-indigo-600 disabled:opacity-40 text-xs font-bold text-white shadow-lg shadow-brand-accent/25 transition-all duration-200"
+            >
+              <Save className="w-4 h-4" />
+              <span>{profileLoading ? 'Updating Profile...' : 'Save Profile Changes'}</span>
+            </button>
+          </div>
+        </form>
       )}
 
     </div>

@@ -12,7 +12,9 @@ import {
   TrendingUp, 
   ShieldAlert,
   Loader2,
-  ExternalLink
+  ExternalLink,
+  Lock,
+  Unlock
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -114,6 +116,29 @@ export default function SuperAdminDashboard() {
       fetchDashboardData();
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to offboard tenant.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+  
+  const handleToggleStatus = async (tenantId, currentStatus) => {
+    const newStatus = currentStatus === 'Suspended' ? 'Active' : 'Suspended';
+    const confirmMsg = `Are you sure you want to update this tenant status to ${newStatus}?` + 
+      (newStatus === 'Suspended' ? '\nThis will block the lender and all their staff from logging into the portal!' : '');
+    
+    if (!window.confirm(confirmMsg)) return;
+
+    try {
+      setActionLoading(true);
+      const headers = { Authorization: `Bearer ${token}` };
+      await axios.put(
+        `http://localhost:5001/api/superadmin/tenants/${tenantId}/status`, 
+        { status: newStatus }, 
+        { headers }
+      );
+      fetchDashboardData();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update tenant status.');
     } finally {
       setActionLoading(false);
     }
@@ -244,6 +269,7 @@ export default function SuperAdminDashboard() {
                   <th className="pb-3.5">Firm / Business</th>
                   <th className="pb-3.5">Lender Name</th>
                   <th className="pb-3.5">Username</th>
+                  <th className="pb-3.5 text-center">Status</th>
                   <th className="pb-3.5 text-center">Borrowers</th>
                   <th className="pb-3.5 text-center">Active Loans</th>
                   <th className="pb-3.5 text-right">Actions</th>
@@ -265,6 +291,13 @@ export default function SuperAdminDashboard() {
                       </td>
                       <td className="py-4 font-semibold">{t.name}</td>
                       <td className="py-4 font-mono font-bold text-brand-dim">{t.username}</td>
+                      <td className="py-4 text-center">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          t.status === 'Suspended' ? 'bg-brand-rose/10 text-brand-rose' : 'bg-brand-emerald/10 text-brand-emerald'
+                        }`}>
+                          {t.status || 'Active'}
+                        </span>
+                      </td>
                       <td className="py-4 text-center font-bold">{t.customerCount}</td>
                       <td className="py-4 text-center">
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${t.activeLoans > 0 ? 'bg-indigo-500/10 text-indigo-400' : 'bg-brand-border/40 text-brand-dim'}`}>
@@ -272,6 +305,19 @@ export default function SuperAdminDashboard() {
                         </span>
                       </td>
                       <td className="py-4 text-right">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleStatus(t._id, t.status)}
+                          className={`p-1.5 rounded-lg border border-brand-border transition mr-2 ${
+                            t.status === 'Suspended' 
+                              ? 'text-brand-emerald hover:bg-brand-emerald/90 hover:text-white border-brand-emerald/20' 
+                              : 'text-brand-rose hover:bg-brand-rose/90 hover:text-white border-brand-rose/20'
+                          }`}
+                          title={t.status === 'Suspended' ? 'Activate Tenant' : 'Suspend Tenant'}
+                          disabled={actionLoading}
+                        >
+                          {t.status === 'Suspended' ? <Unlock className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
+                        </button>
                         <button
                           type="button"
                           onClick={() => handleImpersonateTenant(t._id)}

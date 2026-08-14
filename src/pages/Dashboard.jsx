@@ -26,7 +26,14 @@ import EMICalculator from '../components/EMICalculator';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token, admin } = useAuth();
+  
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
+  };
   
   const [loans, setLoans] = useState([]);
   const [transactions, setTransactions] = useState([]);
@@ -247,7 +254,7 @@ export default function Dashboard() {
           <div className="space-y-1">
             <h2 className="text-lg font-bold text-indigo-950 dark:text-white flex items-center gap-1.5">
               <Sparkle className="w-5 h-5 text-brand-amber animate-spin" style={{ animationDuration: '6s' }} />
-              Good Morning, Admin!
+              {getGreeting()}, {admin?.name || admin?.username || 'Admin'}!
             </h2>
             <p className="text-[11px] text-indigo-900/80 dark:text-brand-dim font-medium">
               Aaj ka estimated collection targets: <span className="text-indigo-950 dark:text-white font-bold">₹{dailySummary.todayDue.toLocaleString('en-IN')}</span> due aaj, 

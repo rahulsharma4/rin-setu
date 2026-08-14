@@ -145,13 +145,13 @@ export default function EMICalculator({ isOpen, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto">
-      <div className="w-full max-w-4xl bg-brand-card border border-brand-border rounded-2xl shadow-2xl overflow-hidden animate-slide-up my-auto max-h-[90vh] flex flex-col">
+      <div className="w-full max-w-2xl bg-brand-card border border-brand-border rounded-2xl shadow-2xl overflow-hidden animate-slide-up my-auto max-h-[90vh] flex flex-col">
         
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-brand-border bg-brand-bg/50 shrink-0">
           <div className="flex items-center space-x-2.5">
             <div className="w-8 h-8 rounded-lg bg-brand-accent/15 flex items-center justify-center text-brand-accent">
-              <Calculator className="w-5 h-5 animate-pulse" />
+              <Calculator className="w-4.5 h-4.5" />
             </div>
             <div>
               <h2 className="text-sm font-bold text-brand-text dark:text-white uppercase tracking-wider">Lending EMI Calculator</h2>
@@ -163,15 +163,15 @@ export default function EMICalculator({ isOpen, onClose }) {
           </button>
         </div>
 
-        {/* Scrollable Body Content */}
-        <div className="p-6 grid grid-cols-1 lg:grid-cols-5 gap-6 overflow-y-auto flex-1">
+        {/* Modal Body */}
+        <div className="p-6 space-y-6 overflow-y-auto flex-1">
           
-          {/* Inputs Section */}
-          <div className="lg:col-span-2 space-y-4">
+          {/* Inputs Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             
             {/* Principal */}
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Principal Amount (Asal)</label>
+            <div className="space-y-1.5 md:col-span-2">
+              <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Principal Amount (Asal) *</label>
               <input
                 type="number"
                 name="principalAmount"
@@ -184,8 +184,8 @@ export default function EMICalculator({ isOpen, onClose }) {
             </div>
 
             {/* Interest Rate */}
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Interest Rate (%)</label>
+            <div className="space-y-1.5 md:col-span-2">
+              <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Interest Rate (%) *</label>
               <div className="flex space-x-2">
                 <input
                   type="number"
@@ -211,101 +211,92 @@ export default function EMICalculator({ isOpen, onClose }) {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              {/* Interest Type */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Interest Type</label>
-                <select
-                  name="interestType"
-                  value={formData.interestType}
-                  onChange={handleChange}
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
-                >
-                  <option value="simple">Simple (साधारण)</option>
-                  <option value="flat">Flat (EMI)</option>
-                  <option value="reducing">Reducing (EMI)</option>
-                </select>
-              </div>
-
-              {/* Payment Frequency */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Repayment Period</label>
-                <select
-                  name="paymentFrequency"
-                  value={formData.paymentFrequency}
-                  onChange={handleChange}
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
-                >
-                  <option value="daily">Daily</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
-                  <option value="yearly">Yearly</option>
-                </select>
-              </div>
+            {/* Interest Type */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Interest Type</label>
+              <select
+                name="interestType"
+                value={formData.interestType}
+                onChange={handleChange}
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+              >
+                <option value="simple">Simple (साधारण)</option>
+                <option value="flat">Flat (EMI)</option>
+                <option value="reducing">Reducing (EMI)</option>
+              </select>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              {/* Tenure */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Installments Count (Tenure)</label>
-                <input
-                  type="number"
-                  name="tenure"
-                  value={formData.tenure}
-                  onChange={handleChange}
-                  placeholder="e.g. 12"
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
-                  min="1"
-                />
-              </div>
-
-              {/* Start Date */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Reference Date</label>
-                <input
-                  type="date"
-                  name="startDate"
-                  value={formData.startDate}
-                  onChange={handleChange}
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
-                />
-              </div>
+            {/* Repayment Period */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Repayment Period</label>
+              <select
+                name="paymentFrequency"
+                value={formData.paymentFrequency}
+                onChange={handleChange}
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+              >
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+              </select>
             </div>
 
-            {/* Calculations Summary Box */}
-            <div className="p-4 bg-brand-bg border border-brand-border rounded-xl space-y-3">
-              <span className="text-[10px] uppercase font-bold text-brand-accent tracking-wider block border-b border-brand-border/40 pb-1.5">Calculated Yield Report</span>
-              <div className="flex justify-between items-center text-xs">
-                <span className="text-brand-dim font-medium">Principal (मूलधन):</span>
-                <span className="font-bold text-brand-text dark:text-white">₹{parseFloat(formData.principalAmount || 0).toLocaleString('en-IN')}</span>
-              </div>
-              <div className="flex justify-between items-center text-xs">
-                <span className="text-brand-dim font-medium">Interest (ब्याज):</span>
-                <span className="font-bold text-brand-emerald">₹{Math.round(totalInterestExpected).toLocaleString('en-IN')}</span>
-              </div>
-              <div className="flex justify-between items-center text-xs border-t border-brand-border/40 pt-2 font-bold">
-                <span className="text-brand-text dark:text-white">Total Repayable:</span>
-                <span className="text-brand-accent">₹{Math.round(totalRepayExpected).toLocaleString('en-IN')}</span>
-              </div>
+            {/* Tenure */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Installments Count (Tenure) *</label>
+              <input
+                type="number"
+                name="tenure"
+                value={formData.tenure}
+                onChange={handleChange}
+                placeholder="e.g. 12"
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
+                min="1"
+              />
+            </div>
+
+            {/* Start Date */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Reference Date *</label>
+              <input
+                type="date"
+                name="startDate"
+                value={formData.startDate}
+                onChange={handleChange}
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+              />
             </div>
 
           </div>
 
-          {/* Results Schedule Table */}
-          <div className="lg:col-span-3 bg-brand-bg/50 border border-brand-border p-4 rounded-xl flex flex-col justify-between overflow-hidden min-h-[380px] lg:min-h-[460px]">
-            <div className="flex items-center space-x-2 text-brand-accent font-bold text-xs uppercase tracking-wider shrink-0 mb-3">
-              <Table className="w-4 h-4" />
-              <span>Simulated Installment Schedule</span>
+          {/* Calculations Summary Box */}
+          <div className="p-4 bg-brand-bg border border-brand-border rounded-xl grid grid-cols-3 gap-4 text-center">
+            <div>
+              <span className="text-[10px] uppercase font-bold text-brand-dim">Principal (मूलधन)</span>
+              <p className="text-sm font-extrabold text-brand-text dark:text-white mt-1">₹{parseFloat(formData.principalAmount || 0).toLocaleString('en-IN')}</p>
             </div>
+            <div>
+              <span className="text-[10px] uppercase font-bold text-brand-dim">Interest (ब्याज)</span>
+              <p className="text-sm font-extrabold text-brand-emerald mt-1">₹{Math.round(totalInterestExpected).toLocaleString('en-IN')}</p>
+            </div>
+            <div>
+              <span className="text-[10px] uppercase font-bold text-brand-dim">Total Repayable</span>
+              <p className="text-sm font-extrabold text-brand-accent mt-1">₹{Math.round(totalRepayExpected).toLocaleString('en-IN')}</p>
+            </div>
+          </div>
 
-            <div className="flex-1 overflow-y-auto border border-brand-border rounded-xl bg-brand-bg p-2.5 space-y-2">
+          {/* Simulated Installments */}
+          <div className="space-y-2.5">
+            <span className="text-[10px] uppercase font-bold text-brand-dim tracking-wider block">Simulated Installment Schedule</span>
+            <div className="max-h-60 overflow-y-auto border border-brand-border rounded-xl bg-brand-bg p-3 space-y-2">
               {schedule.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-center text-xs text-brand-dim font-medium p-4">
-                  Please enter values on the left to preview simulated installments.
+                <div className="text-center text-xs text-brand-dim font-medium py-6">
+                  Please enter values above to preview simulated installments.
                 </div>
               ) : (
                 schedule.map((item) => (
-                  <div key={item.installmentNumber} className="flex justify-between items-center text-xs bg-brand-card border border-brand-border/50 p-3 rounded-lg hover:border-brand-accent/20 transition shadow-sm">
+                  <div key={item.installmentNumber} className="flex justify-between items-center text-xs bg-brand-card border border-brand-border/40 p-2.5 rounded-lg hover:border-brand-accent/20 transition shadow-sm">
                     <div>
                       <span className="font-bold text-brand-text dark:text-white">Installment #{item.installmentNumber}</span>
                       <span className="text-[10px] text-brand-dim block mt-0.5">
@@ -322,15 +313,19 @@ export default function EMICalculator({ isOpen, onClose }) {
                 ))
               )}
             </div>
-
-            <button
-              onClick={onClose}
-              className="mt-4 w-full py-2.5 rounded-xl border border-brand-border hover:bg-brand-border/40 hover:text-brand-text dark:hover:text-white text-xs font-semibold text-brand-dim transition uppercase tracking-wider outline-none"
-            >
-              Close Calculator
-            </button>
           </div>
 
+        </div>
+
+        {/* Modal Footer */}
+        <div className="flex items-center justify-end px-6 py-4 border-t border-brand-border bg-brand-bg/50 shrink-0">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-5 py-2.5 rounded-xl border border-brand-border text-xs font-semibold text-brand-dim hover:text-brand-text dark:hover:text-white transition outline-none"
+          >
+            Close Calculator
+          </button>
         </div>
 
       </div>

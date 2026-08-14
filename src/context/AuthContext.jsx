@@ -92,6 +92,13 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const updateAdmin = (newToken, newAdminInfo) => {
+    localStorage.setItem('byaj_admin_token', newToken);
+    localStorage.setItem('byaj_admin_info', JSON.stringify(newAdminInfo));
+    setToken(newToken);
+    setAdmin(newAdminInfo);
+  };
+
   return (
     <AuthContext.Provider value={{
       token,
@@ -101,7 +108,8 @@ export function AuthProvider({ children }) {
       login,
       logout,
       impersonate,
-      exitImpersonation
+      exitImpersonation,
+      updateAdmin
     }}>
       {children}
     </AuthContext.Provider>
