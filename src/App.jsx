@@ -1,5 +1,6 @@
 import React, { useState, Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, NavLink } from 'react-router-dom';
+import { LayoutDashboard, Users, CalendarClock, HandCoins, Menu } from 'lucide-react';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Sidebar from './components/Sidebar';
@@ -42,7 +43,7 @@ function CRMLayout() {
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       {/* Main Content */}
-      <main className="flex-1 p-4 md:p-8 pb-20 md:pb-8 overflow-y-auto max-h-screen relative z-10">
+      <main className="flex-1 p-4 md:p-8 pb-28 md:pb-8 overflow-y-auto max-h-screen relative z-10">
         {admin?.isImpersonating && (
           <div className="bg-gradient-to-r from-amber-600 to-amber-700 text-white text-xs font-extrabold py-3 px-6 rounded-2xl mb-6 shadow-xl border border-amber-500/20 flex items-center justify-between">
             <div className="flex items-center space-x-2.5">
@@ -86,6 +87,64 @@ function CRMLayout() {
           </Suspense>
         </div>
       </main>
+
+      {/* Mobile Bottom Tab Bar */}
+      {!isSuper && (
+        <div className="fixed bottom-0 left-0 right-0 h-16 bg-brand-card border-t border-brand-border flex items-center justify-around px-2 z-[90] md:hidden shadow-lg shadow-black/10">
+          <NavLink
+            to="/"
+            end
+            className={({ isActive }) =>
+              `flex flex-col items-center justify-center flex-1 py-1.5 transition-colors duration-150 ${
+                isActive ? 'text-brand-accent' : 'text-brand-dim hover:text-brand-text'
+              }`
+            }
+          >
+            <LayoutDashboard className="w-5 h-5" />
+            <span className="text-[9px] font-bold mt-1">Home</span>
+          </NavLink>
+          <NavLink
+            to="/customers"
+            className={({ isActive }) =>
+              `flex flex-col items-center justify-center flex-1 py-1.5 transition-colors duration-150 ${
+                isActive ? 'text-brand-accent' : 'text-brand-dim hover:text-brand-text'
+              }`
+            }
+          >
+            <Users className="w-5 h-5" />
+            <span className="text-[9px] font-bold mt-1">Borrowers</span>
+          </NavLink>
+          <NavLink
+            to="/loans"
+            className={({ isActive }) =>
+              `flex flex-col items-center justify-center flex-1 py-1.5 transition-colors duration-150 ${
+                isActive ? 'text-brand-accent' : 'text-brand-dim hover:text-brand-text'
+              }`
+            }
+          >
+            <HandCoins className="w-5 h-5" />
+            <span className="text-[9px] font-bold mt-1">Loans</span>
+          </NavLink>
+          <NavLink
+            to="/collection"
+            className={({ isActive }) =>
+              `flex flex-col items-center justify-center flex-1 py-1.5 transition-colors duration-150 ${
+                isActive ? 'text-brand-accent' : 'text-brand-dim hover:text-brand-text'
+              }`
+            }
+          >
+            <CalendarClock className="w-5 h-5" />
+            <span className="text-[9px] font-bold mt-1">Collection</span>
+          </NavLink>
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="flex flex-col items-center justify-center flex-1 py-1.5 text-brand-dim hover:text-brand-text transition-colors duration-150 outline-none"
+          >
+            <Menu className="w-5 h-5" />
+            <span className="text-[9px] font-bold mt-1">More</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -63,7 +63,7 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
             <div className="w-8 h-8 rounded-lg bg-brand-emerald/10 flex items-center justify-center text-brand-emerald">
               <Receipt className="w-4 h-4" />
             </div>
-            <h2 className="text-base font-bold text-white">Record Repayment Receipt</h2>
+            <h2 className="text-base font-bold text-brand-text dark:text-white">Record Repayment Receipt</h2>
           </div>
           <button type="button" onClick={onClose} className="text-brand-dim hover:text-white transition">
             <X className="w-5 h-5" />
@@ -74,7 +74,7 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           <div className="bg-brand-bg/50 border border-brand-border p-3.5 rounded-xl">
             <span className="text-[9px] uppercase font-bold text-brand-dim">Active Borrower File</span>
-            <p className="text-sm font-semibold text-white mt-0.5">{customerName}</p>
+            <p className="text-sm font-semibold text-brand-text dark:text-white mt-0.5">{customerName}</p>
           </div>
 
           {error && (
@@ -94,7 +94,7 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
                 value={formData.amount}
                 onChange={handleChange}
                 placeholder="e.g. 5000"
-                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/50 outline-none transition"
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
                 required
                 min="0.01"
                 step="0.01"
@@ -109,7 +109,7 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
                   name="paymentType"
                   value={formData.paymentType}
                   onChange={handleChange}
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2.5 text-xs text-white outline-none transition"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
                   required
                 >
                   <option value="both">Waterfall (Byaj + Asal)</option>
@@ -125,7 +125,7 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
                   name="paymentMode"
                   value={formData.paymentMode}
                   onChange={handleChange}
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2.5 text-xs text-white outline-none transition"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
                   required
                 >
                   <option value="cash">Cash (Nokad)</option>
@@ -143,7 +143,7 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
                 name="paymentDate"
                 value={formData.paymentDate}
                 onChange={handleChange}
-                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition"
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
                 required
               />
             </div>
@@ -157,7 +157,7 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
                 value={formData.notes}
                 onChange={handleChange}
                 placeholder="e.g. Received via GPay, reference ID noted."
-                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/50 outline-none transition"
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
               />
             </div>
           </div>

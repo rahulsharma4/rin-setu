@@ -202,7 +202,7 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
             <div className="w-8 h-8 rounded-lg bg-brand-accent/10 flex items-center justify-center text-brand-accent">
               <HandCoins className="w-4.5 h-4.5" />
             </div>
-            <h2 className="text-base font-bold text-white">Create Loan Agreement</h2>
+            <h2 className="text-base font-bold text-brand-text dark:text-white">Create Loan Agreement</h2>
           </div>
           <button type="button" onClick={onClose} className="text-brand-dim hover:text-white transition">
             <X className="w-5 h-5" />
@@ -231,7 +231,7 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                     name="customerId"
                     value={formData.customerId}
                     onChange={handleChange}
-                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition"
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
                     required
                     disabled={!!preselectedCustomerId}
                   >
@@ -255,7 +255,7 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                     name="startDate"
                     value={formData.startDate}
                     onChange={handleChange}
-                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition"
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
                     required
                   />
                 </div>
@@ -269,7 +269,7 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                     value={formData.principalAmount}
                     onChange={handleChange}
                     placeholder="e.g. 100000"
-                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/40 outline-none transition"
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
                     required
                     min="1"
                   />
@@ -284,7 +284,7 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                     value={formData.processingFee}
                     onChange={handleChange}
                     placeholder="e.g. 1000"
-                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/40 outline-none transition"
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
                     min="0"
                   />
                 </div>
@@ -300,7 +300,7 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                       onChange={handleChange}
                       placeholder="e.g. 2"
                       step="0.01"
-                      className="flex-1 bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/40 outline-none transition"
+                      className="flex-1 bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
                       required
                       min="0"
                     />
@@ -308,7 +308,7 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                       name="rateType"
                       value={formData.rateType}
                       onChange={handleChange}
-                      className="w-28 bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-2 py-2.5 text-xs text-white outline-none transition"
+                      className="w-28 bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-2 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
                     >
                       <option value="daily">Per Day</option>
                       <option value="weekly">Per Week</option>
@@ -340,7 +340,7 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                     name="interestType"
                     value={formData.interestType}
                     onChange={handleChange}
-                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition"
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
                   >
                     <option value="simple">Simple Interest (Sadharan)</option>
                     <option value="flat">Flat Rate (EMI)</option>
@@ -355,7 +355,7 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                     name="paymentFrequency"
                     value={formData.paymentFrequency}
                     onChange={handleChange}
-                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition"
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
                   >
                     <option value="daily">Daily Collection</option>
                     <option value="weekly">Weekly Collection</option>
@@ -373,7 +373,7 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                     value={formData.dueCharges}
                     onChange={handleChange}
                     placeholder="e.g. 500 (one-time penalty)"
-                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/40 outline-none transition"
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
                     min="0"
                   />
                 </div>
@@ -387,7 +387,7 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                     value={formData.lateCharges}
                     onChange={handleChange}
                     placeholder="e.g. 1000 (accumulated fines)"
-                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/40 outline-none transition"
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
                     min="0"
                   />
                 </div>
@@ -401,7 +401,7 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                     value={formData.lateFeeRate}
                     onChange={handleChange}
                     placeholder="e.g. 50"
-                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/40 outline-none transition"
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
                     min="0"
                     required
                   />
@@ -414,7 +414,7 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                     name="lateFeeType"
                     value={formData.lateFeeType}
                     onChange={handleChange}
-                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition"
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
                   >
                     <option value="daily">Daily (रोज का)</option>
                     <option value="flat">Flat (एक बार का)</option>
@@ -431,7 +431,7 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                   value={formData.remarks}
                   onChange={handleChange}
                   placeholder="Notes about documents verified, guarantor, etc."
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/40 outline-none transition"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
                 />
               </div>
 
@@ -463,16 +463,16 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                 ) : (
                   <div className="space-y-1.5">
                     {previewSchedule.map(item => (
-                      <div key={item.installmentNumber} className="flex justify-between items-center text-[10px] bg-brand-card border border-brand-border/40 p-2 rounded-lg">
+                      <div key={item.installmentNumber} className="flex justify-between items-center text-xs bg-brand-card border border-brand-border/40 p-2 rounded-lg">
                         <div>
-                          <span className="font-bold text-white">EMI #{item.installmentNumber}</span>
-                          <span className="text-[8px] text-brand-dim block mt-0.5">
+                          <span className="font-bold text-brand-text dark:text-white">EMI #{item.installmentNumber}</span>
+                          <span className="text-[10px] text-brand-dim block mt-0.5">
                             Due: {new Date(item.dueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
                           </span>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-white">₹{Math.round(item.totalAmount).toLocaleString('en-IN')}</p>
-                          <span className="text-[8px] text-brand-dim block mt-0.5">
+                          <p className="font-bold text-brand-text dark:text-white">₹{Math.round(item.totalAmount).toLocaleString('en-IN')}</p>
+                          <span className="text-[10px] text-brand-dim block mt-0.5">
                             ₹{Math.round(item.principalComponent)} asal / ₹{Math.round(item.interestComponent)} byaj
                           </span>
                         </div>

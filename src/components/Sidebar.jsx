@@ -53,10 +53,9 @@ export default function Sidebar({ isOpen, onClose }) {
       <aside className={`fixed inset-y-0 left-0 z-[100] w-64 bg-brand-card border-r border-brand-border flex flex-col h-screen py-6 px-4 shrink-0 transition-transform duration-300 md:sticky md:top-0 md:translate-x-0 ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
-        {/* Logo Header + Close button on mobile (Fixed Top) */}
         <div className="flex items-center justify-between px-2 pb-4 border-b border-brand-border/30 shrink-0">
           <div className="flex items-center space-x-3 cursor-pointer" onClick={() => { if(onClose) onClose(); navigate('/'); }}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-accent to-indigo-400 flex items-center justify-center shadow-lg shadow-brand-accent/25">
+            <div className="w-10 h-10 rounded-xl bg-brand-accent flex items-center justify-center shadow-lg shadow-brand-accent/25 shrink-0">
               <Percent className="w-5 h-5 text-white" />
             </div>
             <div>

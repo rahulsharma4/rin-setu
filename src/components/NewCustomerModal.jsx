@@ -288,7 +288,7 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="e.g. Rahul Sharma"
-                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/50 outline-none transition"
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
                 required
               />
             </div>
@@ -301,7 +301,7 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="e.g. 9876543219"
-                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/50 outline-none transition"
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
                 required
               />
             </div>
@@ -314,7 +314,7 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
                 value={formData.occupation}
                 onChange={handleChange}
                 placeholder="e.g. Shopkeeper / Business"
-                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/50 outline-none transition"
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
               />
             </div>
 
@@ -326,7 +326,7 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
                 value={formData.address}
                 onChange={handleChange}
                 placeholder="e.g. Civil Lines, Jaipur"
-                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/50 outline-none transition"
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
               />
             </div>
 
@@ -339,7 +339,7 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
                 value={formData.aadharNumber}
                 onChange={handleChange}
                 placeholder="12-digit Aadhaar Number"
-                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/50 outline-none transition"
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
               />
             </div>
 
@@ -351,7 +351,7 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
                 value={formData.panNumber}
                 onChange={handleChange}
                 placeholder="10-digit PAN ID"
-                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/50 outline-none transition"
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
               />
             </div>
 
@@ -363,7 +363,7 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
                 value={formData.bankAccountNumber}
                 onChange={handleChange}
                 placeholder="Acc No / IFSC Code or Bank Name"
-                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/50 outline-none transition"
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
               />
             </div>
 
@@ -380,7 +380,7 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
                 value={formData.guarantorName}
                 onChange={handleChange}
                 placeholder="e.g. Suresh Sharma"
-                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/50 outline-none transition"
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
               />
             </div>
 
@@ -392,7 +392,7 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
                 value={formData.guarantorPhone}
                 onChange={handleChange}
                 placeholder="e.g. 9876543211"
-                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/50 outline-none transition"
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
               />
             </div>
 
@@ -404,7 +404,7 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
                 value={formData.guarantorAddress}
                 onChange={handleChange}
                 placeholder="Guarantor residential address"
-                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/50 outline-none transition"
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
               />
             </div>
 
@@ -416,7 +416,7 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
                 value={formData.guarantorIdDoc}
                 onChange={handleChange}
                 placeholder="Aadhaar / Voter ID Number"
-                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/50 outline-none transition"
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
               />
             </div>
 
@@ -431,7 +431,7 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
                 name="collateralType"
                 value={formData.collateralType}
                 onChange={handleChange}
-                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition"
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
               >
                 <option value="None">None</option>
                 <option value="Gold">Gold (Sona)</option>
@@ -450,7 +450,7 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
                 value={formData.collateralValue}
                 onChange={handleChange}
                 placeholder="e.g. 150000"
-                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/50 outline-none transition"
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
                 disabled={formData.collateralType === 'None'}
               />
             </div>
@@ -463,7 +463,7 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
                 value={formData.collateralDescription}
                 onChange={handleChange}
                 placeholder="e.g. Gold necklace (22 grams, Hallmarked)"
-                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/50 outline-none transition"
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
                 disabled={formData.collateralType === 'None'}
               />
             </div>
@@ -552,7 +552,7 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
                             type="text"
                             value={temp.label}
                             onChange={(e) => handleUpdateTempLabel(temp.tempId, e.target.value)}
-                            className="bg-transparent border-b border-brand-border focus:border-brand-accent/50 outline-none text-xs text-white py-0.5 w-full focus:ring-0"
+                            className="bg-transparent border-b border-brand-border focus:border-brand-accent/50 outline-none text-xs text-brand-text dark:text-white py-0.5 w-full focus:ring-0"
                             placeholder="Enter document label..."
                             title="Edit label before saving"
                           />

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'byaj-crm-v1';
+const CACHE_NAME = 'byaj-crm-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -30,6 +30,11 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Disable caching during local development
+  if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1') {
+    return;
+  }
+
   // Only handle GET requests
   if (event.request.method !== 'GET') {
     return;

@@ -145,26 +145,26 @@ export default function EMICalculator({ isOpen, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto">
-      <div className="w-full max-w-4xl bg-brand-card border border-brand-border rounded-2xl shadow-2xl overflow-hidden animate-slide-up my-auto">
+      <div className="w-full max-w-4xl bg-brand-card border border-brand-border rounded-2xl shadow-2xl overflow-hidden animate-slide-up my-auto max-h-[90vh] flex flex-col">
         
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-brand-border bg-brand-bg/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-brand-border bg-brand-bg/50 shrink-0">
           <div className="flex items-center space-x-2.5">
             <div className="w-8 h-8 rounded-lg bg-brand-accent/15 flex items-center justify-center text-brand-accent">
               <Calculator className="w-5 h-5 animate-pulse" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-white uppercase tracking-wider">Lending EMI Calculator</h2>
-              <span className="text-[9px] text-brand-dim font-semibold block mt-0.5">Check interest payouts & installment schedule templates</span>
+              <h2 className="text-sm font-bold text-brand-text dark:text-white uppercase tracking-wider">Lending EMI Calculator</h2>
+              <span className="text-[10px] text-brand-dim font-semibold block mt-0.5">Check interest payouts & installment schedule templates</span>
             </div>
           </div>
-          <button onClick={onClose} className="text-brand-dim hover:text-white transition">
+          <button onClick={onClose} className="text-brand-dim hover:text-brand-text dark:hover:text-white transition outline-none">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Body Content */}
-        <div className="p-6 grid grid-cols-1 lg:grid-cols-5 gap-6">
+        {/* Scrollable Body Content */}
+        <div className="p-6 grid grid-cols-1 lg:grid-cols-5 gap-6 overflow-y-auto flex-1">
           
           {/* Inputs Section */}
           <div className="lg:col-span-2 space-y-4">
@@ -178,7 +178,7 @@ export default function EMICalculator({ isOpen, onClose }) {
                 value={formData.principalAmount}
                 onChange={handleChange}
                 placeholder="e.g. 100000"
-                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/40 outline-none transition"
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
                 min="1"
               />
             </div>
@@ -194,14 +194,14 @@ export default function EMICalculator({ isOpen, onClose }) {
                   onChange={handleChange}
                   placeholder="e.g. 2"
                   step="0.01"
-                  className="flex-1 bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/40 outline-none transition"
+                  className="flex-1 bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
                   min="0"
                 />
                 <select
                   name="rateType"
                   value={formData.rateType}
                   onChange={handleChange}
-                  className="w-28 bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-2 py-2.5 text-xs text-white outline-none transition"
+                  className="w-28 bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-2 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
                 >
                   <option value="daily">Per Day</option>
                   <option value="weekly">Per Week</option>
@@ -219,7 +219,7 @@ export default function EMICalculator({ isOpen, onClose }) {
                   name="interestType"
                   value={formData.interestType}
                   onChange={handleChange}
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
                 >
                   <option value="simple">Simple (साधारण)</option>
                   <option value="flat">Flat (EMI)</option>
@@ -234,7 +234,7 @@ export default function EMICalculator({ isOpen, onClose }) {
                   name="paymentFrequency"
                   value={formData.paymentFrequency}
                   onChange={handleChange}
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
                 >
                   <option value="daily">Daily</option>
                   <option value="weekly">Weekly</option>
@@ -254,7 +254,7 @@ export default function EMICalculator({ isOpen, onClose }) {
                   value={formData.tenure}
                   onChange={handleChange}
                   placeholder="e.g. 12"
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white placeholder-brand-dim/40 outline-none transition"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
                   min="1"
                 />
               </div>
@@ -267,24 +267,24 @@ export default function EMICalculator({ isOpen, onClose }) {
                   name="startDate"
                   value={formData.startDate}
                   onChange={handleChange}
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
                 />
               </div>
             </div>
 
             {/* Calculations Summary Box */}
             <div className="p-4 bg-brand-bg border border-brand-border rounded-xl space-y-3">
-              <span className="text-[9px] uppercase font-bold text-brand-accent tracking-wider block border-b border-brand-border/40 pb-1.5">Calculated Yield Report</span>
+              <span className="text-[10px] uppercase font-bold text-brand-accent tracking-wider block border-b border-brand-border/40 pb-1.5">Calculated Yield Report</span>
               <div className="flex justify-between items-center text-xs">
                 <span className="text-brand-dim font-medium">Principal (मूलधन):</span>
-                <span className="font-bold text-white">₹{parseFloat(formData.principalAmount || 0).toLocaleString('en-IN')}</span>
+                <span className="font-bold text-brand-text dark:text-white">₹{parseFloat(formData.principalAmount || 0).toLocaleString('en-IN')}</span>
               </div>
               <div className="flex justify-between items-center text-xs">
                 <span className="text-brand-dim font-medium">Interest (ब्याज):</span>
                 <span className="font-bold text-brand-emerald">₹{Math.round(totalInterestExpected).toLocaleString('en-IN')}</span>
               </div>
               <div className="flex justify-between items-center text-xs border-t border-brand-border/40 pt-2 font-bold">
-                <span className="text-white">Total Repayable:</span>
+                <span className="text-brand-text dark:text-white">Total Repayable:</span>
                 <span className="text-brand-accent">₹{Math.round(totalRepayExpected).toLocaleString('en-IN')}</span>
               </div>
             </div>
@@ -292,7 +292,7 @@ export default function EMICalculator({ isOpen, onClose }) {
           </div>
 
           {/* Results Schedule Table */}
-          <div className="lg:col-span-3 bg-brand-bg/50 border border-brand-border p-4 rounded-xl flex flex-col justify-between max-h-[380px] lg:max-h-[460px] overflow-hidden">
+          <div className="lg:col-span-3 bg-brand-bg/50 border border-brand-border p-4 rounded-xl flex flex-col justify-between overflow-hidden min-h-[380px] lg:min-h-[460px]">
             <div className="flex items-center space-x-2 text-brand-accent font-bold text-xs uppercase tracking-wider shrink-0 mb-3">
               <Table className="w-4 h-4" />
               <span>Simulated Installment Schedule</span>
@@ -300,21 +300,21 @@ export default function EMICalculator({ isOpen, onClose }) {
 
             <div className="flex-1 overflow-y-auto border border-brand-border rounded-xl bg-brand-bg p-2.5 space-y-2">
               {schedule.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-center text-[10px] text-brand-dim font-medium p-4">
+                <div className="h-full flex items-center justify-center text-center text-xs text-brand-dim font-medium p-4">
                   Please enter values on the left to preview simulated installments.
                 </div>
               ) : (
                 schedule.map((item) => (
-                  <div key={item.installmentNumber} className="flex justify-between items-center text-[10px] bg-brand-card border border-brand-border/40 p-2 rounded-lg hover:border-brand-accent/20 transition">
+                  <div key={item.installmentNumber} className="flex justify-between items-center text-xs bg-brand-card border border-brand-border/50 p-3 rounded-lg hover:border-brand-accent/20 transition shadow-sm">
                     <div>
-                      <span className="font-bold text-white">Installment #{item.installmentNumber}</span>
-                      <span className="text-[8px] text-brand-dim block mt-0.5">
+                      <span className="font-bold text-brand-text dark:text-white">Installment #{item.installmentNumber}</span>
+                      <span className="text-[10px] text-brand-dim block mt-0.5">
                         Due Date: {new Date(item.dueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                       </span>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-white">₹{Math.round(item.totalAmount).toLocaleString('en-IN')}</p>
-                      <span className="text-[8px] text-brand-dim block mt-0.5">
+                      <p className="font-bold text-brand-text dark:text-white">₹{Math.round(item.totalAmount).toLocaleString('en-IN')}</p>
+                      <span className="text-[10px] text-brand-dim block mt-0.5">
                         Asal: ₹{Math.round(item.principalComponent)} | Byaj: ₹{Math.round(item.interestComponent)}
                       </span>
                     </div>
@@ -325,7 +325,7 @@ export default function EMICalculator({ isOpen, onClose }) {
 
             <button
               onClick={onClose}
-              className="mt-4 w-full py-2.5 rounded-xl border border-brand-border hover:bg-brand-border hover:text-white text-xs font-semibold text-brand-dim transition uppercase tracking-wider outline-none"
+              className="mt-4 w-full py-2.5 rounded-xl border border-brand-border hover:bg-brand-border/40 hover:text-brand-text dark:hover:text-white text-xs font-semibold text-brand-dim transition uppercase tracking-wider outline-none"
             >
               Close Calculator
             </button>
