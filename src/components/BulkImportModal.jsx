@@ -58,7 +58,7 @@ export default function BulkImportModal({ isOpen, onClose, onRefresh }) {
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 md:p-8 bg-black/75 backdrop-blur-sm animate-fade-in overflow-y-auto">
+    <div className="fixed inset-0 z-[100] flex items-start justify-center p-4 md:p-8 bg-black/75 backdrop-blur-sm animate-fade-in overflow-y-auto">
       <div className="w-full max-w-xl bg-brand-card border border-brand-border rounded-2xl shadow-2xl overflow-hidden animate-slide-up my-auto">
         
         {/* Header */}

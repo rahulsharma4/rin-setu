@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Calculator, Table, CircleDollarSign, CalendarDays } from 'lucide-react';
+import { createPortal } from 'react-dom';
 
 function getPeriodicRateFraction(interestRate, rateType, paymentFrequency) {
   let annualRateFraction = 0;
@@ -143,9 +144,9 @@ export default function EMICalculator({ isOpen, onClose }) {
   const totalInterestExpected = schedule.reduce((acc, i) => acc + i.interestComponent, 0);
   const totalRepayExpected = parseFloat(formData.principalAmount || 0) + totalInterestExpected;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto">
-      <div className="w-full max-w-2xl bg-brand-card border border-brand-border rounded-2xl shadow-2xl overflow-hidden animate-slide-up my-auto max-h-[90vh] flex flex-col">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-start justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto">
+      <div className="w-full max-w-2xl bg-brand-card border border-brand-border rounded-2xl shadow-2xl overflow-hidden animate-slide-up my-auto">
         
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-brand-border bg-brand-bg/50 shrink-0">
@@ -164,7 +165,7 @@ export default function EMICalculator({ isOpen, onClose }) {
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 space-y-6 overflow-y-auto flex-1">
+        <div className="p-6 space-y-6">
           
           {/* Inputs Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -329,6 +330,7 @@ export default function EMICalculator({ isOpen, onClose }) {
         </div>
 
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

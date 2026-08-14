@@ -45,12 +45,12 @@ export default function Sidebar({ isOpen, onClose }) {
       {/* Backdrop overlay for mobile screens */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] md:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[35] md:hidden"
           onClick={onClose}
         />
       )}
 
-      <aside className={`fixed inset-y-0 left-0 z-[100] w-64 bg-brand-card border-r border-brand-border flex flex-col h-screen py-6 px-4 shrink-0 transition-transform duration-300 md:sticky md:top-0 md:translate-x-0 ${
+      <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-brand-card border-r border-brand-border flex flex-col h-screen py-6 px-4 shrink-0 transition-transform duration-300 md:sticky md:top-0 md:translate-x-0 ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div className="flex items-center justify-between px-2 pb-4 border-b border-brand-border/30 shrink-0">

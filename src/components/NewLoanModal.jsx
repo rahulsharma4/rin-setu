@@ -191,7 +191,7 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
   const totalRepayExpected = parseFloat(formData.principalAmount || 0) + totalInterestExpected;
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 md:p-8 bg-black/75 backdrop-blur-sm animate-fade-in overflow-y-auto">
+    <div className="fixed inset-0 z-[100] flex items-start justify-center p-4 md:p-8 bg-black/75 backdrop-blur-sm animate-fade-in overflow-y-auto">
       
       {/* Modal Card */}
       <div className="w-full max-w-4xl bg-brand-card border border-brand-border rounded-2xl shadow-2xl animate-slide-up my-auto overflow-hidden">
