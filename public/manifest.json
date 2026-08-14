@@ -1,0 +1,22 @@
+{
+  "name": "Byaj CRM Ledger",
+  "short_name": "Byaj CRM",
+  "description": "Progressive Web App for private money lending ledger management",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#090d16",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "https://img.icons8.com/color/192/percentage.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://img.icons8.com/color/512/percentage.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

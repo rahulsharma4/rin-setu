@@ -1,0 +1,460 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-bg: #f8fafc;
+  --brand-bg-rgb: 248, 250, 252;
+  --brand-card: #ffffff;
+  --brand-card-rgb: 255, 255, 255;
+  --brand-border: #e2e8f0;
+  --brand-border-rgb: 226, 232, 240;
+  --brand-text: #1e293b;
+  --brand-dim: #64748b;
+  --brand-accent: #4f46e5;
+  --brand-accent-rgb: 79, 70, 229;
+  --brand-emerald: #0f766e;
+  --brand-emerald-rgb: 15, 118, 110;
+  --brand-amber: #b45309;
+  --brand-amber-rgb: 180, 83, 9;
+  --brand-rose: #be123c;
+  --brand-rose-rgb: 190, 18, 60;
+}
+
+.dark {
+  --brand-bg: #090d16;
+  --brand-bg-rgb: 9, 13, 22;
+  --brand-card: #111726;
+  --brand-card-rgb: 17, 23, 38;
+  --brand-border: #1f293d;
+  --brand-border-rgb: 31, 41, 61;
+  --brand-text: #f3f4f6;
+  --brand-dim: #9ca3af;
+  --brand-accent: #6366f1;
+  --brand-accent-rgb: 99, 102, 241;
+  --brand-emerald: #10b981;
+  --brand-emerald-rgb: 16, 185, 129;
+  --brand-amber: #f59e0b;
+  --brand-amber-rgb: 245, 158, 11;
+  --brand-rose: #ef4444;
+  --brand-rose-rgb: 239, 68, 68;
+}
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--brand-bg);
+    color: var(--brand-text);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    transition: background-color 0.3s ease, color 0.3s ease;
+    position: relative;
+  }
+
+  /* Custom Premium Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--brand-bg);
+    transition: background-color 0.3s ease;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--brand-border);
+    border-radius: 9999px;
+    transition: background-color 0.3s ease;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--brand-accent);
+  }
+}
+
+/* Glassmorphism Styles */
+.glass-panel {
+  background: var(--brand-card);
+  border: 1px solid var(--brand-border);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dark .glass-panel {
+  background: rgba(17, 23, 38, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(31, 41, 61, 0.5);
+  box-shadow: none;
+}
+
+.glass-panel-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-panel-hover:hover {
+  transform: translateY(-2px);
+  border-color: var(--brand-accent);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+}
+
+.dark .glass-panel-hover:hover {
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.15);
+}
+
+/* Custom radial glows */
+.dark .glow-indigo {
+  box-shadow: 0 0 40px -5px rgba(99, 102, 241, 0.15);
+}
+.dark .glow-emerald {
+  box-shadow: 0 0 40px -5px rgba(16, 185, 129, 0.15);
+}
+.dark .glow-amber {
+  box-shadow: 0 0 40px -5px rgba(245, 158, 11, 0.15);
+}
+
+/* Micro-animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+.animate-float { animation: float 4s ease-in-out infinite; }
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+.animate-pulse-soft { animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+/* Shimmer layout for cards */
+.shimmer-bg {
+  background: linear-gradient(90deg, var(--brand-border) 0%, rgba(99, 102, 241, 0.08) 50%, var(--brand-border) 100%);
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.5s infinite;
+}
+@keyframes loading-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Fade in animation */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fade-in 0.3s ease-out both; }
+
+/* Slide up for modals */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-slide-up { animation: slide-up 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+
+/* ==========================================================================
+   LIGHT MODE VIBRANT SaaS DESIGN UPGRADES
+   ========================================================================== */
+
+/* 1. Colorful Radial Mesh Gradient on the top wrapper background */
+html:not(.dark) body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 380px;
+  background: radial-gradient(circle at 80% 0%, rgba(79, 70, 229, 0.08) 0%, rgba(16, 185, 129, 0.04) 45%, transparent 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+html:not(.dark) body {
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+}
+
+/* Page containers & layout */
+html:not(.dark) .bg-brand-bg,
+html:not(.dark) .min-h-screen {
+  background-color: #f8fafc !important;
+}
+
+/* Premium Sidebar container */
+html:not(.dark) aside {
+  background-color: #ffffff !important;
+  border-right: 1px solid #e2e8f0 !important;
+  box-shadow: 4px 0 25px rgba(99, 102, 241, 0.02) !important;
+}
+
+/* Premium Cards with top accent borders & soft color backgrounds */
+html:not(.dark) .bg-brand-card,
+html:not(.dark) .glass-panel {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.04), 0 2px 8px -1px rgba(0, 0, 0, 0.02) !important;
+}
+
+/* Color highlights on panel borders and backgrounds */
+html:not(.dark) .glow-indigo {
+  border: 1px solid #c7d2fe !important;
+  background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%) !important;
+}
+html:not(.dark) .glow-indigo h3,
+html:not(.dark) .glow-indigo p,
+html:not(.dark) .glow-indigo span {
+  color: #3730a3 !important;
+}
+
+html:not(.dark) .glow-emerald {
+  border: 1px solid #a7f3d0 !important;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%) !important;
+}
+html:not(.dark) .glow-emerald h3,
+html:not(.dark) .glow-emerald p,
+html:not(.dark) .glow-emerald span {
+  color: #065f46 !important;
+}
+
+html:not(.dark) .glow-amber {
+  border: 1px solid #fef3c7 !important;
+  background: linear-gradient(135deg, #fffbeb 0%, #fde68a 100%) !important;
+}
+html:not(.dark) .glow-amber h3,
+html:not(.dark) .glow-amber p,
+html:not(.dark) .glow-amber span {
+  color: #92400e !important;
+}
+
+html:not(.dark) .border-brand-rose,
+html:not(.dark) .glow-rose {
+  border: 1px solid #fecaca !important;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%) !important;
+}
+html:not(.dark) .glow-rose h3,
+html:not(.dark) .glow-rose p,
+html:not(.dark) .glow-rose span {
+  color: #9b1c1c !important;
+}
+
+html:not(.dark) .border-brand-border {
+  border-color: #e2e8f0 !important;
+}
+
+/* 2. Global text-white Overrides for High-Contrast Light Mode readability */
+html:not(.dark) h1.text-white,
+html:not(.dark) h2.text-white,
+html:not(.dark) h3.text-white,
+html:not(.dark) h4.text-white,
+html:not(.dark) h5.text-white,
+html:not(.dark) p.text-white,
+html:not(.dark) label.text-white,
+html:not(.dark) div.text-white:not(.bg-brand-accent *):not(.bg-brand-emerald *):not(.bg-brand-rose *):not(.bg-brand-amber *):not(button *):not([class*="bg-indigo-600"]):not([class*="bg-emerald-600"]):not([class*="bg-rose-600"]):not([class*="bg-red-600"]):not([class*="bg-amber-600"]),
+html:not(.dark) span.text-white:not(.bg-brand-accent *):not(.bg-brand-emerald *):not(.bg-brand-rose *):not(.bg-brand-amber *):not(button *):not([class*="bg-indigo-600"]):not([class*="bg-emerald-600"]):not([class*="bg-rose-600"]):not([class*="bg-red-600"]):not([class*="bg-amber-600"]) {
+  color: var(--brand-text) !important;
+}
+
+/* Force standard brand variables for AI text & prompt text in light mode */
+html:not(.dark) .text-brand-text {
+  color: #1e293b !important;
+}
+html:not(.dark) .text-brand-dim {
+  color: #64748b !important;
+}
+
+/* Maintain crisp white text on solid dark buttons, indicators, and user chat bubbles */
+html:not(.dark) button.text-white,
+html:not(.dark) button .text-white,
+html:not(.dark) .bg-brand-accent .text-white,
+html:not(.dark) .bg-brand-accent.text-white,
+html:not(.dark) .bg-brand-accent.text-white *,
+html:not(.dark) .bg-brand-accent * .text-white,
+html:not(.dark) .bg-brand-emerald .text-white,
+html:not(.dark) .bg-brand-emerald.text-white,
+html:not(.dark) .bg-brand-rose .text-white,
+html:not(.dark) .bg-brand-rose.text-white,
+html:not(.dark) .bg-brand-amber .text-white,
+html:not(.dark) .bg-brand-amber.text-white,
+html:not(.dark) a.bg-brand-accent .text-white,
+html:not(.dark) a.bg-brand-accent.text-white,
+html:not(.dark) .bg-indigo-600 .text-white,
+html:not(.dark) .bg-indigo-600.text-white,
+html:not(.dark) .bg-emerald-600 .text-white,
+html:not(.dark) .bg-emerald-600.text-white,
+html:not(.dark) .bg-rose-600 .text-white,
+html:not(.dark) .bg-rose-600.text-white,
+html:not(.dark) .bg-red-600 .text-white,
+html:not(.dark) .bg-red-600.text-white,
+html:not(.dark) .bg-amber-600 .text-white,
+html:not(.dark) .bg-amber-600.text-white,
+html:not(.dark) .bg-brand-rose/20 .text-white,
+html:not(.dark) [class*="bg-brand-rose/20"] .text-white,
+html:not(.dark) [class*="bg-brand-amber/15"] .text-white,
+html:not(.dark) [class*="bg-brand-emerald/15"] .text-white,
+html:not(.dark) [class*="bg-brand-accent/25"] .text-white {
+  color: #ffffff !important;
+}
+
+/* Ensure placeholder texts are readable but styled */
+html:not(.dark) ::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Prevent hover:text-white from turning text white on hover in Light Mode unless the background turns dark */
+html:not(.dark) .hover\:text-white:hover:not([class*="bg-brand-accent"]):not([class*="bg-brand-emerald"]):not([class*="bg-brand-rose"]):not([class*="bg-brand-amber"]):not([class*="bg-indigo-"]):not([class*="bg-emerald-"]):not([class*="bg-rose-"]):not([class*="bg-red-"]):not([class*="hover:bg-brand-accent"]):not([class*="hover:bg-indigo-"]):not([class*="hover:bg-emerald-"]):not([class*="hover:bg-rose-"]):not([class*="hover:bg-brand-emerald"]):not([class*="hover:bg-brand-rose"]),
+html:not(.dark) .hover\:text-white:hover *:not([class*="bg-brand-accent"]):not([class*="bg-brand-emerald"]):not([class*="bg-brand-rose"]):not([class*="bg-brand-amber"]):not([class*="bg-indigo-"]):not([class*="bg-emerald-"]):not([class*="bg-rose-"]):not([class*="bg-red-"]):not([class*="hover:bg-brand-accent"]):not([class*="hover:bg-indigo-"]):not([class*="hover:bg-emerald-"]):not([class*="hover:bg-rose-"]):not([class*="hover:bg-brand-emerald"]):not([class*="hover:bg-brand-rose"]) {
+  color: var(--brand-text) !important;
+}
+
+/* Logo Gradient Text styling */
+.logo-gradient-text {
+  background: linear-gradient(to right, #4f46e5, #0ea5e9) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.dark .logo-gradient-text {
+  background: linear-gradient(to right, #ffffff, #818cf8) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+
+/* Table layout adjustments */
+html:not(.dark) th {
+  background-color: #f8fafc !important;
+  color: #475569 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+/* Alternating colorful blue rows inside tables */
+html:not(.dark) tbody tr:nth-child(even) {
+  background-color: rgba(239, 246, 255, 0.25) !important;
+}
+
+/* Premium Gradient buttons in light mode */
+html:not(.dark) button.bg-brand-accent {
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25) !important;
+  color: #ffffff !important;
+}
+html:not(.dark) button.bg-brand-accent:hover {
+  background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%) !important;
+}
+
+html:not(.dark) button.bg-brand-emerald {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25) !important;
+  color: #ffffff !important;
+}
+html:not(.dark) button.bg-brand-emerald:hover {
+  background: linear-gradient(135deg, #047857 0%, #059669 100%) !important;
+}
+
+/* High contrast inputs */
+html:not(.dark) input,
+html:not(.dark) select,
+html:not(.dark) textarea {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02) !important;
+}
+
+html:not(.dark) input:focus,
+html:not(.dark) select:focus,
+html:not(.dark) textarea:focus {
+  border-color: #4f46e5 !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12) !important;
+}
+
+html:not(.dark) input::placeholder,
+html:not(.dark) textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Top search layout input */
+html:not(.dark) header input {
+  color: #1e293b !important;
+  background-color: transparent !important;
+}
+html:not(.dark) header .bg-brand-card {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Sidebar Nav Link styles (Universal Upgrades) */
+aside a {
+  border-left: 3px solid transparent !important;
+  border-radius: 0 12px 12px 0 !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+/* Light Mode active and hover states */
+html:not(.dark) aside a:not(.bg-brand-accent) {
+  color: #475569 !important;
+}
+html:not(.dark) aside a:not(.bg-brand-accent):hover {
+  background-color: rgba(79, 70, 229, 0.04) !important;
+  color: #4f46e5 !important;
+}
+html:not(.dark) aside a.bg-brand-accent {
+  background: #f5f3ff !important;
+  border-left: 3px solid #4f46e5 !important;
+  color: #4f46e5 !important;
+  box-shadow: none !important;
+}
+
+/* Dark Mode active and hover states */
+.dark aside a:not(.bg-brand-accent) {
+  color: #94a3b8 !important;
+}
+.dark aside a:not(.bg-brand-accent):hover {
+  background-color: rgba(99, 102, 241, 0.05) !important;
+  color: #818cf8 !important;
+}
+.dark aside a.bg-brand-accent {
+  background: rgba(99, 102, 241, 0.1) !important;
+  border-left: 3px solid #6366f1 !important;
+  color: #818cf8 !important;
+  box-shadow: none !important;
+}
+
+/* Admin Profile Drawer footer */
+html:not(.dark) aside .bg-brand-bg\/50 {
+  background-color: #f8fafc !important;
+}
+
+/* Pastel color badge tints with rich dark contrast texts */
+html:not(.dark) .bg-brand-emerald\/10,
+html:not(.dark) [class*="bg-brand-emerald/10"] {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+  color: #0f766e !important;
+}
+html:not(.dark) .bg-brand-rose\/10,
+html:not(.dark) [class*="bg-brand-rose/10"] {
+  background-color: rgba(239, 68, 68, 0.12) !important;
+  color: #be123c !important;
+}
+html:not(.dark) .bg-brand-amber\/10,
+html:not(.dark) [class*="bg-brand-amber/10"] {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  color: #b45309 !important;
+}
+html:not(.dark) .bg-brand-accent\/10,
+html:not(.dark) [class*="bg-brand-accent/10"] {
+  background-color: rgba(99, 102, 241, 0.12) !important;
+  color: #4f46e5 !important;
+}
+
+/* Highlight Girvi Panel details in light mode (warm cream boxes) */
+html:not(.dark) .glass-panel .bg-brand-bg\/50,
+html:not(.dark) .glass-panel [class*="bg-brand-bg/50"] {
+  background-color: #fffbeb !important;
+  border-color: #fde68a !important;
+  color: #b45309 !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+}
+html:not(.dark) .glass-panel .bg-brand-bg\/50 *,
+html:not(.dark) .glass-panel [class*="bg-brand-bg/50"] * {
+  color: #b45309 !important;
+}
