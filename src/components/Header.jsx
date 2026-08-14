@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function Header({ onMenuClick }) {
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token, admin } = useAuth();
   
   // Theme Switching State
   const [theme, setTheme] = useState(() => localStorage.getItem('byaj_theme') || 'dark');
@@ -58,6 +58,8 @@ export default function Header({ onMenuClick }) {
   };
 
   useEffect(() => {
+    if (!token || admin?.role === 'super-admin') return;
+
     fetchNotifications();
     fetchPendingMessages();
     
@@ -67,7 +69,7 @@ export default function Header({ onMenuClick }) {
       fetchPendingMessages();
     }, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [token, admin]);
 
   const handleSendWhatsApp = async (notif) => {
     const cleanPhone = notif.recipientPhone.replace(/[^0-9]/g, '');
@@ -153,7 +155,8 @@ export default function Header({ onMenuClick }) {
       </button>
 
       {/* 1. Global Search Input Area */}
-      <div ref={searchRef} className="relative w-full max-w-sm sm:max-w-md flex-1 mr-4">
+      {admin?.role !== 'super-admin' ? (
+        <div ref={searchRef} className="relative w-full max-w-sm sm:max-w-md flex-1 mr-4">
         <div className="flex items-center bg-brand-card border border-brand-border focus-within:border-brand-accent/50 rounded-xl px-3.5 py-2.5 transition">
           <Search className="w-4 h-4 text-brand-dim mr-2.5 shrink-0" />
           <input
@@ -248,6 +251,9 @@ export default function Header({ onMenuClick }) {
           </div>
         )}
       </div>
+      ) : (
+        <div className="flex-1" />
+      )}
 
       {/* Toggler & Notifications */}
       <div className="flex items-center space-x-2 shrink-0">
@@ -267,7 +273,8 @@ export default function Header({ onMenuClick }) {
         </button>
 
         {/* 3. Notifications Bell dropdown */}
-        <div ref={bellRef} className="relative">
+        {admin?.role !== 'super-admin' && (
+          <div ref={bellRef} className="relative">
           <button 
             type="button"
             onClick={() => setShowNotifications(!showNotifications)}
@@ -411,6 +418,7 @@ export default function Header({ onMenuClick }) {
             </div>
           )}
         </div>
+        )}
 
       </div>
 

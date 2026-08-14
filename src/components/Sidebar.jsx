@@ -25,16 +25,20 @@ export default function Sidebar({ isOpen, onClose }) {
     navigate('/login');
   };
 
-  const links = [
-    { to: '/', name: 'Dashboard', icon: LayoutDashboard },
-    { to: '/customers', name: 'Borrowers', icon: Users },
-    { to: '/loans', name: 'Loans (Byaj)', icon: HandCoins },
-    { to: '/collection', name: 'Collection', icon: CalendarClock },
-    { to: '/transactions', name: 'Payment Ledger', icon: History },
-    { to: '/cashbook', name: 'Cash Book', icon: BookOpen },
-    { to: '/reports', name: 'Reports', icon: BarChart3 },
-    { to: '/settings', name: 'Settings', icon: Settings },
-  ];
+  const links = admin?.role === 'super-admin'
+    ? [
+        { to: '/', name: 'SaaS Command', icon: LayoutDashboard },
+      ]
+    : [
+        { to: '/', name: 'Dashboard', icon: LayoutDashboard },
+        { to: '/customers', name: 'Borrowers', icon: Users },
+        { to: '/loans', name: 'Loans (Byaj)', icon: HandCoins },
+        { to: '/collection', name: 'Collection', icon: CalendarClock },
+        { to: '/transactions', name: 'Payment Ledger', icon: History },
+        { to: '/cashbook', name: 'Cash Book', icon: BookOpen },
+        { to: '/reports', name: 'Reports', icon: BarChart3 },
+        { to: '/settings', name: 'Settings', icon: Settings },
+      ];
 
   return (
     <>
@@ -107,7 +111,9 @@ export default function Sidebar({ isOpen, onClose }) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-bold text-white truncate">{admin?.username || 'Admin'}</p>
-            <span className="text-[9px] text-brand-emerald font-semibold uppercase tracking-wider">Administrator</span>
+            <span className="text-[9px] text-brand-emerald font-semibold uppercase tracking-wider">
+              {admin?.role === 'super-admin' ? 'Super Admin' : 'Administrator'}
+            </span>
           </div>
         </div>
 

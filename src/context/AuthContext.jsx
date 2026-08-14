@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const AuthContext = createContext(null);
 
-const API_BASE = 'http://localhost:5001/api';
+const API_BASE = `${window.API_BASE}/api`;
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem('byaj_admin_token'));
@@ -57,8 +57,39 @@ export function AuthProvider({ children }) {
   const logout = () => {
     localStorage.removeItem('byaj_admin_token');
     localStorage.removeItem('byaj_admin_info');
+    localStorage.removeItem('byaj_super_token');
+    localStorage.removeItem('byaj_super_info');
     setToken(null);
     setAdmin(null);
+  };
+
+  const impersonate = (newToken, newAdminInfo) => {
+    localStorage.setItem('byaj_super_token', token);
+    localStorage.setItem('byaj_super_info', JSON.stringify(admin));
+
+    localStorage.setItem('byaj_admin_token', newToken);
+    localStorage.setItem('byaj_admin_info', JSON.stringify(newAdminInfo));
+
+    setToken(newToken);
+    setAdmin(newAdminInfo);
+  };
+
+  const exitImpersonation = () => {
+    const superToken = localStorage.getItem('byaj_super_token');
+    const superInfo = localStorage.getItem('byaj_super_info');
+
+    if (superToken && superInfo) {
+      localStorage.setItem('byaj_admin_token', superToken);
+      localStorage.setItem('byaj_admin_info', superInfo);
+      
+      localStorage.removeItem('byaj_super_token');
+      localStorage.removeItem('byaj_super_info');
+
+      setToken(superToken);
+      setAdmin(JSON.parse(superInfo));
+    } else {
+      logout();
+    }
   };
 
   return (
@@ -68,7 +99,9 @@ export function AuthProvider({ children }) {
       loading,
       isAuthenticated: !!token,
       login,
-      logout
+      logout,
+      impersonate,
+      exitImpersonation
     }}>
       {children}
     </AuthContext.Provider>

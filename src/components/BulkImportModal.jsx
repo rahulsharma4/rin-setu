@@ -25,7 +25,7 @@ export default function BulkImportModal({ isOpen, onClose, onRefresh }) {
   };
 
   const handleDownloadTemplate = () => {
-    window.open(`http://localhost:5001/api/customers/import-template?token=${token}`, '_blank');
+    window.open(`${window.API_BASE}/api/customers/import-template?token=${token}`, '_blank');
   };
 
   const handleSubmit = async (e) => {
@@ -44,7 +44,7 @@ export default function BulkImportModal({ isOpen, onClose, onRefresh }) {
 
     try {
       const res = await axios.post(
-        'http://localhost:5001/api/customers/bulk-import',
+        `${window.API_BASE}/api/customers/bulk-import`,
         formData,
         { headers }
       );

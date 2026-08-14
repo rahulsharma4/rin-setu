@@ -28,7 +28,7 @@ const PageLoader = () => (
 
 function CRMLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { admin } = useAuth();
+  const { admin, exitImpersonation } = useAuth();
   
   const isSuper = admin?.role === 'super-admin';
 
@@ -43,6 +43,20 @@ function CRMLayout() {
 
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-8 pb-20 md:pb-8 overflow-y-auto max-h-screen relative z-10">
+        {admin?.isImpersonating && (
+          <div className="bg-gradient-to-r from-amber-600 to-amber-700 text-white text-xs font-extrabold py-3 px-6 rounded-2xl mb-6 shadow-xl border border-amber-500/20 flex items-center justify-between">
+            <div className="flex items-center space-x-2.5">
+              <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+              <span>⚠️ Impersonation Mode: Accessing portal of <strong>{admin.businessName}</strong> ({admin.name})</span>
+            </div>
+            <button
+              onClick={exitImpersonation}
+              className="bg-white/10 hover:bg-white/20 active:bg-white/30 text-white border border-white/20 hover:border-white/40 transition duration-150 py-1.5 px-4 rounded-xl font-bold uppercase tracking-wider text-[10px] outline-none"
+            >
+              Exit & Return to Super Admin
+            </button>
+          </div>
+        )}
         <div className="max-w-7xl mx-auto">
           {/* Global Search and Bell Alert Navbar Header */}
           <Header onMenuClick={() => setIsSidebarOpen(true)} />

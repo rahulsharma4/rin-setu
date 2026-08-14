@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "replace-urls": "node C:\\Users\\ASUS\\.gemini\\antigravity-ide\\brain\\19a7744a-e70f-41ce-a151-94b0a4d83eaa\\scratch\\replace_urls.js"
   },
   "dependencies": {
     "axios": "^1.7.2",

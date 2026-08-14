@@ -11,12 +11,13 @@ import {
   Plus, 
   TrendingUp, 
   ShieldAlert,
-  Loader2
+  Loader2,
+  ExternalLink
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function SuperAdminDashboard() {
-  const { token } = useAuth();
+  const { token, impersonate } = useAuth();
   
   const [stats, setStats] = useState(null);
   const [tenants, setTenants] = useState([]);
@@ -113,6 +114,22 @@ export default function SuperAdminDashboard() {
       fetchDashboardData();
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to offboard tenant.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleImpersonateTenant = async (tenantId) => {
+    try {
+      setActionLoading(true);
+      setError('');
+      const headers = { Authorization: `Bearer ${token}` };
+      const res = await axios.post(`http://localhost:5001/api/superadmin/impersonate/${tenantId}`, {}, { headers });
+      
+      const { token: impersonatedToken, admin: impersonatedAdmin } = res.data;
+      impersonate(impersonatedToken, impersonatedAdmin);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Tenant impersonation failed.');
     } finally {
       setActionLoading(false);
     }
@@ -257,12 +274,22 @@ export default function SuperAdminDashboard() {
                       <td className="py-4 text-right">
                         <button
                           type="button"
+                          onClick={() => handleImpersonateTenant(t._id)}
+                          className="p-1.5 rounded-lg border border-brand-border text-brand-emerald hover:text-white hover:bg-brand-emerald/90 transition mr-2"
+                          title="Access Portal"
+                          disabled={actionLoading}
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
                           onClick={() => {
                             setDeleteConfirmId(t._id);
                             setDeleteBusinessName(t.businessName);
                           }}
                           className="p-1.5 rounded-lg border border-brand-border text-brand-rose hover:text-white hover:bg-brand-rose/90 transition"
                           title="Offboard Tenant"
+                          disabled={actionLoading}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>

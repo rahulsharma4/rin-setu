@@ -30,34 +30,10 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests
-  if (event.request.method !== 'GET') {
-    return;
-  }
-
-  const url = new URL(event.request.url);
-
-  // Only handle requests for our local assets (same origin)
-  if (url.origin !== self.location.origin) {
-    return;
-  }
-
-  // Bypass API requests
-  if (url.pathname.startsWith('/api')) {
-    return;
-  }
-
+  // Simple pass-through fetch listener to satisfy PWA installation criteria
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).catch((err) => {
-        if (event.request.mode === 'navigate') {
-          return caches.match('/index.html');
-        }
-        throw err;
-      });
+    fetch(event.request).catch(() => {
+      return caches.match(event.request);
     })
   );
 });
