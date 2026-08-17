@@ -11,7 +11,14 @@ import {
   ShieldCheck,
   Terminal,
   RefreshCw,
-  FolderSync
+  FolderSync,
+  Wallet,
+  Key,
+  Copy,
+  ExternalLink,
+  Webhook,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -19,7 +26,7 @@ import { useAuth } from '../context/AuthContext';
 export default function Settings() {
   const { token, admin, updateAdmin } = useAuth();
   
-  // Tab State: 'config' | 'audit' | 'backup' | 'profile'
+  // Tab State: 'config' | 'audit' | 'backup' | 'profile' | 'payment'
   const [activeTab, setActiveTab] = useState('config');
 
   const [settings, setSettings] = useState(null);
@@ -37,6 +44,50 @@ export default function Settings() {
     password: ''
   });
   const [profileLoading, setProfileLoading] = useState(false);
+
+  // ── Gateway (Razorpay) Settings State ───────────────────────────────
+  const [gatewayData, setGatewayData] = useState({
+    gatewayKeyId: '',
+    gatewayKeySecret: '',
+    gatewayWebhookSecret: '',
+  });
+  const [gatewayInfo, setGatewayInfo] = useState(null); // { isConfigured, webhookUrl }
+  const [gatewayLoading, setGatewayLoading] = useState(false);
+  const [showSecret, setShowSecret] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const fetchGatewaySettings = async () => {
+    try {
+      const res = await axios.get('http://localhost:5001/api/auth/gateway-settings', { headers });
+      setGatewayData(prev => ({ ...prev, gatewayKeyId: res.data.gatewayKeyId, gatewayWebhookSecret: res.data.gatewayWebhookSecret }));
+      setGatewayInfo({ isConfigured: res.data.isConfigured, webhookUrl: res.data.webhookUrl });
+    } catch (_) {}
+  };
+
+  const handleSaveGateway = async (e) => {
+    e.preventDefault();
+    setGatewayLoading(true);
+    setSuccess('');
+    setError('');
+    try {
+      await axios.put('http://localhost:5001/api/auth/gateway-settings', gatewayData, { headers });
+      setSuccess('Payment gateway settings saved! Your Razorpay UPI QR integration is now active.');
+      setTimeout(() => setSuccess(''), 4000);
+      fetchGatewaySettings();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to save gateway settings.');
+    } finally {
+      setGatewayLoading(false);
+    }
+  };
+
+  const handleCopyWebhook = () => {
+    if (gatewayInfo?.webhookUrl) {
+      navigator.clipboard.writeText(gatewayInfo.webhookUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   useEffect(() => {
     if (admin) {
@@ -112,6 +163,9 @@ export default function Settings() {
   useEffect(() => {
     if (activeTab === 'audit') {
       fetchAuditLogs();
+    }
+    if (activeTab === 'payment') {
+      fetchGatewaySettings();
     }
   }, [activeTab]);
 
@@ -253,6 +307,16 @@ export default function Settings() {
         >
           <span>Admin Profile Settings</span>
           {activeTab === 'profile' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-accent animate-scale-x" />}
+        </button>
+
+        <button 
+          onClick={() => setActiveTab('payment')}
+          className={`pb-3 relative transition outline-none ${
+            activeTab === 'payment' ? 'text-brand-accent' : 'text-brand-dim hover:text-white'
+          }`}
+        >
+          <span>💳 Payment Settings</span>
+          {activeTab === 'payment' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-accent animate-scale-x" />}
         </button>
       </div>
 
@@ -614,6 +678,143 @@ export default function Settings() {
               <span>{profileLoading ? 'Updating Profile...' : 'Save Profile Changes'}</span>
             </button>
           </div>
+        </form>
+      )}
+
+      {/* ── Tab: Payment Gateway Settings ─────────────────────────────── */}
+      {activeTab === 'payment' && (
+        <form onSubmit={handleSaveGateway} className="space-y-6">
+
+          {/* Status Banner */}
+          {gatewayInfo && (
+            <div className={`flex items-center space-x-3 p-4 rounded-2xl border ${
+              gatewayInfo.isConfigured
+                ? 'bg-brand-emerald/10 border-brand-emerald/30 text-brand-emerald'
+                : 'bg-brand-amber/10 border-brand-amber/30 text-brand-amber'
+            }`}>
+              <Wallet className="w-5 h-5 shrink-0" />
+              <div>
+                <p className="text-xs font-bold">
+                  {gatewayInfo.isConfigured ? '✅ Razorpay UPI QR is Active & Ready' : '⚙️ Payment Gateway Not Configured'}
+                </p>
+                <p className="text-[10px] mt-0.5 opacity-80">
+                  {gatewayInfo.isConfigured
+                    ? 'Borrowers can now pay via UPI QR Code and entries will be logged automatically.'
+                    : 'Fill in your Razorpay credentials below to enable automatic UPI payment recording.'}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Main Credentials Card */}
+          <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-5">
+            <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
+              <Key className="w-4 h-4 text-brand-accent" />
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider">Razorpay API Credentials</h3>
+            </div>
+
+            {/* Setup Steps */}
+            <div className="p-4 bg-brand-bg/60 border border-brand-border rounded-xl space-y-2 text-[10px] text-brand-dim leading-relaxed">
+              <p className="font-bold text-brand-text dark:text-white text-[11px]">📋 How to get your Razorpay credentials:</p>
+              <ol className="list-decimal list-inside space-y-1">
+                <li>Go to <strong className="text-brand-accent">razorpay.com</strong> → Create a business account (free) → Complete KYC</li>
+                <li>Navigate to <strong>Dashboard → Settings → API Keys → Generate Key</strong></li>
+                <li>Copy the <strong>Key ID</strong> (starts with <code>rzp_</code>) and <strong>Key Secret</strong> and paste below</li>
+                <li>Go to <strong>Settings → Webhooks → Add New Webhook</strong></li>
+                <li>Paste your unique Webhook URL (shown below) and select the <strong>payment.captured</strong> event</li>
+                <li>Copy the <strong>Webhook Secret</strong> from Razorpay and paste it below</li>
+              </ol>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Key ID */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Razorpay Key ID *</label>
+                <input
+                  type="text"
+                  value={gatewayData.gatewayKeyId}
+                  onChange={(e) => setGatewayData(prev => ({ ...prev, gatewayKeyId: e.target.value }))}
+                  placeholder="rzp_live_xxxxxxxxxxxxxxxx"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
+                />
+              </div>
+
+              {/* Key Secret */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Razorpay Key Secret *</label>
+                <div className="relative">
+                  <input
+                    type={showSecret ? 'text' : 'password'}
+                    value={gatewayData.gatewayKeySecret}
+                    onChange={(e) => setGatewayData(prev => ({ ...prev, gatewayKeySecret: e.target.value }))}
+                    placeholder="Enter new secret (leave blank to keep existing)"
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl pl-4 pr-10 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
+                  />
+                  <button type="button" onClick={() => setShowSecret(s => !s)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-dim hover:text-white transition">
+                    {showSecret ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Webhook Secret */}
+              <div className="space-y-1.5 md:col-span-2">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Razorpay Webhook Secret</label>
+                <input
+                  type="password"
+                  value={gatewayData.gatewayWebhookSecret}
+                  onChange={(e) => setGatewayData(prev => ({ ...prev, gatewayWebhookSecret: e.target.value }))}
+                  placeholder="Paste Webhook Secret from Razorpay dashboard"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
+                />
+                <p className="text-[9px] text-brand-dim">This is used to verify that payment notifications truly come from Razorpay (prevents fraud).</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Webhook URL Card */}
+          {gatewayInfo?.webhookUrl && (
+            <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-4">
+              <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
+                <Webhook className="w-4 h-4 text-brand-accent" />
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider">Your Unique Webhook URL</h3>
+              </div>
+              <p className="text-[10px] text-brand-dim leading-relaxed">
+                Copy this URL and add it to your <strong className="text-brand-text dark:text-white">Razorpay → Settings → Webhooks</strong> panel. 
+                This is unique to your account — Razorpay will call it automatically whenever a borrower pays.
+              </p>
+              <div className="flex items-center space-x-2">
+                <code className="flex-1 text-[10px] font-mono bg-brand-bg border border-brand-border rounded-xl px-4 py-3 text-brand-accent overflow-x-auto whitespace-nowrap">
+                  {gatewayInfo.webhookUrl}
+                </code>
+                <button
+                  type="button"
+                  onClick={handleCopyWebhook}
+                  className={`flex items-center space-x-1.5 px-4 py-3 rounded-xl border text-[10px] font-bold transition ${
+                    copied
+                      ? 'bg-brand-emerald/20 border-brand-emerald/40 text-brand-emerald'
+                      : 'border-brand-border text-brand-dim hover:text-white hover:bg-brand-border/30'
+                  }`}
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                  <span>{copied ? 'Copied!' : 'Copy'}</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Save Button */}
+          <div className="flex justify-end pt-2">
+            <button
+              type="submit"
+              disabled={gatewayLoading}
+              className="flex items-center space-x-1.5 px-6 py-3.5 rounded-xl bg-brand-accent hover:bg-indigo-600 disabled:opacity-40 text-xs font-bold text-white shadow-lg shadow-brand-accent/25 transition-all duration-200"
+            >
+              <Save className="w-4 h-4" />
+              <span>{gatewayLoading ? 'Saving...' : 'Save Payment Gateway Settings'}</span>
+            </button>
+          </div>
+
         </form>
       )}
 
