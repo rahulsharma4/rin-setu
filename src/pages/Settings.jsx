@@ -342,7 +342,7 @@ export default function Settings() {
                 <textarea
                   value={settings.whatsappTemplates?.upcomingDue}
                   onChange={(e) => handleTemplateChange('upcomingDue', e.target.value)}
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition h-16 font-mono"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition h-16 font-mono"
                 />
               </div>
 
@@ -351,7 +351,7 @@ export default function Settings() {
                 <textarea
                   value={settings.whatsappTemplates?.dueToday}
                   onChange={(e) => handleTemplateChange('dueToday', e.target.value)}
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition h-16 font-mono"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition h-16 font-mono"
                 />
               </div>
 
@@ -360,7 +360,7 @@ export default function Settings() {
                 <textarea
                   value={settings.whatsappTemplates?.paymentReceived}
                   onChange={(e) => handleTemplateChange('paymentReceived', e.target.value)}
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition h-16 font-mono"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition h-16 font-mono"
                 />
               </div>
 
@@ -369,7 +369,7 @@ export default function Settings() {
                 <textarea
                   value={settings.whatsappTemplates?.overdueReminder}
                   onChange={(e) => handleTemplateChange('overdueReminder', e.target.value)}
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition h-16 font-mono"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition h-16 font-mono"
                 />
               </div>
             </div>
@@ -510,21 +510,21 @@ export default function Settings() {
             <div className="space-y-2 pt-1.5">
               <button
                 onClick={() => handleExportCSV('customers')}
-                className="flex items-center justify-between px-4 py-2.5 bg-brand-bg hover:bg-brand-border/40 border border-brand-border rounded-xl text-xs font-bold text-white transition w-full"
+                className="flex items-center justify-between px-4 py-2.5 bg-brand-bg hover:bg-brand-border/40 border border-brand-border rounded-xl text-xs font-bold text-brand-text dark:text-white transition w-full"
               >
                 <span>Export Borrowers Directory</span>
                 <span className="text-[10px] text-brand-emerald uppercase">Download CSV</span>
               </button>
               <button
                 onClick={() => handleExportCSV('loans')}
-                className="flex items-center justify-between px-4 py-2.5 bg-brand-bg hover:bg-brand-border/40 border border-brand-border rounded-xl text-xs font-bold text-white transition w-full"
+                className="flex items-center justify-between px-4 py-2.5 bg-brand-bg hover:bg-brand-border/40 border border-brand-border rounded-xl text-xs font-bold text-brand-text dark:text-white transition w-full"
               >
                 <span>Export Loan Agreements Sheet</span>
                 <span className="text-[10px] text-brand-emerald uppercase">Download CSV</span>
               </button>
               <button
                 onClick={() => handleExportCSV('payments')}
-                className="flex items-center justify-between px-4 py-2.5 bg-brand-bg hover:bg-brand-border/40 border border-brand-border rounded-xl text-xs font-bold text-white transition w-full"
+                className="flex items-center justify-between px-4 py-2.5 bg-brand-bg hover:bg-brand-border/40 border border-brand-border rounded-xl text-xs font-bold text-brand-text dark:text-white transition w-full"
               >
                 <span>Export Repayments Timeline Log</span>
                 <span className="text-[10px] text-brand-emerald uppercase">Download CSV</span>

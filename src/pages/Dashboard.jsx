@@ -208,6 +208,49 @@ export default function Dashboard() {
     // Add user message
     setChatMessages(prev => [...prev, { sender: 'user', text: msg }]);
     setChatInput('');
+
+    const lowerMsg = msg.toLowerCase();
+    if (lowerMsg.includes('use kaise') || lowerMsg.includes('user guide') || lowerMsg.includes('how to use') || lowerMsg.includes('guide')) {
+      setChatLoading(true);
+      setTimeout(() => {
+        const guideText = `📖 **Byaj CRM User Guide (उपयोगकर्ता मार्गदर्शिका)**
+
+Namaste! RinSetu Byaj CRM ko use karna behad aasan hai. Neeche har section aur setting ki poori detail di gayi hai:
+
+### 1. Dashboard (डैशबोर्ड)
+- **Cumulative Profit (Byaj)**: Lenders dwara kamaya gaya kul byaj.
+- **Active Borrowers**: Vo log jinka loan abhi chal raha hai.
+- **Expected Monthly Yield**: Har mahine aane wala estimated byaj payout.
+- **Quick Shortcuts**: *Register Borrower* aur *Issue Loan* buttons se naye entries turant kar sakte hain.
+
+### 2. Borrowers (उधारकर्ता)
+- Naya borrower jodte waqt uska naam, phone, aadhar aur collateral/gurantor details bharein.
+- Har borrower ki file me uski active loan history, repayment statements aur document previews dekh sakte hain.
+
+### 3. Loans (ऋण) & Interest Types
+- **Simple Interest (साधारण ब्याज)**: Byaj sirf bache hue principal par lagta hai.
+- **Flat Interest (EMI)**: Byaj shuruati loan amount par hi fix ho jata hai.
+- **Reducing (EMI)**: principal kam hone ke sath-sath byaj ki rashi bhi kam hoti jati hai.
+- **Collateral Assets (गिरवी)**: Loan ke badle girvi rakhi cheezon (collateral) ki detail yahan note karein.
+
+### 4. Cash Book (कैश बुक - Nokad Ledger)
+- **Nokad Balance sheet**: Apne business ke cash flows ko track karein.
+- **Cash In**: Jab aapke paas cash aaye (e.g. Loan collection, naya capital investment).
+- **Cash Out**: Jab aapke paas se cash jaye (e.g. loan disburse karna, office expenses, salaries).
+- Ye aapko batata hai ki aapke paas physically kitna cash hona chahiye.
+
+### 5. Settings & Automations (सिस्टम सेटिंग्स)
+- **Configurable Repayment Waterfall**: Jab koi borrower payment karta hai, to paise pehle kahan katein (Due charges, Fines/Penalty, Interest, ya Principal). Aap iski priority sequence ko drag-and-drop karke badal sakte hain.
+- **WhatsApp Rules Automation**: Auto reminder message templates. Turn ON/OFF templates so drafts are generated dynamically for borrowers on WhatsApp.
+- **Manual System Automation Checks**: Late fee penalty aur status sync manually trigger karne ke liye isko use karein.
+
+Aap is guide ke zariye poora system manage kar sakte hain! Koi aur doubt ho to bejhijhak puchein.`;
+        setChatMessages(prev => [...prev, { sender: 'bot', text: guideText }]);
+        setChatLoading(false);
+      }, 500);
+      return;
+    }
+
     setChatLoading(true);
 
     try {
@@ -242,7 +285,8 @@ export default function Dashboard() {
   const quickPrompts = [
     "Aaj kitna collection expected hai?",
     "Overdue loans check karo",
-    "Cash Book balance kya hai?"
+    "Cash Book balance kya hai?",
+    "Byaj CRM use kaise karein? (User Guide)"
   ];
 
   return (

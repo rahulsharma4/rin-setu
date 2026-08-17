@@ -147,7 +147,7 @@ export default function Customers() {
             <select
               value={collateralFilter}
               onChange={(e) => setCollateralFilter(e.target.value)}
-              className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition"
+              className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
             >
               <option value="all">All Collateral Types</option>
               <option value="gold">Gold (सोना)</option>
@@ -164,7 +164,7 @@ export default function Customers() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition"
+              className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
             >
               <option value="all">All Statuses</option>
               <option value="active">Active Accounts</option>
@@ -178,7 +178,7 @@ export default function Customers() {
               <select
                 value={loanCountFilter}
                 onChange={(e) => setLoanCountFilter(e.target.value)}
-                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition"
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
               >
                 <option value="all">Any Loan Count</option>
                 <option value="active">Has Active Loans</option>

@@ -40,9 +40,16 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
   // Local document viewer state
   const [viewingDoc, setViewingDoc] = useState(null);
 
+  // Custom collateral text field toggle state
+  const [isCustomCollateral, setIsCustomCollateral] = useState(false);
+
   // Sync state if editingCustomer changes
   useEffect(() => {
     if (editingCustomer) {
+      const predefined = ['None', 'Gold', 'Silver', 'Vehicle', 'Land', 'Documents'];
+      const isCustom = editingCustomer.collateralType && !predefined.includes(editingCustomer.collateralType);
+      setIsCustomCollateral(isCustom);
+
       setFormData({
         name: editingCustomer.name || '',
         phone: editingCustomer.phone || '',
@@ -61,6 +68,7 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
       });
       setUploadedDocs(editingCustomer.documents || []);
     } else {
+      setIsCustomCollateral(false);
       setFormData({
         name: '',
         phone: '',
@@ -88,7 +96,17 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === 'collateralType' && e.target.tagName.toLowerCase() === 'select') {
+      if (value === 'Other') {
+        setIsCustomCollateral(true);
+        setFormData((prev) => ({ ...prev, collateralType: '' }));
+      } else {
+        setIsCustomCollateral(false);
+        setFormData((prev) => ({ ...prev, collateralType: value }));
+      }
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   // Handle multiple file selections
@@ -429,7 +447,7 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
               <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wide">Girvi Item (Collateral)</label>
               <select
                 name="collateralType"
-                value={formData.collateralType}
+                value={isCustomCollateral ? 'Other' : (formData.collateralType || 'None')}
                 onChange={handleChange}
                 className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
               >
@@ -439,8 +457,24 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
                 <option value="Vehicle">Vehicle (Gadi)</option>
                 <option value="Land">Land / Property Plot</option>
                 <option value="Documents">Files / Sign Papers</option>
+                <option value="Other">Other (Type custom asset...)</option>
               </select>
             </div>
+
+            {isCustomCollateral && (
+              <div className="space-y-1.5 md:col-span-2 animate-fade-in">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wide">Custom Collateral Item Name *</label>
+                <input
+                  type="text"
+                  name="collateralType"
+                  value={formData.collateralType}
+                  onChange={handleChange}
+                  placeholder="e.g. Laptop, Tractor, Diamond Ring"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
+                  required
+                />
+              </div>
+            )}
 
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wide">Collateral Est. Value (Rupiya)</label>
@@ -451,7 +485,7 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
                 onChange={handleChange}
                 placeholder="e.g. 150000"
                 className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
-                disabled={formData.collateralType === 'None'}
+                disabled={formData.collateralType === 'None' && !isCustomCollateral}
               />
             </div>
 
@@ -464,7 +498,7 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
                 onChange={handleChange}
                 placeholder="e.g. Gold necklace (22 grams, Hallmarked)"
                 className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
-                disabled={formData.collateralType === 'None'}
+                disabled={formData.collateralType === 'None' && !isCustomCollateral}
               />
             </div>
 

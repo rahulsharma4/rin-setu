@@ -217,7 +217,7 @@ export default function Loans() {
               placeholder="Min value"
               value={minPrincipal}
               onChange={(e) => setMinPrincipal(e.target.value)}
-              className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition"
+              className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
             />
           </div>
 
@@ -228,7 +228,7 @@ export default function Loans() {
               placeholder="Max value"
               value={maxPrincipal}
               onChange={(e) => setMaxPrincipal(e.target.value)}
-              className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition"
+              className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
             />
           </div>
 
@@ -237,7 +237,7 @@ export default function Loans() {
             <select
               value={collateralFilter}
               onChange={(e) => setCollateralFilter(e.target.value)}
-              className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition"
+              className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
             >
               <option value="all">All Collateral Types</option>
               <option value="gold">Gold (सोना)</option>
@@ -255,7 +255,7 @@ export default function Loans() {
               <select
                 value={overdueDaysFilter}
                 onChange={(e) => setOverdueDaysFilter(e.target.value)}
-                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition"
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
               >
                 <option value="all">Any Overdue Days</option>
                 <option value="15">&gt; 15 Days Overdue</option>
@@ -430,7 +430,7 @@ export default function Loans() {
                 <select
                   value={editForm.status}
                   onChange={(e) => setEditForm(prev => ({ ...prev, status: e.target.value }))}
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
                 >
                   <option value="active">Active</option>
                   <option value="overdue">Overdue</option>
@@ -445,7 +445,7 @@ export default function Loans() {
                   value={editForm.remarks}
                   onChange={(e) => setEditForm(prev => ({ ...prev, remarks: e.target.value }))}
                   placeholder="Update loan documentation comments"
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
                 />
               </div>
 

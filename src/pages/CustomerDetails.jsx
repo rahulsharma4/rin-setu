@@ -963,7 +963,7 @@ export default function CustomerDetails() {
                   value={restructureForm.interestRate}
                   onChange={(e) => setRestructureForm(prev => ({ ...prev, interestRate: e.target.value }))}
                   placeholder="e.g. 2"
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2.5 text-xs text-white outline-none"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2.5 text-xs text-brand-text dark:text-white outline-none"
                   required
                 />
               </div>
@@ -973,7 +973,7 @@ export default function CustomerDetails() {
                 <select
                   value={restructureForm.paymentFrequency}
                   onChange={(e) => setRestructureForm(prev => ({ ...prev, paymentFrequency: e.target.value }))}
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2.5 text-xs text-white outline-none"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2.5 text-xs text-brand-text dark:text-white outline-none"
                 >
                   <option value="daily">Daily EMI</option>
                   <option value="weekly">Weekly EMI</option>
@@ -989,7 +989,7 @@ export default function CustomerDetails() {
                   value={restructureForm.tenure}
                   onChange={(e) => setRestructureForm(prev => ({ ...prev, tenure: e.target.value }))}
                   placeholder="e.g. 12"
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2.5 text-xs text-white outline-none"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2.5 text-xs text-brand-text dark:text-white outline-none"
                   required
                 />
               </div>
@@ -1001,7 +1001,7 @@ export default function CustomerDetails() {
                   value={restructureForm.remarks}
                   onChange={(e) => setRestructureForm(prev => ({ ...prev, remarks: e.target.value }))}
                   placeholder="Reason for restructure"
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2.5 text-xs text-white outline-none"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2.5 text-xs text-brand-text dark:text-white outline-none"
                 />
               </div>
 

@@ -242,7 +242,7 @@ export default function CashBook() {
                 <select
                   value={form.type}
                   onChange={(e) => setForm(prev => ({ ...prev, type: e.target.value }))}
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2 text-xs text-white outline-none transition"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2 text-xs text-brand-text dark:text-white outline-none transition"
                 >
                   <option value="opening_balance">Set/Add Opening Balance</option>
                   <option value="expense_rent">Office Rent Expense (किराया)</option>
@@ -263,7 +263,7 @@ export default function CashBook() {
                   value={form.amount}
                   onChange={(e) => setForm(prev => ({ ...prev, amount: e.target.value }))}
                   placeholder="e.g. 10000"
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2 text-xs text-white placeholder-brand-dim/50 outline-none transition"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
                   required
                 />
               </div>
@@ -273,7 +273,7 @@ export default function CashBook() {
                 <select
                   value={form.paymentMode}
                   onChange={(e) => setForm(prev => ({ ...prev, paymentMode: e.target.value }))}
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2 text-xs text-white outline-none transition"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2 text-xs text-brand-text dark:text-white outline-none transition"
                 >
                   <option value="cash">Cash (Drawer)</option>
                   <option value="online">UPI / QR Code</option>
@@ -289,7 +289,7 @@ export default function CashBook() {
                   value={form.notes}
                   onChange={(e) => setForm(prev => ({ ...prev, notes: e.target.value }))}
                   placeholder="Rent payment or opening cash details"
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2 text-xs text-white placeholder-brand-dim/50 outline-none transition"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
                 />
               </div>
 
