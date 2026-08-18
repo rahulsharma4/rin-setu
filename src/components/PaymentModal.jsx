@@ -95,7 +95,7 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
       setQrPhase('waiting');
       startPolling(res.data.qrCodeId);
     } catch (err) {
-      const msg = err.response?.data?.message || 'Failed to generate QR code.';
+      const msg = err.response?.data?.message || err.message || 'Failed to generate QR code.';
       const code = err.response?.data?.code;
       setError(msg);
       if (code === 'GATEWAY_NOT_CONFIGURED') {
