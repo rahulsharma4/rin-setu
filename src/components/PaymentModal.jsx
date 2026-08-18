@@ -93,7 +93,7 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
       });
       setQrData(res.data);
       setQrPhase('waiting');
-      startPolling(res.data.orderId);
+      startPolling(res.data.qrCodeId);
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to generate QR code.';
       const code = err.response?.data?.code;
@@ -112,7 +112,7 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
     pollingRef.current = setInterval(async () => {
       pollingCountRef.current += 1;
       // Stop after 5 minutes (60 polls × 5s)
-      if (pollingCountRef.current > 60) {
+      if (pollingCountRef.current > 180) {
         clearInterval(pollingRef.current);
         setQrPhase('timeout');
         return;
@@ -153,17 +153,17 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
           <div className="w-52 h-52 bg-white rounded-2xl p-3 flex items-center justify-center shadow-lg shadow-black/20 border-2 border-brand-accent/30 relative">
             {/* Visual QR frame pattern */}
             <div className="w-full h-full border-4 border-gray-900 rounded-xl flex items-center justify-center relative overflow-hidden">
-              <div className="absolute inset-0 grid grid-cols-8 grid-rows-8 opacity-20">
+              <div className="hidden">
                 {Array.from({ length: 64 }).map((_, i) => (
                   <div key={i} className={`${Math.random() > 0.5 ? 'bg-gray-900' : 'bg-transparent'}`} />
                 ))}
               </div>
               <a
-                href={qrData.upiIntent}
+                href={qrData.qrImageUrl}
                 className="z-10 flex flex-col items-center text-center"
                 title="Click to open UPI app on this device"
               >
-                <QrCode className="w-12 h-12 text-gray-900" />
+                <img src={qrData.qrImageUrl} alt="Razorpay UPI payment QR" className="w-36 h-36 object-contain" />
                 <span className="text-[9px] font-bold text-gray-900 mt-1">Tap to Pay</span>
                 <span className="text-[8px] text-gray-600">₹{parseFloat(formData.amount).toLocaleString('en-IN')}</span>
               </a>
@@ -227,7 +227,7 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
       return (
         <div className="flex flex-col items-center py-8 space-y-3">
           <Clock className="w-8 h-8 text-brand-amber" />
-          <p className="text-xs font-semibold text-brand-amber text-center">QR Code has expired (5 min limit).</p>
+          <p className="text-xs font-semibold text-brand-amber text-center">QR Code has expired (15 min limit).</p>
           <button type="button" onClick={() => setQrPhase('idle')} className="text-xs text-brand-accent underline">Generate new QR</button>
         </div>
       );
