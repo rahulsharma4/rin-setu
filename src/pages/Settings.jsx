@@ -20,7 +20,7 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 
 export default function Settings() {
@@ -29,7 +29,12 @@ export default function Settings() {
   // Tab State: 'config' | 'audit' | 'backup' | 'profile' | 'payment'
   const [activeTab, setActiveTab] = useState('config');
 
-  const [settings, setSettings] = useState(null);
+  // Keep the form renderable while tenant settings are being fetched.
+  const [settings, setSettings] = useState({
+    waterfallPriority: ['dueCharges', 'lateCharges', 'interest', 'principal'],
+    whatsappAutomation: true,
+    whatsappTemplates: {},
+  });
   const [loading, setLoading] = useState(true);
   const [saveLoading, setSaveLoading] = useState(false);
   const [cronLoading, setCronLoading] = useState(false);
@@ -58,7 +63,7 @@ export default function Settings() {
 
   const fetchGatewaySettings = async () => {
     try {
-      const res = await axios.get('http://localhost:5001/api/auth/gateway-settings', { headers });
+      const res = await api.get('auth/gateway-settings');
       setGatewayData(prev => ({ ...prev, gatewayKeyId: res.data.gatewayKeyId, gatewayWebhookSecret: res.data.gatewayWebhookSecret }));
       setGatewayInfo({ isConfigured: res.data.isConfigured, webhookUrl: res.data.webhookUrl });
     } catch (_) {}
@@ -70,7 +75,7 @@ export default function Settings() {
     setSuccess('');
     setError('');
     try {
-      await axios.put('http://localhost:5001/api/auth/gateway-settings', gatewayData, { headers });
+      await api.put('auth/gateway-settings', gatewayData);
       setSuccess('Payment gateway settings saved! Your Razorpay UPI QR integration is now active.');
       setTimeout(() => setSuccess(''), 4000);
       fetchGatewaySettings();
@@ -241,7 +246,7 @@ export default function Settings() {
     window.open(`http://localhost:5001/api/settings/export/${type}?token=${token}`, '_blank');
   };
 
-  if (loading) {
+  if (loading || !settings) {
     return (
       <div className="h-96 flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-brand-accent border-t-transparent rounded-full animate-spin" />
