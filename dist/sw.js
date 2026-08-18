@@ -1,4 +1,4 @@
-const CACHE_NAME = 'byaj-crm-v1';
+const CACHE_NAME = 'byaj-crm-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -30,10 +30,39 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Simple pass-through fetch listener to satisfy PWA installation criteria
+  // Disable caching during local development
+  if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1') {
+    return;
+  }
+
+  // Only handle GET requests
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
+  const url = new URL(event.request.url);
+
+  // Only handle requests for our local assets (same origin)
+  if (url.origin !== self.location.origin) {
+    return;
+  }
+
+  // Bypass API requests
+  if (url.pathname.startsWith('/api')) {
+    return;
+  }
+
   event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.match(event.request);
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      return fetch(event.request).catch((err) => {
+        if (event.request.mode === 'navigate') {
+          return caches.match('/index.html');
+        }
+        throw err;
+      });
     })
   );
 });
