@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Upload, Download, CheckCircle, AlertTriangle, ShieldCheck } from 'lucide-react';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 
 export default function BulkImportModal({ isOpen, onClose, onRefresh }) {
@@ -43,10 +43,14 @@ export default function BulkImportModal({ isOpen, onClose, onRefresh }) {
     formData.append('file', file);
 
     try {
-      const res = await axios.post(
-        `${window.API_BASE}/api/customers/bulk-import`,
+      const res = await api.post(
+        'customers/bulk-import',
         formData,
-        { headers }
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
       );
       setSuccessData(res.data);
       onRefresh();

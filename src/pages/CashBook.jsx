@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CircleDollarSign, Plus, ArrowUpRight, ArrowDownRight, RefreshCw, Trash2, CalendarCheck, ShieldAlert, Sparkles } from 'lucide-react';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 
 export default function CashBook() {
@@ -23,7 +23,7 @@ export default function CashBook() {
   const fetchCashBook = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('http://localhost:5001/api/reports/cashbook', { headers });
+      const res = await api.get('reports/cashbook');
       setData(res.data);
     } catch {
       setError('Failed to load cash book details.');
@@ -57,11 +57,11 @@ export default function CashBook() {
     }
 
     try {
-      await axios.post('http://localhost:5001/api/reports/cashbook', {
+      await api.post('reports/cashbook', {
         ...form,
         type,
         notes
-      }, { headers });
+      });
       setForm({ type: 'opening_balance', amount: '', paymentMode: 'cash', notes: '' });
       fetchCashBook();
     } catch (err) {
@@ -74,7 +74,7 @@ export default function CashBook() {
   const handleDeleteEntry = async (id) => {
     if (!window.confirm('Are you sure you want to revert this entry? This cannot be undone.')) return;
     try {
-      await axios.delete(`http://localhost:5001/api/reports/cashbook/${id}`, { headers });
+      await api.delete(`reports/cashbook/${id}`);
       fetchCashBook();
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to delete entry.');

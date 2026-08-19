@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { 
   Building2, 
   Users, 
@@ -44,11 +44,9 @@ export default function SuperAdminDashboard() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const headers = { Authorization: `Bearer ${token}` };
-      
       const [statsRes, tenantsRes] = await Promise.all([
-        axios.get('http://localhost:5001/api/superadmin/stats', { headers }),
-        axios.get('http://localhost:5001/api/superadmin/tenants', { headers })
+        api.get('superadmin/stats'),
+        api.get('superadmin/tenants')
       ]);
       
       setStats(statsRes.data);
@@ -86,8 +84,7 @@ export default function SuperAdminDashboard() {
       setFormError('');
       setFormSuccess('');
       
-      const headers = { Authorization: `Bearer ${token}` };
-      const res = await axios.post('http://localhost:5001/api/superadmin/tenants', form, { headers });
+      const res = await api.post('superadmin/tenants', form);
       
       setFormSuccess(res.data.message);
       setForm({ username: '', password: '', name: '', businessName: '' });
@@ -106,8 +103,7 @@ export default function SuperAdminDashboard() {
 
     try {
       setActionLoading(true);
-      const headers = { Authorization: `Bearer ${token}` };
-      await axios.delete(`http://localhost:5001/api/superadmin/tenants/${deleteConfirmId}`, { headers });
+      await api.delete(`superadmin/tenants/${deleteConfirmId}`);
       
       setDeleteConfirmId(null);
       setDeleteBusinessName('');
@@ -130,11 +126,9 @@ export default function SuperAdminDashboard() {
 
     try {
       setActionLoading(true);
-      const headers = { Authorization: `Bearer ${token}` };
-      await axios.put(
-        `http://localhost:5001/api/superadmin/tenants/${tenantId}/status`, 
-        { status: newStatus }, 
-        { headers }
+      await api.put(
+        `superadmin/tenants/${tenantId}/status`, 
+        { status: newStatus }
       );
       fetchDashboardData();
     } catch (err) {
@@ -148,8 +142,7 @@ export default function SuperAdminDashboard() {
     try {
       setActionLoading(true);
       setError('');
-      const headers = { Authorization: `Bearer ${token}` };
-      const res = await axios.post(`http://localhost:5001/api/superadmin/impersonate/${tenantId}`, {}, { headers });
+      const res = await api.post(`superadmin/impersonate/${tenantId}`, {});
       
       const { token: impersonatedToken, admin: impersonatedAdmin } = res.data;
       impersonate(impersonatedToken, impersonatedAdmin);

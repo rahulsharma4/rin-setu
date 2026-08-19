@@ -121,11 +121,7 @@ export default function Settings() {
     setError('');
 
     try {
-      const res = await axios.put(
-        'http://localhost:5001/api/auth/profile', 
-        profileData, 
-        { headers }
-      );
+      const res = await api.put('auth/profile', profileData);
       updateAdmin(res.data.token, res.data.admin);
       setSuccess('Profile updated successfully!');
       setTimeout(() => setSuccess(''), 3000);
@@ -139,7 +135,7 @@ export default function Settings() {
   const fetchSettings = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('http://localhost:5001/api/settings', { headers });
+      const res = await api.get('settings');
       setSettings(res.data);
       setPriority(res.data.waterfallPriority || []);
     } catch {
@@ -152,7 +148,7 @@ export default function Settings() {
   const fetchAuditLogs = async () => {
     setLoadingAudits(true);
     try {
-      const res = await axios.get('http://localhost:5001/api/settings/audit-logs', { headers });
+      const res = await api.get('settings/audit-logs');
       setAuditLogs(res.data);
     } catch {
       setError('Failed to load audit trail logs.');
@@ -213,7 +209,7 @@ export default function Settings() {
         ...settings,
         waterfallPriority: priority
       };
-      await axios.put('http://localhost:5001/api/settings', payload, { headers });
+      await api.put('settings', payload);
       setSuccess('Settings updated successfully!');
       setTimeout(() => setSuccess(''), 3000);
     } catch {
@@ -228,7 +224,7 @@ export default function Settings() {
     setSuccess('');
     setError('');
     try {
-      const res = await axios.post('http://localhost:5001/api/settings/trigger-cron', {}, { headers });
+      const res = await api.post('settings/trigger-cron', {});
       setSuccess(res.data.message || 'Auto check & late fee calculations processed successfully!');
       setTimeout(() => setSuccess(''), 4000);
     } catch (err) {
@@ -239,11 +235,11 @@ export default function Settings() {
   };
 
   const handleDownloadBackup = () => {
-    window.open(`http://localhost:5001/api/settings/backup?token=${token}`, '_blank');
+    window.open(`${window.API_BASE}/api/settings/backup?token=${token}`, '_blank');
   };
 
   const handleExportCSV = (type) => {
-    window.open(`http://localhost:5001/api/settings/export/${type}?token=${token}`, '_blank');
+    window.open(`${window.API_BASE}/api/settings/export/${type}?token=${token}`, '_blank');
   };
 
   if (loading || !settings) {
@@ -752,8 +748,9 @@ export default function Settings() {
                     type={showSecret ? 'text' : 'password'}
                     value={gatewayData.gatewayKeySecret}
                     onChange={(e) => setGatewayData(prev => ({ ...prev, gatewayKeySecret: e.target.value }))}
-                    placeholder="Enter new secret (leave blank to keep existing)"
+                    placeholder={gatewayInfo?.hasKeySecret ? "•••••••• (Saved - enter new secret to change)" : "Enter Razorpay Key Secret"}
                     className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl pl-4 pr-10 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
+                    autoComplete="new-password"
                   />
                   <button type="button" onClick={() => setShowSecret(s => !s)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-dim hover:text-white transition">
@@ -771,6 +768,7 @@ export default function Settings() {
                   onChange={(e) => setGatewayData(prev => ({ ...prev, gatewayWebhookSecret: e.target.value }))}
                   placeholder="Paste Webhook Secret from Razorpay dashboard"
                   className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
+                  autoComplete="new-password"
                 />
                 <p className="text-[9px] text-brand-dim">This is used to verify that payment notifications truly come from Razorpay (prevents fraud).</p>
               </div>

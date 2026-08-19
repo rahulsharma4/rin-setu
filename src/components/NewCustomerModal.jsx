@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, UserPlus, ShieldAlert, Edit, Upload, FileCheck, Trash2, Paperclip, CheckCircle, AlertTriangle } from 'lucide-react';
 import { customerAPI } from '../api';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 
 export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCustomer = null }) {
@@ -147,13 +147,12 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
         fd.append('file', temp.file);
         fd.append('label', temp.label);
 
-        const res = await axios.post(
-          `http://localhost:5001/api/customers/${editingCustomer._id}/documents`,
+        const res = await api.post(
+          `customers/${editingCustomer._id}/documents`,
           fd,
           {
             headers: {
-              'Content-Type': 'multipart/form-data',
-              Authorization: `Bearer ${activeToken}`
+              'Content-Type': 'multipart/form-data'
             }
           }
         );
@@ -174,11 +173,8 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
     const activeToken = token || localStorage.getItem('byaj_admin_token');
     
     try {
-      await axios.delete(
-        `http://localhost:5001/api/customers/${editingCustomer._id}/documents/${docId}`,
-        {
-          headers: { Authorization: `Bearer ${activeToken}` }
-        }
+      await api.delete(
+        `customers/${editingCustomer._id}/documents/${docId}`
       );
       setUploadedDocs(prev => prev.filter(d => d._id !== docId));
     } catch {
@@ -214,13 +210,12 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
             const fd = new FormData();
             fd.append('file', temp.file);
             fd.append('label', temp.label);
-            await axios.post(
-              `http://localhost:5001/api/customers/${customerId}/documents`,
+            await api.post(
+              `customers/${customerId}/documents`,
               fd,
               {
                 headers: {
-                  'Content-Type': 'multipart/form-data',
-                  Authorization: `Bearer ${activeToken}`
+                  'Content-Type': 'multipart/form-data'
                 }
               }
             );
@@ -236,13 +231,12 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
             const fd = new FormData();
             fd.append('file', temp.file);
             fd.append('label', temp.label);
-            await axios.post(
-              `http://localhost:5001/api/customers/${customerId}/documents`,
+            await api.post(
+              `customers/${customerId}/documents`,
               fd,
               {
                 headers: {
-                  'Content-Type': 'multipart/form-data',
-                  Authorization: `Bearer ${activeToken}`
+                  'Content-Type': 'multipart/form-data'
                 }
               }
             );

@@ -10,7 +10,7 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 
 export default function Transactions() {
@@ -29,7 +29,7 @@ export default function Transactions() {
   const fetchTransactions = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`http://localhost:5001/api/transactions?showReversed=${showReversed}`, { headers });
+      const res = await api.get(`transactions?showReversed=${showReversed}`);
       setTransactions(res.data);
     } catch (err) {
       setError('Failed to load transaction ledger records.');
@@ -48,7 +48,7 @@ export default function Transactions() {
     }
 
     try {
-      await axios.delete(`http://localhost:5001/api/transactions/${id}`, { headers });
+      await api.delete(`transactions/${id}`);
       fetchTransactions();
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to revert transaction.');

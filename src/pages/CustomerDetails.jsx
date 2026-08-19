@@ -25,7 +25,7 @@ import {
   Printer
 } from 'lucide-react';
 import { customerAPI, loanAPI, transactionAPI } from '../api';
-import axios from 'axios';
+import api from '../api';
 import PaymentModal from '../components/PaymentModal';
 import NewLoanModal from '../components/NewLoanModal';
 import NewCustomerModal from '../components/NewCustomerModal';
@@ -87,9 +87,7 @@ export default function CustomerDetails() {
   const handleRunAnalysis = async () => {
     setLoadingAnalysis(true);
     try {
-      const res = await axios.get(`http://localhost:5001/api/ai/credit-risk/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get(`ai/credit-risk/${id}`);
       setCreditAnalysis(res.data);
     } catch (err) {
       alert('Failed to generate AI credit analysis.');
@@ -130,9 +128,7 @@ export default function CustomerDetails() {
     setActiveScheduleLoanId(loanId);
     setLoadingSchedule(true);
     try {
-      const res = await axios.get(`http://localhost:5001/api/loans/${loanId}/installments`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get(`loans/${loanId}/installments`);
       setScheduleInstallments(res.data);
     } catch (err) {
       console.error('Failed to load installment schedule:', err);
@@ -147,12 +143,9 @@ export default function CustomerDetails() {
 
     setRestructureLoading(true);
     try {
-      await axios.post(
-        `http://localhost:5001/api/loans/${restructureLoanItem._id}/restructure`,
-        restructureForm,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
+      await api.post(
+        `loans/${restructureLoanItem._id}/restructure`,
+        restructureForm
       );
       alert('Loan structured and rescheduled successfully!');
       setRestructureLoanItem(null);
@@ -190,10 +183,9 @@ export default function CustomerDetails() {
     setCopied(false);
 
     try {
-      const res = await axios.post(
-        'http://localhost:5001/api/ai/draft-reminder',
-        { customerId: customer._id, loanId: loan._id },
-        { headers: { Authorization: `Bearer ${token}` } }
+      const res = await api.post(
+        'ai/draft-reminder',
+        { customerId: customer._id, loanId: loan._id }
       );
       setDraftText(res.data.message);
     } catch (err) {

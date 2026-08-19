@@ -17,7 +17,7 @@ import {
   GripVertical
 } from 'lucide-react';
 import { loanAPI, transactionAPI } from '../api';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 import StatsCard from '../components/StatsCard';
 import NewCustomerModal from '../components/NewCustomerModal';
@@ -73,7 +73,7 @@ export default function Dashboard() {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      let eodUrl = 'http://localhost:5001/api/reports/eod-summary';
+      let eodUrl = 'reports/eod-summary';
       if (filterStartDate && filterEndDate) {
         eodUrl += `?startDate=${filterStartDate}&endDate=${filterEndDate}`;
       }
@@ -81,9 +81,9 @@ export default function Dashboard() {
       const [loansData, txData, dailyRes, eodRes, anomalyRes] = await Promise.all([
         loanAPI.getAll(),
         transactionAPI.getAll(),
-        axios.get('http://localhost:5001/api/reports/daily-summary', { headers }),
-        axios.get(eodUrl, { headers }),
-        axios.get('http://localhost:5001/api/reports/anomalies', { headers })
+        api.get('reports/daily-summary'),
+        api.get(eodUrl),
+        api.get('reports/anomalies')
       ]);
       setLoans(loansData);
       setAllTransactions(txData);
@@ -254,10 +254,9 @@ Aap is guide ke zariye poora system manage kar sakte hain! Koi aur doubt ho to b
     setChatLoading(true);
 
     try {
-      const response = await axios.post(
-        'http://localhost:5001/api/ai/chat',
-        { message: msg },
-        { headers }
+      const response = await api.post(
+        'ai/chat',
+        { message: msg }
       );
       const reply = response.data.reply;
       

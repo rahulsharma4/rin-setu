@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Phone, AlertTriangle, Clock, CalendarCheck, RefreshCw, MessageSquareShare } from 'lucide-react';
 import { collectionAPI } from '../api';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 
 export default function Collection() {
@@ -39,10 +39,9 @@ export default function Collection() {
     setReminderModal({ open: true, text: '', phone: item.customer?.phone, name: item.customer?.name });
     setReminderLoading(true);
     try {
-      const res = await axios.post(
-        'http://localhost:5001/api/ai/draft-reminder',
-        { customerId: item.customer?._id, loanId: item.loan?._id },
-        { headers: { Authorization: `Bearer ${token}` } }
+      const res = await api.post(
+        'ai/draft-reminder',
+        { customerId: item.customer?._id, loanId: item.loan?._id }
       );
       setReminderModal(prev => ({ ...prev, text: res.data.message }));
     } catch {

@@ -1,5 +1,5 @@
 import { Search, Bell, User, HandCoins, Receipt, AlertTriangle, HelpCircle, Sun, Moon, MessageSquareShare, Trash2, Send, MessageCircle, Menu } from 'lucide-react';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -41,7 +41,7 @@ export default function Header({ onMenuClick }) {
   // Fetch Bell Alerts Stats
   const fetchNotifications = async () => {
     try {
-      const res = await axios.get('http://localhost:5001/api/settings/notifications', { headers });
+      const res = await api.get('settings/notifications');
       setNotifications(res.data);
     } catch (err) {
       console.error('Failed to load notifications count:', err);
@@ -50,7 +50,7 @@ export default function Header({ onMenuClick }) {
 
   const fetchPendingMessages = async () => {
     try {
-      const res = await axios.get('http://localhost:5001/api/notifications/pending', { headers });
+      const res = await api.get('notifications/pending');
       setPendingMessages(res.data);
     } catch (err) {
       console.error('Failed to load pending WhatsApp queue:', err);
@@ -78,7 +78,7 @@ export default function Header({ onMenuClick }) {
     window.open(url, '_blank');
 
     try {
-      await axios.post(`http://localhost:5001/api/notifications/${notif._id}/send`, {}, { headers });
+      await api.post(`notifications/${notif._id}/send`, {});
       fetchPendingMessages();
     } catch (err) {
       console.error('Failed to mark message as sent:', err);
@@ -87,7 +87,7 @@ export default function Header({ onMenuClick }) {
 
   const handleDiscardWhatsApp = async (id) => {
     try {
-      await axios.delete(`http://localhost:5001/api/notifications/${id}`, { headers });
+      await api.delete(`notifications/${id}`);
       fetchPendingMessages();
     } catch (err) {
       console.error('Failed to delete notification:', err);
@@ -104,7 +104,7 @@ export default function Header({ onMenuClick }) {
     const delayDebounce = setTimeout(async () => {
       setLoadingSearch(true);
       try {
-        const res = await axios.get(`http://localhost:5001/api/settings/global-search?q=${searchQuery}`, { headers });
+        const res = await api.get(`settings/global-search?q=${searchQuery}`);
         setSearchResults(res.data);
       } catch (err) {
         console.error('Failed to run global search:', err);

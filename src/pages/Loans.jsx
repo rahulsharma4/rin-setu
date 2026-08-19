@@ -16,7 +16,7 @@ import {
   X
 } from 'lucide-react';
 import { loanAPI } from '../api';
-import axios from 'axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 import PaymentModal from '../components/PaymentModal';
 import NewLoanModal from '../components/NewLoanModal';
@@ -99,10 +99,9 @@ export default function Loans() {
     e.preventDefault();
     setEditLoading(true);
     try {
-      await axios.put(
-        `http://localhost:5001/api/loans/${editingLoan._id}`,
-        editForm,
-        { headers: { Authorization: `Bearer ${token}` } }
+      await api.put(
+        `loans/${editingLoan._id}`,
+        editForm
       );
       setEditingLoan(null);
       fetchLoans();
