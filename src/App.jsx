@@ -20,6 +20,7 @@ const Reports = lazy(() => import('./pages/Reports'));
 const CashBook = lazy(() => import('./pages/CashBook'));
 const Settings = lazy(() => import('./pages/Settings'));
 const SuperAdminDashboard = lazy(() => import('./pages/SuperAdminDashboard'));
+const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
 
 const PageLoader = () => (
   <div className="h-full flex items-center justify-center py-24">
@@ -156,6 +157,18 @@ export default function App() {
         <Routes>
           {/* Public Route - Login */}
           <Route path="/login" element={<LoginPage />} />
+
+          {/* Subscription Page - Protected but outside standard sidebar layout */}
+          <Route
+            path="/subscription"
+            element={
+              <ProtectedRoute>
+                <Suspense fallback={<PageLoader />}>
+                  <SubscriptionPage />
+                </Suspense>
+              </ProtectedRoute>
+            }
+          />
 
           {/* Protected Routes */}
           <Route

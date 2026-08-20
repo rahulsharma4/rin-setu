@@ -19,7 +19,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor: 401 aane par auto-logout karo
+// Response Interceptor: 401 aane par auto-logout karo, 403 SUBSCRIPTION_EXPIRED aane par /subscription pe bhejo
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -27,6 +27,9 @@ api.interceptors.response.use(
       localStorage.removeItem('byaj_admin_token');
       localStorage.removeItem('byaj_admin_info');
       window.location.href = '/login';
+    }
+    if (error.response?.status === 403 && error.response?.data?.code === 'SUBSCRIPTION_EXPIRED') {
+      window.location.href = '/subscription';
     }
     return Promise.reject(error);
   }

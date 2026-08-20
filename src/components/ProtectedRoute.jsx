@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function ProtectedRoute({ children }) {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, admin } = useAuth();
 
   // Token verify ho raha hai — wait karo
   if (loading) {
@@ -20,6 +20,12 @@ export default function ProtectedRoute({ children }) {
   // Authenticated nahi hai — Login page par bhejo
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  // Block access to normal pages if lender subscription has expired
+  const isSubscriptionPage = window.location.pathname === '/subscription';
+  if (admin?.role !== 'super-admin' && admin?.subscriptionStatus === 'expired' && !isSubscriptionPage) {
+    return <Navigate to="/subscription" replace />;
   }
 
   return children;
