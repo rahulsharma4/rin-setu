@@ -139,13 +139,24 @@ export default function SubscriptionPage() {
             <h1 className="text-2xl font-extrabold text-brand-text dark:text-white tracking-tight">RinSetu Billing Center</h1>
             <p className="text-xs text-brand-dim mt-1">Manage your Lender Admin subscription plans and invoices.</p>
           </div>
-          <button
-            onClick={logout}
-            className="flex items-center space-x-1.5 px-4 py-2 border border-brand-border bg-brand-card rounded-xl hover:bg-brand-rose/15 hover:border-brand-rose/30 text-brand-dim hover:text-brand-rose text-xs font-semibold transition"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>Sign Out</span>
-          </button>
+          <div className="flex items-center space-x-2.5">
+            {status?.subscriptionStatus !== 'expired' && (
+              <button
+                type="button"
+                onClick={() => window.location.href = '/'}
+                className="px-4 py-2 bg-brand-accent hover:bg-indigo-600 text-white text-xs font-extrabold rounded-xl transition shadow-lg shadow-brand-accent/20"
+              >
+                Go back to Dashboard
+              </button>
+            )}
+            <button
+              onClick={logout}
+              className="flex items-center space-x-1.5 px-4 py-2 border border-brand-border bg-brand-card rounded-xl hover:bg-brand-rose/15 hover:border-brand-rose/30 text-brand-dim hover:text-brand-rose text-xs font-semibold transition"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Sign Out</span>
+            </button>
+          </div>
         </div>
 
         {/* Global Success / Error banners */}

@@ -12,7 +12,8 @@ import {
   ShieldCheck,
   BookOpen,
   Settings,
-  X
+  X,
+  CreditCard
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -38,6 +39,7 @@ export default function Sidebar({ isOpen, onClose }) {
         { to: '/cashbook', name: 'Cash Book', icon: BookOpen },
         { to: '/reports', name: 'Reports', icon: BarChart3 },
         { to: '/settings', name: 'Settings', icon: Settings },
+        { to: '/subscription', name: 'Billing & Subscription', icon: CreditCard },
       ];
 
   return (
