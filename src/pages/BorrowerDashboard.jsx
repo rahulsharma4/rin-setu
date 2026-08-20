@@ -258,7 +258,7 @@ export default function BorrowerDashboard() {
             <div className="space-y-1">
               <span className="text-[9px] font-bold text-brand-dim uppercase tracking-wider block">Next Repayment Due</span>
               <h2 className="text-2xl font-black text-brand-emerald leading-none">
-                {upcomingInst ? `₹${upcomingInst.installmentAmount.toLocaleString('en-IN')}` : 'No Dues'}
+                {upcomingInst ? `₹${upcomingInst.totalAmount.toLocaleString('en-IN')}` : 'No Dues'}
               </h2>
               <span className="text-[9px] text-brand-dim font-medium block">
                 {upcomingInst ? `Due on: ${new Date(upcomingInst.dueDate).toLocaleDateString('en-IN')}` : 'All loans settled'}
@@ -330,6 +330,8 @@ export default function BorrowerDashboard() {
               ) : (
                 data.loans.map(loan => {
                   const remaining = loan.calculations?.totalOutstanding || 0;
+                  const loanInsts = data?.installments?.filter(i => i.loanId === loan._id) || [];
+                  const instAmount = loanInsts[0]?.totalAmount || 0;
                   
                   return (
                     <div key={loan._id} className="p-6 border border-brand-border bg-brand-card rounded-2xl shadow-2xl relative flex flex-col justify-between space-y-5">
@@ -362,7 +364,7 @@ export default function BorrowerDashboard() {
                           </div>
                           <div>
                             <span className="text-[9px] block">Installment Due</span>
-                            <span className="text-white font-bold">₹{loan.installmentAmount?.toLocaleString('en-IN')} / {loan.paymentFrequency}</span>
+                            <span className="text-white font-bold">₹{instAmount.toLocaleString('en-IN')} / {loan.paymentFrequency}</span>
                           </div>
                           <div>
                             <span className="text-[9px] block">Start Date</span>
@@ -380,7 +382,7 @@ export default function BorrowerDashboard() {
                       {loan.status !== 'settled' && (
                         <button
                           type="button"
-                          onClick={() => handleOpenPayModal(loan._id, loan.installmentAmount)}
+                          onClick={() => handleOpenPayModal(loan._id, instAmount)}
                           className="w-full py-2 bg-brand-accent hover:bg-indigo-600 text-xs font-bold text-white shadow-lg shadow-brand-accent/25 rounded-xl transition flex items-center justify-center space-x-1"
                         >
                           <CreditCard className="w-3.5 h-3.5" />
@@ -415,7 +417,7 @@ export default function BorrowerDashboard() {
                       {data.installments.slice(0, 10).map((inst, index) => (
                         <tr key={inst._id} className="hover:bg-brand-bg/30">
                           <td className="py-3 font-mono">{new Date(inst.dueDate).toLocaleDateString('en-IN')}</td>
-                          <td className="py-3 text-right text-white">₹{inst.installmentAmount.toLocaleString('en-IN')}</td>
+                          <td className="py-3 text-right text-white">₹{inst.totalAmount.toLocaleString('en-IN')}</td>
                           <td className="py-3 text-right">₹{inst.interestComponent?.toLocaleString('en-IN') || 0}</td>
                           <td className="py-3 text-right">₹{inst.principalComponent?.toLocaleString('en-IN') || 0}</td>
                           <td className="py-3 text-center">
