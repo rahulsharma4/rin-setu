@@ -697,38 +697,21 @@ Aap is guide ke zariye poora system manage kar sakte hain! Koi aur doubt ho to b
               )}
             </div>
 
-            {/* Quick Prompts Chips */}
-            <div className="flex flex-wrap gap-1.5 mb-3">
-              {quickPrompts.map((p, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleSendChat(p)}
-                  disabled={chatLoading}
-                  className="px-2.5 py-1.5 rounded-lg border border-brand-border text-[9px] font-bold text-brand-dim hover:text-white hover:border-brand-accent hover:bg-brand-accent/5 transition outline-none"
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
-
-            {/* Chat Input */}
-            <div className="flex items-center space-x-2 bg-brand-bg border border-brand-border rounded-xl p-1">
-              <input
-                type="text"
-                placeholder="Ask AI e.g. Kitna overdue chal raha hai?"
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSendChat()}
-                className="flex-1 bg-transparent border-none text-xs text-white placeholder-brand-dim/50 outline-none pl-3.5 focus:ring-0 focus:outline-none"
-                disabled={chatLoading}
-              />
-              <button
-                onClick={() => handleSendChat()}
-                disabled={chatLoading || !chatInput.trim()}
-                className="w-8 h-8 rounded-lg bg-brand-accent hover:bg-indigo-600 disabled:opacity-40 flex items-center justify-center text-white transition outline-none"
-              >
-                <Send className="w-4 h-4" />
-              </button>
+            {/* Quick Prompts Grid */}
+            <div className="border-t border-brand-border/40 pt-3 mt-auto">
+              <span className="text-[9px] font-bold text-brand-dim uppercase tracking-wider block mb-2">Select Query Option:</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {quickPrompts.map((p, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleSendChat(p)}
+                    disabled={chatLoading}
+                    className="px-2.5 py-2 text-left rounded-xl border border-brand-border bg-brand-bg/60 text-[10px] font-semibold text-brand-dim hover:text-white hover:border-brand-accent/50 hover:bg-brand-accent/5 transition outline-none disabled:opacity-50"
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
             </div>
 
           </div>

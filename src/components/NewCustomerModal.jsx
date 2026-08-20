@@ -23,6 +23,9 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
     collateralType: 'None',
     collateralDescription: '',
     collateralValue: '',
+    email: '',
+    password: '',
+    isPortalEnabled: false,
   });
 
   const [loading, setLoading] = useState(false);
@@ -65,6 +68,9 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
         collateralType: editingCustomer.collateralType || 'None',
         collateralDescription: editingCustomer.collateralDescription || '',
         collateralValue: editingCustomer.collateralValue || '',
+        email: editingCustomer.email || '',
+        password: '',
+        isPortalEnabled: !!editingCustomer.isPortalEnabled,
       });
       setUploadedDocs(editingCustomer.documents || []);
     } else {
@@ -84,6 +90,9 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
         collateralType: 'None',
         collateralDescription: '',
         collateralValue: '',
+        email: '',
+        password: '',
+        isPortalEnabled: false,
       });
       setUploadedDocs([]);
     }
@@ -341,6 +350,57 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
                 className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
               />
             </div>
+
+            {/* Portal Credentials Info */}
+            <div className="md:col-span-2 border-b border-brand-border/40 pb-2 pt-2">
+              <h3 className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Borrower Portal Access</h3>
+            </div>
+
+            <div className="flex items-center space-x-2 md:col-span-2 py-1">
+              <input
+                type="checkbox"
+                id="isPortalEnabled"
+                name="isPortalEnabled"
+                checked={formData.isPortalEnabled}
+                onChange={(e) => setFormData(prev => ({ ...prev, isPortalEnabled: e.target.checked }))}
+                className="w-4 h-4 rounded text-brand-accent bg-brand-bg border-brand-border focus:ring-0 focus:ring-offset-0 cursor-pointer"
+              />
+              <label htmlFor="isPortalEnabled" className="text-[10px] font-bold text-brand-dim uppercase tracking-wider select-none cursor-pointer">
+                Enable Client Portal Login
+              </label>
+            </div>
+
+            {formData.isPortalEnabled && (
+              <>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wide">Client Email *</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email || ''}
+                    onChange={handleChange}
+                    placeholder="e.g. ramesh@test.com"
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
+                    required={formData.isPortalEnabled}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wide">
+                    {isEditMode ? 'Reset Password (optional)' : 'Portal Password *'}
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password || ''}
+                    onChange={handleChange}
+                    placeholder={isEditMode ? 'Leave blank to keep current' : 'Enter portal password'}
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/50 outline-none transition"
+                    required={!isEditMode && formData.isPortalEnabled}
+                  />
+                </div>
+              </>
+            )}
 
             {/* KYC Inputs */}
             <div className="space-y-1.5">

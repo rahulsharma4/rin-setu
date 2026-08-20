@@ -21,6 +21,7 @@ const CashBook = lazy(() => import('./pages/CashBook'));
 const Settings = lazy(() => import('./pages/Settings'));
 const SuperAdminDashboard = lazy(() => import('./pages/SuperAdminDashboard'));
 const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
+const BorrowerDashboard = lazy(() => import('./pages/BorrowerDashboard'));
 
 const PageLoader = () => (
   <div className="h-full flex items-center justify-center py-24">
@@ -33,6 +34,22 @@ function CRMLayout() {
   const { admin, exitImpersonation } = useAuth();
   
   const isSuper = admin?.role === 'super-admin';
+  const isBorrower = admin?.role === 'borrower';
+
+  if (isBorrower) {
+    return (
+      <div className="flex bg-brand-bg min-h-screen w-full relative overflow-hidden">
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto max-h-screen relative z-10 w-full font-sans">
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<BorrowerDashboard />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="flex bg-brand-bg min-h-screen relative overflow-hidden">
