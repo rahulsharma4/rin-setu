@@ -323,7 +323,7 @@ export default function BorrowerDashboard() {
           /* SECTION 1: Active Loans List */
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {data.loans.length === 0 ? (
+              {!data?.loans || data.loans.length === 0 ? (
                 <div className="md:col-span-2 glass-panel p-8 text-center text-brand-dim">
                   Aapke account par koi loan chal raha nahi hai.
                 </div>
@@ -453,7 +453,7 @@ export default function BorrowerDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-brand-border/30 text-brand-text dark:text-slate-300 font-medium">
-                  {data.transactions.length === 0 ? (
+                  {!data?.transactions || data.transactions.length === 0 ? (
                     <tr>
                       <td colSpan="5" className="py-6 text-center text-brand-dim">
                         No transactions registered yet.
