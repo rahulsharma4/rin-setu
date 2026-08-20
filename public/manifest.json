@@ -1,6 +1,6 @@
 {
-  "name": "Byaj CRM Ledger",
-  "short_name": "Byaj CRM",
+  "name": "RinSetu CRM Ledger",
+  "short_name": "RinSetu",
   "description": "Progressive Web App for private money lending ledger management",
   "start_url": "/",
   "display": "standalone",

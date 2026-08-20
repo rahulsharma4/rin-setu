@@ -660,7 +660,7 @@ export default function BorrowerDashboard() {
 
       {/* Footer */}
       <div className="max-w-5xl mx-auto w-full text-center text-[10px] text-brand-dim pt-8 border-t border-brand-border/20 mt-12">
-        &copy; {new Date().getFullYear()} Byaj CRM Client Portal. Secure money lending systems and reports.
+        &copy; {new Date().getFullYear()} RinSetu Client Portal. Secure money lending systems and reports.
       </div>
     </div>
   );

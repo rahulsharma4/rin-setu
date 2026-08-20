@@ -48,7 +48,7 @@ export default function Dashboard() {
   // Chat Bot states
   const [chatInput, setChatInput] = useState('');
   const [chatMessages, setChatMessages] = useState([
-    { sender: 'bot', text: 'Namaste! Mai Byaj CRM ka AI assistant hu. Aaj aapka business kaisa raha? Overdue reports ya collection analysis dekhne ke liye mujhse puchhein.' }
+    { sender: 'bot', text: 'Namaste! Mai RinSetu ka AI assistant hu. Aaj aapka business kaisa raha? Overdue reports ya collection analysis dekhne ke liye mujhse puchhein.' }
   ]);
   const [chatLoading, setChatLoading] = useState(false);
 
@@ -213,9 +213,9 @@ export default function Dashboard() {
     if (lowerMsg.includes('use kaise') || lowerMsg.includes('user guide') || lowerMsg.includes('how to use') || lowerMsg.includes('guide')) {
       setChatLoading(true);
       setTimeout(() => {
-        const guideText = `📖 **Byaj CRM User Guide (उपयोगकर्ता मार्गदर्शिका)**
+        const guideText = `📖 **RinSetu CRM User Guide (उपयोगकर्ता मार्गदर्शिका)**
 
-Namaste! RinSetu Byaj CRM ko use karna behad aasan hai. Neeche har section aur setting ki poori detail di gayi hai:
+Namaste! RinSetu CRM ko use karna behad aasan hai. Neeche har section aur setting ki poori detail di gayi hai:
 
 ### 1. Dashboard (डैशबोर्ड)
 - **Cumulative Profit (Byaj)**: Lenders dwara kamaya gaya kul byaj.
@@ -285,7 +285,7 @@ Aap is guide ke zariye poora system manage kar sakte hain! Koi aur doubt ho to b
     "Aaj kitna collection expected hai?",
     "Overdue loans check karo",
     "Cash Book balance kya hai?",
-    "Byaj CRM use kaise karein? (User Guide)"
+    "RinSetu CRM use kaise karein? (User Guide)"
   ];
 
   return (

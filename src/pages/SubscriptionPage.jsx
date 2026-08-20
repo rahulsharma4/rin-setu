@@ -71,7 +71,7 @@ export default function SubscriptionPage() {
         key: res.data.keyId,
         amount: res.data.amount * 100, // paise
         currency: res.data.currency,
-        name: 'Byaj CRM SaaS',
+        name: 'RinSetu CRM SaaS',
         description: `Subscription: ${res.data.planName}`,
         order_id: res.data.orderId,
         prefill: {
