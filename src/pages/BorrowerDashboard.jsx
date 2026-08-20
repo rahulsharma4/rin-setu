@@ -172,8 +172,8 @@ export default function BorrowerDashboard() {
   const getOutstandingTotal = () => {
     if (!data?.loans) return 0;
     return data.loans.reduce((acc, l) => {
-      const remaining = (l.principalAmount + (l.totalInterestAccrued || 0)) - (l.totalPrincipalPaid + l.totalInterestPaid);
-      return acc + (remaining > 0 ? remaining : 0);
+      const remaining = l.calculations?.totalOutstanding || 0;
+      return acc + remaining;
     }, 0);
   };
 
@@ -329,7 +329,7 @@ export default function BorrowerDashboard() {
                 </div>
               ) : (
                 data.loans.map(loan => {
-                  const remaining = (loan.principalAmount + (loan.totalInterestAccrued || 0)) - (loan.totalPrincipalPaid + loan.totalInterestPaid);
+                  const remaining = loan.calculations?.totalOutstanding || 0;
                   
                   return (
                     <div key={loan._id} className="p-6 border border-brand-border bg-brand-card rounded-2xl shadow-2xl relative flex flex-col justify-between space-y-5">
