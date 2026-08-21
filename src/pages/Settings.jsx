@@ -1194,54 +1194,64 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* Bank Credentials Form Card */}
-          <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-5">
-            <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
-              <Wallet className="w-4 h-4 text-brand-accent" />
-              <h3 className="text-xs font-bold text-brand-text dark:text-white uppercase tracking-wider">Bank Settlement Details</h3>
+          {payoutData.paymentModePreference === 'byok' ? (
+            <div className="glass-panel border border-brand-border rounded-2xl p-6 text-center space-y-2.5">
+              <Key className="w-7 h-7 text-brand-accent mx-auto" />
+              <p className="text-xs font-bold text-white">Custom Gateway (BYOK) Mode Selected</p>
+              <p className="text-[10px] text-brand-dim leading-relaxed max-w-md mx-auto">
+                No bank details are required for this mode here. Please switch to the **💳 Payment Settings** tab at the top to configure your custom Razorpay API credentials.
+              </p>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Beneficiary Name */}
-              <div className="space-y-1.5 md:col-span-2">
-                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Beneficiary Name (Bank Account Holder) *</label>
-                <input
-                  type="text"
-                  required
-                  value={payoutData.payoutBankBeneficiaryName}
-                  onChange={(e) => setPayoutData(prev => ({ ...prev, payoutBankBeneficiaryName: e.target.value }))}
-                  placeholder="e.g. Ramesh Kumar"
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
-                />
+          ) : (
+            /* Bank Credentials Form Card */
+            <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-5">
+              <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
+                <Wallet className="w-4 h-4 text-brand-accent" />
+                <h3 className="text-xs font-bold text-brand-text dark:text-white uppercase tracking-wider">Bank Settlement Details</h3>
               </div>
 
-              {/* Account Number */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Bank Account Number *</label>
-                <input
-                  type="text"
-                  required
-                  value={payoutData.payoutBankAccountNumber}
-                  onChange={(e) => setPayoutData(prev => ({ ...prev, payoutBankAccountNumber: e.target.value }))}
-                  placeholder="e.g. 501002345678"
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
-                />
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Beneficiary Name */}
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Beneficiary Name (Bank Account Holder) *</label>
+                  <input
+                    type="text"
+                    required={payoutData.paymentModePreference === 'central_split'}
+                    value={payoutData.payoutBankBeneficiaryName}
+                    onChange={(e) => setPayoutData(prev => ({ ...prev, payoutBankBeneficiaryName: e.target.value }))}
+                    placeholder="e.g. Ramesh Kumar"
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
+                  />
+                </div>
 
-              {/* IFSC Code */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">IFSC Code *</label>
-                <input
-                  type="text"
-                  required
-                  value={payoutData.payoutBankIfsc}
-                  onChange={(e) => setPayoutData(prev => ({ ...prev, payoutBankIfsc: e.target.value }))}
-                  placeholder="e.g. HDFC0000123"
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono uppercase"
-                />
+                {/* Account Number */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Bank Account Number *</label>
+                  <input
+                    type="text"
+                    required={payoutData.paymentModePreference === 'central_split'}
+                    value={payoutData.payoutBankAccountNumber}
+                    onChange={(e) => setPayoutData(prev => ({ ...prev, payoutBankAccountNumber: e.target.value }))}
+                    placeholder="e.g. 501002345678"
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
+                  />
+                </div>
+
+                {/* IFSC Code */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">IFSC Code *</label>
+                  <input
+                    type="text"
+                    required={payoutData.paymentModePreference === 'central_split'}
+                    value={payoutData.payoutBankIfsc}
+                    onChange={(e) => setPayoutData(prev => ({ ...prev, payoutBankIfsc: e.target.value }))}
+                    placeholder="e.g. HDFC0000123"
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono uppercase"
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Save Button */}
           <div className="flex justify-end pt-2">
