@@ -94,6 +94,54 @@ export default function Settings() {
     }
   };
 
+  // ── WhatsApp settings State ───────────────────────────────
+  const [whatsappData, setWhatsappData] = useState({
+    whatsappAccessToken: '',
+    whatsappPhoneNumberId: '',
+    whatsappEnabled: false,
+    whatsappTemplates: {
+      upcomingDue: 'upcoming_due',
+      dueToday: 'due_today',
+      paymentReceived: 'payment_received',
+      overdueWarning: 'overdue_warning'
+    }
+  });
+  const [whatsappLoading, setWhatsappLoading] = useState(false);
+
+  const fetchWhatsappSettings = async () => {
+    try {
+      const res = await api.get('auth/whatsapp-settings');
+      setWhatsappData({
+        whatsappAccessToken: res.data.whatsappAccessToken || '',
+        whatsappPhoneNumberId: res.data.whatsappPhoneNumberId || '',
+        whatsappEnabled: !!res.data.whatsappEnabled,
+        whatsappTemplates: {
+          upcomingDue: res.data.whatsappTemplates?.upcomingDue || 'upcoming_due',
+          dueToday: res.data.whatsappTemplates?.dueToday || 'due_today',
+          paymentReceived: res.data.whatsappTemplates?.paymentReceived || 'payment_received',
+          overdueWarning: res.data.whatsappTemplates?.overdueWarning || 'overdue_warning'
+        }
+      });
+    } catch (_) {}
+  };
+
+  const handleSaveWhatsapp = async (e) => {
+    e.preventDefault();
+    setWhatsappLoading(true);
+    setSuccess('');
+    setError('');
+    try {
+      await api.put('auth/whatsapp-settings', whatsappData);
+      setSuccess('WhatsApp Cloud API settings saved successfully!');
+      setTimeout(() => setSuccess(''), 4000);
+      fetchWhatsappSettings();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to save WhatsApp settings.');
+    } finally {
+      setWhatsappLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (admin) {
       setProfileData({
@@ -167,6 +215,9 @@ export default function Settings() {
     }
     if (activeTab === 'payment') {
       fetchGatewaySettings();
+    }
+    if (activeTab === 'whatsapp') {
+      fetchWhatsappSettings();
     }
   }, [activeTab]);
 
@@ -318,6 +369,16 @@ export default function Settings() {
         >
           <span>💳 Payment Settings</span>
           {activeTab === 'payment' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-accent animate-scale-x" />}
+        </button>
+
+        <button 
+          onClick={() => setActiveTab('whatsapp')}
+          className={`pb-3 relative transition outline-none ${
+            activeTab === 'whatsapp' ? 'text-brand-accent' : 'text-brand-dim hover:text-white'
+          }`}
+        >
+          <span>💬 WhatsApp Settings</span>
+          {activeTab === 'whatsapp' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-accent animate-scale-x" />}
         </button>
       </div>
 
@@ -815,6 +876,178 @@ export default function Settings() {
             >
               <Save className="w-4 h-4" />
               <span>{gatewayLoading ? 'Saving...' : 'Save Payment Gateway Settings'}</span>
+            </button>
+          </div>
+
+        </form>
+      )}
+
+      {/* ── Tab: WhatsApp Cloud API Settings ─────────────────────────────── */}
+      {activeTab === 'whatsapp' && (
+        <form onSubmit={handleSaveWhatsapp} className="space-y-6">
+
+          {/* Status Banner */}
+          <div className={`flex items-center space-x-3 p-4 rounded-2xl border ${
+            whatsappData.whatsappEnabled
+              ? 'bg-brand-emerald/10 border-brand-emerald/30 text-brand-emerald'
+              : 'bg-brand-amber/10 border-brand-amber/30 text-brand-amber'
+          }`}>
+            <MessageSquare className="w-5 h-5 shrink-0" />
+            <div>
+              <p className="text-xs font-bold">
+                {whatsappData.whatsappEnabled ? '✅ Meta WhatsApp Cloud API is Active' : '⚙️ WhatsApp Automation is Disabled'}
+              </p>
+              <p className="text-[10px] mt-0.5 opacity-80">
+                {whatsappData.whatsappEnabled
+                  ? 'Automated WhatsApp alerts will go out to borrowers on loan creation, payments, and dues.'
+                  : 'Toggle WhatsApp Automation ON and fill in credentials to send direct messages.'}
+              </p>
+            </div>
+          </div>
+
+          {/* Credentials Card */}
+          <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-5">
+            <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
+              <Key className="w-4 h-4 text-brand-accent" />
+              <h3 className="text-xs font-bold text-brand-text dark:text-white uppercase tracking-wider">Meta WhatsApp API Settings</h3>
+            </div>
+
+            {/* Setup Instructions */}
+            <div className="p-4 bg-brand-bg/60 border border-brand-border rounded-xl space-y-2 text-[10px] text-brand-dim leading-relaxed">
+              <p className="font-bold text-brand-text dark:text-white text-[11px]">📋 How to set up your WhatsApp Business Cloud API:</p>
+              <ol className="list-decimal list-inside space-y-1">
+                <li>Go to <strong className="text-brand-accent">developers.facebook.com</strong> → Create a Meta Developer Account</li>
+                <li>Add the <strong>WhatsApp</strong> product to your App in the console</li>
+                <li>Verify your Business details and Phone Number in Meta Business Manager</li>
+                <li>Copy the <strong>Permanent Access Token</strong> and paste it below</li>
+                <li>Copy the <strong>Phone Number ID</strong> from Meta WhatsApp settings panel and paste it below</li>
+                <li>Create and register templates (upcoming_due, due_today, payment_received, overdue_warning) on Meta Manager</li>
+              </ol>
+            </div>
+
+            {/* Toggle Enable */}
+            <div className="flex items-center justify-between p-3.5 bg-brand-bg/40 border border-brand-border rounded-xl">
+              <div>
+                <p className="text-xs font-bold text-brand-text dark:text-white">Enable Automated WhatsApp Alerts</p>
+                <p className="text-[10px] text-brand-dim mt-0.5">Toggle WhatsApp messages in background on/off</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setWhatsappData(prev => ({ ...prev, whatsappEnabled: !prev.whatsappEnabled }))}
+                className={`px-4 py-2 rounded-xl text-[10px] font-bold transition ${
+                  whatsappData.whatsappEnabled ? 'bg-brand-emerald text-white' : 'bg-brand-border text-brand-dim'
+                }`}
+              >
+                {whatsappData.whatsappEnabled ? 'ENABLED' : 'DISABLED'}
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Access Token */}
+              <div className="space-y-1.5 md:col-span-2">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Meta WhatsApp Permanent Token *</label>
+                <input
+                  type="password"
+                  value={whatsappData.whatsappAccessToken}
+                  onChange={(e) => setWhatsappData(prev => ({ ...prev, whatsappAccessToken: e.target.value }))}
+                  placeholder="Paste EAAB... Meta Permanent Access Token"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
+                  autoComplete="new-password"
+                />
+              </div>
+
+              {/* Phone Number ID */}
+              <div className="space-y-1.5 md:col-span-2">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">WhatsApp Phone Number ID *</label>
+                <input
+                  type="text"
+                  value={whatsappData.whatsappPhoneNumberId}
+                  onChange={(e) => setWhatsappData(prev => ({ ...prev, whatsappPhoneNumberId: e.target.value }))}
+                  placeholder="e.g. 1098654215467"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Templates Card */}
+          <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-5">
+            <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
+              <MessageSquare className="w-4 h-4 text-brand-accent" />
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider">Meta Template Names</h3>
+            </div>
+            <p className="text-[10px] text-brand-dim leading-relaxed">
+              Enter the exact template names (created in Meta dashboard) that we should map to loan events.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Upcoming Due Template */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Upcoming Due Template Name</label>
+                <input
+                  type="text"
+                  value={whatsappData.whatsappTemplates.upcomingDue}
+                  onChange={(e) => setWhatsappData(prev => ({
+                    ...prev,
+                    whatsappTemplates: { ...prev.whatsappTemplates, upcomingDue: e.target.value }
+                  }))}
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                />
+              </div>
+
+              {/* Due Today Template */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Due Today Template Name</label>
+                <input
+                  type="text"
+                  value={whatsappData.whatsappTemplates.dueToday}
+                  onChange={(e) => setWhatsappData(prev => ({
+                    ...prev,
+                    whatsappTemplates: { ...prev.whatsappTemplates, dueToday: e.target.value }
+                  }))}
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                />
+              </div>
+
+              {/* Payment Received Template */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Payment Received Template Name</label>
+                <input
+                  type="text"
+                  value={whatsappData.whatsappTemplates.paymentReceived}
+                  onChange={(e) => setWhatsappData(prev => ({
+                    ...prev,
+                    whatsappTemplates: { ...prev.whatsappTemplates, paymentReceived: e.target.value }
+                  }))}
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                />
+              </div>
+
+              {/* Overdue Warning Template */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Overdue Warning Template Name</label>
+                <input
+                  type="text"
+                  value={whatsappData.whatsappTemplates.overdueWarning}
+                  onChange={(e) => setWhatsappData(prev => ({
+                    ...prev,
+                    whatsappTemplates: { ...prev.whatsappTemplates, overdueWarning: e.target.value }
+                  }))}
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Save Button */}
+          <div className="flex justify-end pt-2">
+            <button
+              type="submit"
+              disabled={whatsappLoading}
+              className="flex items-center space-x-1.5 px-6 py-3.5 rounded-xl bg-brand-accent hover:bg-indigo-600 disabled:opacity-40 text-xs font-bold text-white shadow-lg shadow-brand-accent/25 transition-all duration-200"
+            >
+              <Save className="w-4 h-4" />
+              <span>{whatsappLoading ? 'Saving...' : 'Save WhatsApp Settings'}</span>
             </button>
           </div>
 
