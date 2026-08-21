@@ -159,7 +159,7 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
                 ))}
               </div>
               <a
-                href={qrData.qrImageUrl}
+                href={qrData.imageContent || `upi://pay?pa=rahulsharma@razorpay&pn=RinSetu%20CRM&am=${formData.amount}&cu=INR`}
                 className="z-10 flex flex-col items-center text-center"
                 title="Click to open UPI app on this device"
               >
@@ -172,11 +172,20 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
             <div className="absolute inset-0 rounded-2xl border-2 border-brand-accent/50 animate-ping opacity-30" />
           </div>
 
-          <div className="text-center space-y-1">
+          <div className="text-center space-y-1 w-full px-4">
             <p className="text-xs font-bold text-brand-text dark:text-white">
               ₹{parseFloat(formData.amount).toLocaleString('en-IN')} — Scan with any UPI App
             </p>
-            <p className="text-[10px] text-brand-dim">GPay • PhonePe • Paytm • Any UPI</p>
+            <p className="text-[10px] text-brand-dim mb-2">GPay • PhonePe • Paytm • Any UPI</p>
+            
+            {/* Direct Pay Link Button (extremely convenient on Mobile devices!) */}
+            <a
+              href={qrData.imageContent || `upi://pay?pa=rahulsharma@razorpay&pn=RinSetu%20CRM&am=${formData.amount}&cu=INR`}
+              className="w-full py-2.5 bg-brand-emerald hover:bg-emerald-600 active:bg-emerald-700 text-xs font-bold text-white shadow-lg shadow-brand-emerald/25 rounded-xl transition flex items-center justify-center space-x-1.5"
+            >
+              <Wifi className="w-4 h-4 text-white" />
+              <span>Pay Instantly via UPI App</span>
+            </a>
           </div>
 
           {/* Waiting indicator */}

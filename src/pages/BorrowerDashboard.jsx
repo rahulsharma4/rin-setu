@@ -159,6 +159,7 @@ export default function BorrowerDashboard() {
         ...prev,
         qrCodeId: res.data.qrCodeId,
         qrImageUrl: res.data.qrImageUrl,
+        upiString: res.data.imageContent || `upi://pay?pa=rahulsharma@razorpay&pn=RinSetu%20CRM&am=${res.data.amount}&cu=INR`,
         polling: true
       }));
     } catch (err) {
@@ -631,8 +632,20 @@ export default function BorrowerDashboard() {
                     <img src={qrModal.qrImageUrl} alt="Repayment UPI QR" className="w-48 h-48 mx-auto" />
                   )}
                 </div>
+
+                 {/* Direct Pay Link Button (extremely convenient on Mobile devices!) */}
+                 <div className="px-4">
+                   <a
+                     href={qrModal.upiString}
+                     className="w-full py-2.5 bg-brand-emerald hover:bg-emerald-600 active:bg-emerald-700 text-xs font-bold text-white rounded-xl shadow-lg shadow-brand-emerald/20 transition flex items-center justify-center space-x-1.5"
+                   >
+                     <ArrowUpRight className="w-4 h-4 text-white" />
+                     <span>Pay Instantly via UPI App</span>
+                   </a>
+                 </div>
+
                 <div className="space-y-1">
-                  <p className="text-sm font-black text-white">Amount: ₹{qrModal.amount}</p>
+                  <p className="text-sm font-black text-brand-text dark:text-white">Amount: ₹{qrModal.amount}</p>
                   <p className="text-[9px] text-brand-dim font-semibold uppercase tracking-wider animate-pulse flex items-center justify-center gap-1.5">
                     <Loader2 className="w-3 h-3 animate-spin text-brand-accent" />
                     <span>Waiting for scan & payment verification...</span>
