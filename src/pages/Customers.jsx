@@ -267,8 +267,18 @@ export default function Customers() {
                     onClick={() => navigate(`/customers/${customer._id}`)}
                     className="hover:bg-brand-bg/40 transition cursor-pointer"
                   >
-                    <td className="py-3.5 pl-2 font-bold text-white text-xs">{customer.name}</td>
-                    <td className="py-3.5 font-mono text-brand-dim">{customer.phone}</td>
+                    <td className="py-3.5 pl-2 font-bold text-brand-text dark:text-white text-xs">{customer.name}</td>
+                    <td className="py-3.5">
+                      <div className="font-mono text-brand-dim">{customer.phone}</div>
+                      {customer.email && (
+                        <div className="text-[10px] text-brand-accent font-semibold truncate max-w-[150px] mt-0.5 flex items-center gap-1" title={customer.email}>
+                          <span>{customer.email}</span>
+                          {customer.isPortalEnabled && (
+                            <span className="text-[8px] bg-brand-emerald/15 text-brand-emerald px-1.5 py-0.5 rounded font-bold">Portal</span>
+                          )}
+                        </div>
+                      )}
+                    </td>
                     <td className="py-3.5">
                       <span className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${
                         customer.status === 'Active' 
@@ -347,10 +357,20 @@ export default function Customers() {
                 {/* File Header */}
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="text-sm font-extrabold text-white">{customer.name}</h3>
-                    <div className="flex items-center space-x-1.5 text-[10px] text-brand-dim font-medium mt-1">
-                      <Phone className="w-3 h-3 text-brand-accent" />
-                      <span>{customer.phone}</span>
+                    <h3 className="text-sm font-extrabold text-brand-text dark:text-white">{customer.name}</h3>
+                    <div className="flex flex-col space-y-0.5 mt-1 text-[10px] text-brand-dim font-medium">
+                      <div className="flex items-center space-x-1.5">
+                        <Phone className="w-3.5 h-3.5 text-brand-accent" />
+                        <span>{customer.phone}</span>
+                      </div>
+                      {customer.email && (
+                        <div className="flex items-center space-x-1 text-[9px] text-brand-accent mt-0.5" title={customer.email}>
+                          <span className="truncate max-w-[140px]">{customer.email}</span>
+                          {customer.isPortalEnabled && (
+                            <span className="text-[8px] bg-brand-emerald/15 text-brand-emerald px-1 rounded scale-90 origin-left font-bold">Portal</span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
