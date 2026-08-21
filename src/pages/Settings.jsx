@@ -257,12 +257,10 @@ export default function Settings() {
     }
     if (activeTab === 'payment') {
       fetchGatewaySettings();
+      fetchPayoutSettings();
     }
     if (activeTab === 'whatsapp') {
       fetchWhatsappSettings();
-    }
-    if (activeTab === 'payout') {
-      fetchPayoutSettings();
     }
   }, [activeTab]);
 
@@ -424,16 +422,6 @@ export default function Settings() {
         >
           <span>💬 WhatsApp Settings</span>
           {activeTab === 'whatsapp' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-accent animate-scale-x" />}
-        </button>
-
-        <button 
-          onClick={() => setActiveTab('payout')}
-          className={`pb-3 relative transition outline-none ${
-            activeTab === 'payout' ? 'text-brand-accent' : 'text-brand-dim hover:text-white'
-          }`}
-        >
-          <span>🏦 Payout Settings</span>
-          {activeTab === 'payout' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-accent animate-scale-x" />}
         </button>
       </div>
 
@@ -798,143 +786,297 @@ export default function Settings() {
         </form>
       )}
 
-      {/* ── Tab: Payment Gateway Settings ─────────────────────────────── */}
       {activeTab === 'payment' && (
-        <form onSubmit={handleSaveGateway} className="space-y-6">
-
-          {/* Status Banner */}
-          {gatewayInfo && (
-            <div className={`flex items-center space-x-3 p-4 rounded-2xl border ${
-              gatewayInfo.isConfigured
-                ? 'bg-brand-emerald/10 border-brand-emerald/30 text-brand-emerald'
-                : 'bg-brand-amber/10 border-brand-amber/30 text-brand-amber'
-            }`}>
-              <Wallet className="w-5 h-5 shrink-0" />
-              <div>
-                <p className="text-xs font-bold">
-                  {gatewayInfo.isConfigured ? '✅ Razorpay UPI QR is Active & Ready' : '⚙️ Payment Gateway Not Configured'}
-                </p>
-                <p className="text-[10px] mt-0.5 opacity-80">
-                  {gatewayInfo.isConfigured
-                    ? 'Borrowers can now pay via UPI QR Code and entries will be logged automatically.'
-                    : 'Fill in your Razorpay credentials below to enable automatic UPI payment recording.'}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Main Credentials Card */}
+        <div className="space-y-6">
+          
+          {/* Payment Preference Selector Card */}
           <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-5">
             <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
-              <Key className="w-4 h-4 text-brand-accent" />
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider">Razorpay API Credentials</h3>
+              <CheckCircle2 className="w-4 h-4 text-brand-accent" />
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider font-sans">Payment Integration Preference</h3>
             </div>
-
-            {/* Setup Steps */}
-            <div className="p-4 bg-brand-bg/60 border border-brand-border rounded-xl space-y-2 text-[10px] text-brand-dim leading-relaxed">
-              <p className="font-bold text-brand-text dark:text-white text-[11px]">📋 How to get your Razorpay credentials:</p>
-              <ol className="list-decimal list-inside space-y-1">
-                <li>Go to <strong className="text-brand-accent">razorpay.com</strong> → Create a business account (free) → Complete KYC</li>
-                <li>Navigate to <strong>Dashboard → Settings → API Keys → Generate Key</strong></li>
-                <li>Copy the <strong>Key ID</strong> (starts with <code>rzp_</code>) and <strong>Key Secret</strong> and paste below</li>
-                <li>Go to <strong>Settings → Webhooks → Add New Webhook</strong></li>
-                <li>Paste your unique Webhook URL (shown below) and select the <strong>payment.captured</strong> event</li>
-                <li>Copy the <strong>Webhook Secret</strong> from Razorpay and paste it below</li>
-              </ol>
-            </div>
-
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Key ID */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Razorpay Key ID *</label>
-                <input
-                  type="text"
-                  value={gatewayData.gatewayKeyId}
-                  onChange={(e) => setGatewayData(prev => ({ ...prev, gatewayKeyId: e.target.value }))}
-                  placeholder="rzp_live_xxxxxxxxxxxxxxxx"
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
-                />
+              {/* BYOK Selection card */}
+              <div 
+                onClick={async () => {
+                  const updated = { ...payoutData, paymentModePreference: 'byok' };
+                  setPayoutData(updated);
+                  try {
+                    await api.put('auth/payout-settings', updated);
+                  } catch (_) {}
+                }}
+                className={`p-4 rounded-xl border cursor-pointer transition flex flex-col space-y-1.5 ${
+                  payoutData.paymentModePreference === 'byok'
+                    ? 'border-brand-accent/50 bg-brand-accent/5'
+                    : 'border-brand-border hover:border-brand-border/80 bg-brand-bg/40'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-white">Custom Gateway (BYOK)</span>
+                  <input 
+                    type="radio" 
+                    checked={payoutData.paymentModePreference === 'byok'} 
+                    readOnly 
+                    className="text-brand-accent focus:ring-0" 
+                  />
+                </div>
+                <p className="text-[10px] text-brand-dim leading-relaxed">
+                  Use your own Razorpay merchant credentials. 100% of the funds settle directly to your merchant account. Requires manual configuration.
+                </p>
               </div>
 
-              {/* Key Secret */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Razorpay Key Secret *</label>
-                <div className="relative">
-                  <input
-                    type={showSecret ? 'text' : 'password'}
-                    value={gatewayData.gatewayKeySecret}
-                    onChange={(e) => setGatewayData(prev => ({ ...prev, gatewayKeySecret: e.target.value }))}
-                    placeholder={gatewayInfo?.hasKeySecret ? "•••••••• (Saved - enter new secret to change)" : "Enter Razorpay Key Secret"}
-                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl pl-4 pr-10 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
-                    autoComplete="new-password"
+              {/* Central Split Selection card */}
+              <div 
+                onClick={async () => {
+                  const updated = { ...payoutData, paymentModePreference: 'central_split' };
+                  setPayoutData(updated);
+                  try {
+                    await api.put('auth/payout-settings', updated);
+                  } catch (_) {}
+                }}
+                className={`p-4 rounded-xl border cursor-pointer transition flex flex-col space-y-1.5 ${
+                  payoutData.paymentModePreference === 'central_split'
+                    ? 'border-brand-accent/50 bg-brand-accent/5'
+                    : 'border-brand-border hover:border-brand-border/80 bg-brand-bg/40'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-white">Central Split Payouts (Zero Setup)</span>
+                  <input 
+                    type="radio" 
+                    checked={payoutData.paymentModePreference === 'central_split'} 
+                    readOnly 
+                    className="text-brand-accent focus:ring-0" 
                   />
-                  <button type="button" onClick={() => setShowSecret(s => !s)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-dim hover:text-white transition">
-                    {showSecret ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
+                </div>
+                <p className="text-[10px] text-brand-dim leading-relaxed">
+                  Zero gateway setup. Enter your bank details, and client payments will split and settle directly to your bank account automatically.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Conditional Layouts based on Mode Preference */}
+          {payoutData.paymentModePreference === 'byok' ? (
+            /* ================= BYOK CUSTOM GATEPAY FORM ================= */
+            <form onSubmit={handleSaveGateway} className="space-y-6">
+              {/* Status Banner */}
+              {gatewayInfo && (
+                <div className={`flex items-center space-x-3 p-4 rounded-2xl border ${
+                  gatewayInfo.isConfigured
+                    ? 'bg-brand-emerald/10 border-brand-emerald/30 text-brand-emerald'
+                    : 'bg-brand-amber/10 border-brand-amber/30 text-brand-amber'
+                }`}>
+                  <Wallet className="w-5 h-5 shrink-0" />
+                  <div>
+                    <p className="text-xs font-bold">
+                      {gatewayInfo.isConfigured ? '✅ Razorpay UPI QR is Active & Ready' : '⚙️ Payment Gateway Not Configured'}
+                    </p>
+                    <p className="text-[10px] mt-0.5 opacity-80">
+                      {gatewayInfo.isConfigured
+                        ? 'Borrowers can now pay via UPI QR Code and entries will be logged automatically.'
+                        : 'Fill in your Razorpay credentials below to enable automatic UPI payment recording.'}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Main Credentials Card */}
+              <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-5">
+                <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
+                  <Key className="w-4 h-4 text-brand-accent" />
+                  <h3 className="text-xs font-bold text-white uppercase tracking-wider">Razorpay API Credentials</h3>
+                </div>
+
+                <div className="p-4 bg-brand-bg/60 border border-brand-border rounded-xl space-y-2 text-[10px] text-brand-dim leading-relaxed">
+                  <p className="font-bold text-brand-text dark:text-white text-[11px]">📋 How to get your Razorpay credentials:</p>
+                  <ol className="list-decimal list-inside space-y-1">
+                    <li>Go to <strong className="text-brand-accent">razorpay.com</strong> → Create a business account (free) → Complete KYC</li>
+                    <li>Navigate to <strong>Dashboard → Settings → API Keys → Generate Key</strong></li>
+                    <li>Copy the <strong>Key ID</strong> (starts with <code>rzp_</code>) and <strong>Key Secret</strong> and paste below</li>
+                    <li>Go to <strong>Settings → Webhooks → Add New Webhook</strong></li>
+                    <li>Paste your unique Webhook URL (shown below) and select the <strong>payment.captured</strong> event</li>
+                    <li>Copy the <strong>Webhook Secret</strong> from Razorpay and paste it below</li>
+                  </ol>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Key ID */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Razorpay Key ID *</label>
+                    <input
+                      type="text"
+                      value={gatewayData.gatewayKeyId}
+                      onChange={(e) => setGatewayData(prev => ({ ...prev, gatewayKeyId: e.target.value }))}
+                      placeholder="rzp_live_xxxxxxxxxxxxxxxx"
+                      className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
+                    />
+                  </div>
+
+                  {/* Key Secret */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Razorpay Key Secret *</label>
+                    <div className="relative">
+                      <input
+                        type={showSecret ? 'text' : 'password'}
+                        value={gatewayData.gatewayKeySecret}
+                        onChange={(e) => setGatewayData(prev => ({ ...prev, gatewayKeySecret: e.target.value }))}
+                        placeholder={gatewayInfo?.hasKeySecret ? "•••••••• (Saved - enter new secret to change)" : "Enter Razorpay Key Secret"}
+                        className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl pl-4 pr-10 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
+                        autoComplete="new-password"
+                      />
+                      <button type="button" onClick={() => setShowSecret(s => !s)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-dim hover:text-white transition">
+                        {showSecret ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Webhook Secret */}
+                  <div className="space-y-1.5 md:col-span-2">
+                    <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Razorpay Webhook Secret</label>
+                    <input
+                      type="password"
+                      value={gatewayData.gatewayWebhookSecret}
+                      onChange={(e) => setGatewayData(prev => ({ ...prev, gatewayWebhookSecret: e.target.value }))}
+                      placeholder="Paste Webhook Secret from Razorpay dashboard"
+                      className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
+                      autoComplete="new-password"
+                    />
+                    <p className="text-[9px] text-brand-dim">This is used to verify that payment notifications truly come from Razorpay (prevents fraud).</p>
+                  </div>
                 </div>
               </div>
 
-              {/* Webhook Secret */}
-              <div className="space-y-1.5 md:col-span-2">
-                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Razorpay Webhook Secret</label>
-                <input
-                  type="password"
-                  value={gatewayData.gatewayWebhookSecret}
-                  onChange={(e) => setGatewayData(prev => ({ ...prev, gatewayWebhookSecret: e.target.value }))}
-                  placeholder="Paste Webhook Secret from Razorpay dashboard"
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
-                  autoComplete="new-password"
-                />
-                <p className="text-[9px] text-brand-dim">This is used to verify that payment notifications truly come from Razorpay (prevents fraud).</p>
-              </div>
-            </div>
-          </div>
+              {/* Webhook URL Card */}
+              {gatewayInfo?.webhookUrl && (
+                <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-4">
+                  <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
+                    <Webhook className="w-4 h-4 text-brand-accent" />
+                    <h3 className="text-xs font-bold text-white uppercase tracking-wider">Your Unique Webhook URL</h3>
+                  </div>
+                  <p className="text-[10px] text-brand-dim leading-relaxed">
+                    Copy this URL and add it to your <strong className="text-brand-text dark:text-white">Razorpay → Settings → Webhooks</strong> panel. 
+                    This is unique to your account — Razorpay will call it automatically whenever a borrower pays.
+                  </p>
+                  <div className="flex items-center space-x-2">
+                    <code className="flex-1 text-[10px] font-mono bg-brand-bg border border-brand-border rounded-xl px-4 py-3 text-brand-accent overflow-x-auto whitespace-nowrap">
+                      {gatewayInfo.webhookUrl}
+                    </code>
+                    <button
+                      type="button"
+                      onClick={handleCopyWebhook}
+                      className={`flex items-center space-x-1.5 px-4 py-3 rounded-xl border text-[10px] font-bold transition ${
+                        copied
+                          ? 'bg-brand-emerald/20 border-brand-emerald/40 text-brand-emerald'
+                          : 'border-brand-border text-brand-dim hover:text-white hover:bg-brand-border/30'
+                      }`}
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>{copied ? 'Copied!' : 'Copy'}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
 
-          {/* Webhook URL Card */}
-          {gatewayInfo?.webhookUrl && (
-            <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-4">
-              <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
-                <Webhook className="w-4 h-4 text-brand-accent" />
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider">Your Unique Webhook URL</h3>
-              </div>
-              <p className="text-[10px] text-brand-dim leading-relaxed">
-                Copy this URL and add it to your <strong className="text-brand-text dark:text-white">Razorpay → Settings → Webhooks</strong> panel. 
-                This is unique to your account — Razorpay will call it automatically whenever a borrower pays.
-              </p>
-              <div className="flex items-center space-x-2">
-                <code className="flex-1 text-[10px] font-mono bg-brand-bg border border-brand-border rounded-xl px-4 py-3 text-brand-accent overflow-x-auto whitespace-nowrap">
-                  {gatewayInfo.webhookUrl}
-                </code>
+              {/* Save Button */}
+              <div className="flex justify-end pt-2">
                 <button
-                  type="button"
-                  onClick={handleCopyWebhook}
-                  className={`flex items-center space-x-1.5 px-4 py-3 rounded-xl border text-[10px] font-bold transition ${
-                    copied
-                      ? 'bg-brand-emerald/20 border-brand-emerald/40 text-brand-emerald'
-                      : 'border-brand-border text-brand-dim hover:text-white hover:bg-brand-border/30'
-                  }`}
+                  type="submit"
+                  disabled={gatewayLoading}
+                  className="flex items-center space-x-1.5 px-6 py-3.5 rounded-xl bg-brand-accent hover:bg-indigo-600 disabled:opacity-40 text-xs font-bold text-white shadow-lg shadow-brand-accent/25 transition-all duration-200"
                 >
-                  <Copy className="w-3.5 h-3.5" />
-                  <span>{copied ? 'Copied!' : 'Copy'}</span>
+                  <Save className="w-4 h-4" />
+                  <span>{gatewayLoading ? 'Saving...' : 'Save Payment Gateway Settings'}</span>
                 </button>
               </div>
-            </div>
+            </form>
+          ) : (
+            /* ================= CENTRAL SPLIT PAYOUTS FORM ================= */
+            <form onSubmit={handleSavePayout} className="space-y-6">
+              {/* Status Banner */}
+              <div className={`flex items-center space-x-3 p-4 rounded-2xl border ${
+                payoutData.payoutEnabled
+                  ? 'bg-brand-emerald/10 border-brand-emerald/30 text-brand-emerald'
+                  : 'bg-brand-amber/10 border-brand-amber/30 text-brand-amber'
+              }`}>
+                <Wallet className="w-5 h-5 shrink-0" />
+                <div>
+                  <p className="text-xs font-bold text-white uppercase tracking-wider">
+                    {payoutData.payoutEnabled ? '✅ Central Split Payout Mode is ACTIVE' : '⚙️ Central Split Mode is PENDING Linkage Activation'}
+                  </p>
+                  <p className="text-[10px] mt-0.5 text-slate-300">
+                    {payoutData.payoutEnabled
+                      ? `Payments will split automatically and route to Linked Bank Account.`
+                      : 'Your bank details are saved. The platform administrator will activate your linked account shortly.'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Bank Credentials Form Card */}
+              <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-5">
+                <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
+                  <Wallet className="w-4 h-4 text-brand-accent" />
+                  <h3 className="text-xs font-bold text-brand-text dark:text-white uppercase tracking-wider">Bank Settlement Details</h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Beneficiary Name */}
+                  <div className="space-y-1.5 md:col-span-2">
+                    <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Beneficiary Name (Bank Account Holder) *</label>
+                    <input
+                      type="text"
+                      required
+                      value={payoutData.payoutBankBeneficiaryName}
+                      onChange={(e) => setPayoutData(prev => ({ ...prev, payoutBankBeneficiaryName: e.target.value }))}
+                      placeholder="e.g. Ramesh Kumar"
+                      className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
+                    />
+                  </div>
+
+                  {/* Account Number */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Bank Account Number *</label>
+                    <input
+                      type="text"
+                      required
+                      value={payoutData.payoutBankAccountNumber}
+                      onChange={(e) => setPayoutData(prev => ({ ...prev, payoutBankAccountNumber: e.target.value }))}
+                      placeholder="e.g. 501002345678"
+                      className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
+                    />
+                  </div>
+
+                  {/* IFSC Code */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">IFSC Code *</label>
+                    <input
+                      type="text"
+                      required
+                      value={payoutData.payoutBankIfsc}
+                      onChange={(e) => setPayoutData(prev => ({ ...prev, payoutBankIfsc: e.target.value }))}
+                      placeholder="e.g. HDFC0000123"
+                      className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono uppercase"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Save Button */}
+              <div className="flex justify-end pt-2">
+                <button
+                  type="submit"
+                  disabled={payoutLoading}
+                  className="flex items-center space-x-1.5 px-6 py-3.5 rounded-xl bg-brand-accent hover:bg-indigo-600 disabled:opacity-40 text-xs font-bold text-white shadow-lg shadow-brand-accent/25 transition-all duration-200"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>{payoutLoading ? 'Saving...' : 'Save Payout Settings'}</span>
+                </button>
+              </div>
+            </form>
           )}
-
-          {/* Save Button */}
-          <div className="flex justify-end pt-2">
-            <button
-              type="submit"
-              disabled={gatewayLoading}
-              className="flex items-center space-x-1.5 px-6 py-3.5 rounded-xl bg-brand-accent hover:bg-indigo-600 disabled:opacity-40 text-xs font-bold text-white shadow-lg shadow-brand-accent/25 transition-all duration-200"
-            >
-              <Save className="w-4 h-4" />
-              <span>{gatewayLoading ? 'Saving...' : 'Save Payment Gateway Settings'}</span>
-            </button>
-          </div>
-
-        </form>
+        </div>
       )}
 
       {/* ── Tab: WhatsApp Cloud API Settings ─────────────────────────────── */}
@@ -1109,164 +1251,7 @@ export default function Settings() {
         </form>
       )}
 
-      {/* ── Tab: Bank Payout Settings (Central Split) ─────────────────────────────── */}
-      {activeTab === 'payout' && (
-        <form onSubmit={handleSavePayout} className="space-y-6">
 
-          {/* Status Banner */}
-          <div className={`flex items-center space-x-3 p-4 rounded-2xl border ${
-            payoutData.paymentModePreference === 'central_split'
-              ? payoutData.payoutEnabled
-                ? 'bg-brand-emerald/10 border-brand-emerald/30 text-brand-emerald'
-                : 'bg-brand-amber/10 border-brand-amber/30 text-brand-amber'
-              : 'bg-brand-dim/10 border-brand-border text-brand-dim'
-          }`}>
-            <Wallet className="w-5 h-5 shrink-0" />
-            <div>
-              <p className="text-xs font-bold text-white uppercase tracking-wider">
-                {payoutData.paymentModePreference === 'central_split'
-                  ? payoutData.payoutEnabled
-                    ? '✅ Central Split Payout Mode is ACTIVE'
-                    : '⚙️ Central Split Mode is PENDING Linkage Activation'
-                  : 'ℹ️ Custom Gateway (BYOK) Mode is Enabled'}
-              </p>
-              <p className="text-[10px] mt-0.5 text-slate-300">
-                {payoutData.paymentModePreference === 'central_split'
-                  ? payoutData.payoutEnabled
-                    ? `Payments will split automatically and route to Linked Account: ${payoutData.payoutLinkedAccountId}`
-                    : 'Your bank details are saved. The platform administrator will activate your linked account shortly.'
-                  : 'Borrowers pay using the Razorpay API keys you configure in the Payment Settings tab.'}
-              </p>
-            </div>
-          </div>
-
-          {/* Payout Options Card */}
-          <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-5">
-            <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
-              <CheckCircle2 className="w-4 h-4 text-brand-accent" />
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider">Payment Mode Preference</h3>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div 
-                onClick={() => setPayoutData(prev => ({ ...prev, paymentModePreference: 'byok' }))}
-                className={`p-4 rounded-xl border cursor-pointer transition flex flex-col space-y-1.5 ${
-                  payoutData.paymentModePreference === 'byok'
-                    ? 'border-brand-accent/50 bg-brand-accent/5'
-                    : 'border-brand-border hover:border-brand-border/80 bg-brand-bg/40'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-white">Custom Gateway (BYOK)</span>
-                  <input 
-                    type="radio" 
-                    checked={payoutData.paymentModePreference === 'byok'} 
-                    readOnly 
-                    className="text-brand-accent focus:ring-0" 
-                  />
-                </div>
-                <p className="text-[10px] text-brand-dim leading-relaxed">
-                  Use your own Razorpay credentials. 100% of the funds settle directly to your merchant account. Requires manual configuration.
-                </p>
-              </div>
-
-              <div 
-                onClick={() => setPayoutData(prev => ({ ...prev, paymentModePreference: 'central_split' }))}
-                className={`p-4 rounded-xl border cursor-pointer transition flex flex-col space-y-1.5 ${
-                  payoutData.paymentModePreference === 'central_split'
-                    ? 'border-brand-accent/50 bg-brand-accent/5'
-                    : 'border-brand-border hover:border-brand-border/80 bg-brand-bg/40'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-white">Central Split Payouts (Zero Setup)</span>
-                  <input 
-                    type="radio" 
-                    checked={payoutData.paymentModePreference === 'central_split'} 
-                    readOnly 
-                    className="text-brand-accent focus:ring-0" 
-                  />
-                </div>
-                <p className="text-[10px] text-brand-dim leading-relaxed">
-                  Zero gateway setup. Enter your bank details below, and payments will split and settle directly to your bank account.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {payoutData.paymentModePreference === 'byok' ? (
-            <div className="glass-panel border border-brand-border rounded-2xl p-6 text-center space-y-2.5">
-              <Key className="w-7 h-7 text-brand-accent mx-auto" />
-              <p className="text-xs font-bold text-white">Custom Gateway (BYOK) Mode Selected</p>
-              <p className="text-[10px] text-brand-dim leading-relaxed max-w-md mx-auto">
-                No bank details are required for this mode here. Please switch to the **💳 Payment Settings** tab at the top to configure your custom Razorpay API credentials.
-              </p>
-            </div>
-          ) : (
-            /* Bank Credentials Form Card */
-            <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-5">
-              <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
-                <Wallet className="w-4 h-4 text-brand-accent" />
-                <h3 className="text-xs font-bold text-brand-text dark:text-white uppercase tracking-wider">Bank Settlement Details</h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Beneficiary Name */}
-                <div className="space-y-1.5 md:col-span-2">
-                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Beneficiary Name (Bank Account Holder) *</label>
-                  <input
-                    type="text"
-                    required={payoutData.paymentModePreference === 'central_split'}
-                    value={payoutData.payoutBankBeneficiaryName}
-                    onChange={(e) => setPayoutData(prev => ({ ...prev, payoutBankBeneficiaryName: e.target.value }))}
-                    placeholder="e.g. Ramesh Kumar"
-                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
-                  />
-                </div>
-
-                {/* Account Number */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Bank Account Number *</label>
-                  <input
-                    type="text"
-                    required={payoutData.paymentModePreference === 'central_split'}
-                    value={payoutData.payoutBankAccountNumber}
-                    onChange={(e) => setPayoutData(prev => ({ ...prev, payoutBankAccountNumber: e.target.value }))}
-                    placeholder="e.g. 501002345678"
-                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
-                  />
-                </div>
-
-                {/* IFSC Code */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">IFSC Code *</label>
-                  <input
-                    type="text"
-                    required={payoutData.paymentModePreference === 'central_split'}
-                    value={payoutData.payoutBankIfsc}
-                    onChange={(e) => setPayoutData(prev => ({ ...prev, payoutBankIfsc: e.target.value }))}
-                    placeholder="e.g. HDFC0000123"
-                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono uppercase"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Save Button */}
-          <div className="flex justify-end pt-2">
-            <button
-              type="submit"
-              disabled={payoutLoading}
-              className="flex items-center space-x-1.5 px-6 py-3.5 rounded-xl bg-brand-accent hover:bg-indigo-600 disabled:opacity-40 text-xs font-bold text-white shadow-lg shadow-brand-accent/25 transition-all duration-200"
-            >
-              <Save className="w-4 h-4" />
-              <span>{payoutLoading ? 'Saving...' : 'Save Payout Settings'}</span>
-            </button>
-          </div>
-
-        </form>
-      )}
 
     </div>
   );
