@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import LoginPage from './pages/LoginPage';
+import ErrorBoundary from './components/ErrorBoundary';
 
 import { useAuth } from './context/AuthContext';
 
@@ -40,12 +41,14 @@ function CRMLayout() {
     return (
       <div className="flex bg-brand-bg min-h-screen w-full relative overflow-hidden">
         <main className="flex-1 p-4 md:p-8 overflow-y-auto max-h-screen relative z-10 w-full font-sans">
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path="/" element={<BorrowerDashboard />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Suspense>
+          <ErrorBoundary>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/" element={<BorrowerDashboard />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
+          </ErrorBoundary>
         </main>
       </div>
     );
@@ -80,29 +83,31 @@ function CRMLayout() {
           {/* Global Search and Bell Alert Navbar Header */}
           <Header onMenuClick={() => setIsSidebarOpen(true)} />
           
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              {isSuper ? (
-                <>
-                  <Route path="/" element={<SuperAdminDashboard />} />
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </>
-              ) : (
-                <>
-                  <Route path="/" element={<Dashboard />} />
-                  <Route path="/customers" element={<Customers />} />
-                  <Route path="/customers/:id" element={<CustomerDetails />} />
-                  <Route path="/loans" element={<Loans />} />
-                  <Route path="/transactions" element={<Transactions />} />
-                  <Route path="/collection" element={<Collection />} />
-                  <Route path="/reports" element={<Reports />} />
-                  <Route path="/cashbook" element={<CashBook />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </>
-              )}
-            </Routes>
-          </Suspense>
+          <ErrorBoundary>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                {isSuper ? (
+                  <>
+                    <Route path="/" element={<SuperAdminDashboard />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </>
+                ) : (
+                  <>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/customers" element={<Customers />} />
+                    <Route path="/customers/:id" element={<CustomerDetails />} />
+                    <Route path="/loans" element={<Loans />} />
+                    <Route path="/transactions" element={<Transactions />} />
+                    <Route path="/collection" element={<Collection />} />
+                    <Route path="/reports" element={<Reports />} />
+                    <Route path="/cashbook" element={<CashBook />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </>
+                )}
+              </Routes>
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </main>
 
@@ -170,34 +175,36 @@ function CRMLayout() {
 export default function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
-          {/* Public Route - Login */}
-          <Route path="/login" element={<LoginPage />} />
+      <ErrorBoundary>
+        <Router>
+          <Routes>
+            {/* Public Route - Login */}
+            <Route path="/login" element={<LoginPage />} />
 
-          {/* Subscription Page - Protected but outside standard sidebar layout */}
-          <Route
-            path="/subscription"
-            element={
-              <ProtectedRoute>
-                <Suspense fallback={<PageLoader />}>
-                  <SubscriptionPage />
-                </Suspense>
-              </ProtectedRoute>
-            }
-          />
+            {/* Subscription Page - Protected but outside standard sidebar layout */}
+            <Route
+              path="/subscription"
+              element={
+                <ProtectedRoute>
+                  <Suspense fallback={<PageLoader />}>
+                    <SubscriptionPage />
+                  </Suspense>
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Protected Routes */}
-          <Route
-            path="/*"
-            element={
-              <ProtectedRoute>
-                <CRMLayout />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </Router>
+            {/* Protected Routes */}
+            <Route
+              path="/*"
+              element={
+                <ProtectedRoute>
+                  <CRMLayout />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </Router>
+      </ErrorBoundary>
     </AuthProvider>
   );
 }
