@@ -17,6 +17,8 @@ import {
   Settings
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { printPaymentReceipt } from '../utils/AgreementTemplates';
+import { Printer } from 'lucide-react';
 
 export default function BorrowerDashboard() {
   const { logout, admin } = useAuth();
@@ -472,12 +474,13 @@ export default function BorrowerDashboard() {
                     <th className="pb-3 text-right">Amount</th>
                     <th className="pb-3">Reference / Receipt</th>
                     <th className="pb-3">Notes</th>
+                    <th className="pb-3 text-right">Receipt</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-brand-border/30 text-brand-text dark:text-slate-300 font-medium">
                   {!data?.transactions || data.transactions.length === 0 ? (
                     <tr>
-                      <td colSpan="5" className="py-6 text-center text-brand-dim">
+                      <td colSpan="6" className="py-6 text-center text-brand-dim">
                         No transactions registered yet.
                       </td>
                     </tr>
@@ -495,6 +498,17 @@ export default function BorrowerDashboard() {
                           {tx.razorpayPaymentId ? `Razorpay: ${tx.razorpayPaymentId}` : 'Recorded as Cash'}
                         </td>
                         <td className="py-3.5 text-[10px] text-brand-dim">{tx.notes || '—'}</td>
+                        <td className="py-3.5 text-right">
+                          <button
+                            type="button"
+                            onClick={() => printPaymentReceipt(tx, null, data?.borrower, data?.lender)}
+                            className="p-1 rounded bg-brand-accent/10 hover:bg-indigo-500/25 text-brand-accent transition inline-flex items-center space-x-1 text-[10px] font-semibold"
+                            title="Print Receipt"
+                          >
+                            <Printer className="w-3 h-3" />
+                            <span className="hidden sm:inline ml-1">Print</span>
+                          </button>
+                        </td>
                       </tr>
                     ))
                   )}

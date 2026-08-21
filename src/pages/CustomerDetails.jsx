@@ -175,6 +175,15 @@ export default function CustomerDetails() {
     setIsPrintOpen(true);
   };
 
+  const handlePrintAgreement = (loan) => {
+    setPrintType('agreement');
+    setPrintData({
+      ...loan,
+      customerId: customer
+    });
+    setIsPrintOpen(true);
+  };
+
   const handleDraftAI = async (loan) => {
     setSelectedLoanForDraft(loan);
     setDrafting(true);
@@ -692,22 +701,31 @@ export default function CustomerDetails() {
                     {/* Restructure & Closure buttons */}
                     <div className="flex items-center space-x-2">
                       {!isSettled && (
-                        <button
-                          onClick={() => {
-                            setRestructureLoanItem(loan);
-                            setRestructureForm({
-                              interestRate: loan.interestRate.toString(),
-                              rateType: loan.rateType,
-                              paymentFrequency: loan.paymentFrequency,
-                              tenure: loan.tenure.toString(),
-                              remarks: `Restructured from Account #${loan._id.slice(-6)}`
-                            });
-                          }}
-                          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-brand-accent/15 hover:bg-brand-accent/25 text-[10px] font-bold text-brand-accent transition"
-                        >
-                          <Sparkles className="w-3.5 h-3.5" />
-                          <span>Restructure</span>
-                        </button>
+                        <>
+                          <button
+                            onClick={() => {
+                              setRestructureLoanItem(loan);
+                              setRestructureForm({
+                                interestRate: loan.interestRate.toString(),
+                                rateType: loan.rateType,
+                                paymentFrequency: loan.paymentFrequency,
+                                tenure: loan.tenure.toString(),
+                                remarks: `Restructured from Account #${loan._id.slice(-6)}`
+                              });
+                            }}
+                            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-brand-accent/15 hover:bg-brand-accent/25 text-[10px] font-bold text-brand-accent transition"
+                          >
+                            <Sparkles className="w-3.5 h-3.5" />
+                            <span>Restructure</span>
+                          </button>
+                          <button
+                            onClick={() => handlePrintAgreement(loan)}
+                            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-[10px] font-bold text-indigo-400 border border-indigo-500/20 transition"
+                          >
+                            <Printer className="w-3.5 h-3.5" />
+                            <span>Print Agreement</span>
+                          </button>
+                        </>
                       )}
                       
                       {isSettled && (

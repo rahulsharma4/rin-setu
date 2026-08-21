@@ -69,7 +69,7 @@ export default function PrintModal({ isOpen, onClose, type, data }) {
             id="print-area" 
             className="w-full max-w-xl bg-white text-slate-800 p-8 rounded-xl shadow-lg border border-slate-200 font-sans leading-relaxed text-xs"
           >
-            {isReceipt ? (
+            {type === 'receipt' && (
               // ==================== PAYMENT RECEIPT LAYOUT ====================
               <div className="space-y-6">
                 {/* Header */}
@@ -162,7 +162,9 @@ export default function PrintModal({ isOpen, onClose, type, data }) {
                   </div>
                 </div>
               </div>
-            ) : (
+            )}
+
+            {type === 'no_dues' && (
               // ==================== NO DUES CERTIFICATE LAYOUT ====================
               <div className="space-y-8 p-4 border-4 border-double border-slate-300 rounded-lg relative overflow-hidden bg-white">
                 
@@ -234,12 +236,64 @@ export default function PrintModal({ isOpen, onClose, type, data }) {
                     <span className="text-[8px] text-slate-400 block mt-0.5">Seal & Verification Sign</span>
                   </div>
                 </div>
+              </div>
+            )}
 
+            {type === 'agreement' && (
+              // ==================== OFFICIAL LOAN AGREEMENT LAYOUT ====================
+              <div className="space-y-6">
+                {/* Header */}
+                <div className="text-center space-y-1.5 border-b border-double border-slate-300 pb-4">
+                  <h1 className="text-lg font-black tracking-tight text-slate-900 uppercase">OFFICIAL LOAN AGREEMENT</h1>
+                  <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">RinSetu Lending Ledger & Legal Contract</p>
+                  <p className="text-[9px] text-slate-400">Date: {new Date(data.startDate).toLocaleDateString('en-IN')}</p>
+                </div>
+
+                {/* Meta Details */}
+                <div className="grid grid-cols-2 gap-4 text-[10px]">
+                  <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    <span className="text-[8px] font-bold text-slate-400 uppercase block mb-1">Borrower Details</span>
+                    <p><span className="font-bold text-slate-500">Name:</span> {data.customerId?.name || 'Customer'}</p>
+                    <p><span className="font-bold text-slate-500">Phone:</span> {data.customerId?.phone || '—'}</p>
+                    {data.customerId?.address && (
+                      <p><span className="font-bold text-slate-500">Address:</span> {data.customerId.address}</p>
+                    )}
+                  </div>
+                  <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    <span className="text-[8px] font-bold text-slate-400 uppercase block mb-1">Financial Terms</span>
+                    <p><span className="font-bold text-slate-500">Principal:</span> ₹{data.principalAmount?.toLocaleString('en-IN')}</p>
+                    <p><span className="font-bold text-slate-500">Interest Rate:</span> {data.interestRate}% ({data.rateType})</p>
+                    <p><span className="font-bold text-slate-500">Interest Type:</span> <span className="capitalize">{data.interestType}</span></p>
+                    <p><span className="font-bold text-slate-500">Frequency:</span> <span className="capitalize">{data.paymentFrequency}</span></p>
+                  </div>
+                </div>
+
+                {/* Terms and Conditions */}
+                <div className="space-y-2">
+                  <h3 className="text-[9px] font-extrabold text-slate-400 uppercase">Terms & Conditions (ऋण नियम व शर्तें)</h3>
+                  <ol className="list-decimal pl-4 text-[10px] text-slate-600 space-y-1.5 leading-relaxed">
+                    <li>उधारकर्ता मूल ऋण राशि <strong>₹{data.principalAmount?.toLocaleString('en-IN')}</strong> को ब्याज दर <strong>{data.interestRate}% प्रति {data.rateType === 'monthly' ? 'माह' : 'वर्ष'}</strong> के साथ चुकाने का अनुबंध करता है।</li>
+                    <li>सभी किस्तें ऋण अनुसूची (Repayment Schedule) के अनुसार देय होंगी। विलंब भुगतान पर अतिरिक्त दंडात्मक शुल्क आरोपित हो सकता है।</li>
+                    <li>यह डिजिटल दस्तावेज़ दोनों पक्षों के बीच पूर्ण आपसी सहमति का प्रतिनिधित्व करता है।</li>
+                  </ol>
+                </div>
+
+                {/* Signatures */}
+                <div className="pt-8 border-t border-slate-200 grid grid-cols-2 gap-4 text-center">
+                  <div className="space-y-1 border-t border-slate-300 pt-3">
+                    <p className="text-[9px] font-bold text-slate-800 uppercase tracking-wide">Signature of Borrower</p>
+                    <span className="text-[8px] text-slate-400 block">Date Signed: _______________</span>
+                  </div>
+                  <div className="space-y-1 border-t border-slate-300 pt-3">
+                    <p className="text-[9px] font-bold text-slate-800 uppercase tracking-wide">Lender Sign & Stamp</p>
+                    <span className="text-[8px] text-slate-400 block">RinSetu Verified Ledger</span>
+                  </div>
+                </div>
               </div>
             )}
           </div>
-
         </div>
+
 
         {/* Footer Actions */}
         <div className="flex items-center justify-end space-x-3 px-6 py-4 bg-brand-bg/50">
