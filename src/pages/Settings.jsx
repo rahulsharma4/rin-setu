@@ -142,6 +142,48 @@ export default function Settings() {
     }
   };
 
+  // ── Payout Settings State ───────────────────────────────
+  const [payoutData, setPayoutData] = useState({
+    payoutBankAccountNumber: '',
+    payoutBankIfsc: '',
+    payoutBankBeneficiaryName: '',
+    paymentModePreference: 'byok', // 'byok' | 'central_split'
+    payoutLinkedAccountId: '',
+    payoutEnabled: false
+  });
+  const [payoutLoading, setPayoutLoading] = useState(false);
+
+  const fetchPayoutSettings = async () => {
+    try {
+      const res = await api.get('auth/payout-settings');
+      setPayoutData({
+        payoutBankAccountNumber: res.data.payoutBankAccountNumber || '',
+        payoutBankIfsc: res.data.payoutBankIfsc || '',
+        payoutBankBeneficiaryName: res.data.payoutBankBeneficiaryName || '',
+        paymentModePreference: res.data.paymentModePreference || 'byok',
+        payoutLinkedAccountId: res.data.payoutLinkedAccountId || '',
+        payoutEnabled: !!res.data.payoutEnabled
+      });
+    } catch (_) {}
+  };
+
+  const handleSavePayout = async (e) => {
+    e.preventDefault();
+    setPayoutLoading(true);
+    setSuccess('');
+    setError('');
+    try {
+      const res = await api.put('auth/payout-settings', payoutData);
+      setSuccess(res.data.message || 'Payout settings saved successfully!');
+      setTimeout(() => setSuccess(''), 4000);
+      fetchPayoutSettings();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to save payout settings.');
+    } finally {
+      setPayoutLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (admin) {
       setProfileData({
@@ -218,6 +260,9 @@ export default function Settings() {
     }
     if (activeTab === 'whatsapp') {
       fetchWhatsappSettings();
+    }
+    if (activeTab === 'payout') {
+      fetchPayoutSettings();
     }
   }, [activeTab]);
 
@@ -379,6 +424,16 @@ export default function Settings() {
         >
           <span>💬 WhatsApp Settings</span>
           {activeTab === 'whatsapp' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-accent animate-scale-x" />}
+        </button>
+
+        <button 
+          onClick={() => setActiveTab('payout')}
+          className={`pb-3 relative transition outline-none ${
+            activeTab === 'payout' ? 'text-brand-accent' : 'text-brand-dim hover:text-white'
+          }`}
+        >
+          <span>🏦 Payout Settings</span>
+          {activeTab === 'payout' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-accent animate-scale-x" />}
         </button>
       </div>
 
@@ -1048,6 +1103,155 @@ export default function Settings() {
             >
               <Save className="w-4 h-4" />
               <span>{whatsappLoading ? 'Saving...' : 'Save WhatsApp Settings'}</span>
+            </button>
+          </div>
+
+        </form>
+      )}
+
+      {/* ── Tab: Bank Payout Settings (Central Split) ─────────────────────────────── */}
+      {activeTab === 'payout' && (
+        <form onSubmit={handleSavePayout} className="space-y-6">
+
+          {/* Status Banner */}
+          <div className={`flex items-center space-x-3 p-4 rounded-2xl border ${
+            payoutData.paymentModePreference === 'central_split'
+              ? payoutData.payoutEnabled
+                ? 'bg-brand-emerald/10 border-brand-emerald/30 text-brand-emerald'
+                : 'bg-brand-amber/10 border-brand-amber/30 text-brand-amber'
+              : 'bg-brand-dim/10 border-brand-border text-brand-dim'
+          }`}>
+            <Wallet className="w-5 h-5 shrink-0" />
+            <div>
+              <p className="text-xs font-bold text-white uppercase tracking-wider">
+                {payoutData.paymentModePreference === 'central_split'
+                  ? payoutData.payoutEnabled
+                    ? '✅ Central Split Payout Mode is ACTIVE'
+                    : '⚙️ Central Split Mode is PENDING Linkage Activation'
+                  : 'ℹ️ Custom Gateway (BYOK) Mode is Enabled'}
+              </p>
+              <p className="text-[10px] mt-0.5 text-slate-300">
+                {payoutData.paymentModePreference === 'central_split'
+                  ? payoutData.payoutEnabled
+                    ? `Payments will split automatically and route to Linked Account: ${payoutData.payoutLinkedAccountId}`
+                    : 'Your bank details are saved. The platform administrator will activate your linked account shortly.'
+                  : 'Borrowers pay using the Razorpay API keys you configure in the Payment Settings tab.'}
+              </p>
+            </div>
+          </div>
+
+          {/* Payout Options Card */}
+          <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-5">
+            <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
+              <CheckCircle2 className="w-4 h-4 text-brand-accent" />
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider">Payment Mode Preference</h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div 
+                onClick={() => setPayoutData(prev => ({ ...prev, paymentModePreference: 'byok' }))}
+                className={`p-4 rounded-xl border cursor-pointer transition flex flex-col space-y-1.5 ${
+                  payoutData.paymentModePreference === 'byok'
+                    ? 'border-brand-accent/50 bg-brand-accent/5'
+                    : 'border-brand-border hover:border-brand-border/80 bg-brand-bg/40'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-white">Custom Gateway (BYOK)</span>
+                  <input 
+                    type="radio" 
+                    checked={payoutData.paymentModePreference === 'byok'} 
+                    readOnly 
+                    className="text-brand-accent focus:ring-0" 
+                  />
+                </div>
+                <p className="text-[10px] text-brand-dim leading-relaxed">
+                  Use your own Razorpay credentials. 100% of the funds settle directly to your merchant account. Requires manual configuration.
+                </p>
+              </div>
+
+              <div 
+                onClick={() => setPayoutData(prev => ({ ...prev, paymentModePreference: 'central_split' }))}
+                className={`p-4 rounded-xl border cursor-pointer transition flex flex-col space-y-1.5 ${
+                  payoutData.paymentModePreference === 'central_split'
+                    ? 'border-brand-accent/50 bg-brand-accent/5'
+                    : 'border-brand-border hover:border-brand-border/80 bg-brand-bg/40'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-white">Central Split Payouts (Zero Setup)</span>
+                  <input 
+                    type="radio" 
+                    checked={payoutData.paymentModePreference === 'central_split'} 
+                    readOnly 
+                    className="text-brand-accent focus:ring-0" 
+                  />
+                </div>
+                <p className="text-[10px] text-brand-dim leading-relaxed">
+                  Zero gateway setup. Enter your bank details below, and payments will split and settle directly to your bank account.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Bank Credentials Form Card */}
+          <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-5">
+            <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
+              <Wallet className="w-4 h-4 text-brand-accent" />
+              <h3 className="text-xs font-bold text-brand-text dark:text-white uppercase tracking-wider">Bank Settlement Details</h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Beneficiary Name */}
+              <div className="space-y-1.5 md:col-span-2">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Beneficiary Name (Bank Account Holder) *</label>
+                <input
+                  type="text"
+                  required
+                  value={payoutData.payoutBankBeneficiaryName}
+                  onChange={(e) => setPayoutData(prev => ({ ...prev, payoutBankBeneficiaryName: e.target.value }))}
+                  placeholder="e.g. Ramesh Kumar"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
+                />
+              </div>
+
+              {/* Account Number */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Bank Account Number *</label>
+                <input
+                  type="text"
+                  required
+                  value={payoutData.payoutBankAccountNumber}
+                  onChange={(e) => setPayoutData(prev => ({ ...prev, payoutBankAccountNumber: e.target.value }))}
+                  placeholder="e.g. 501002345678"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
+                />
+              </div>
+
+              {/* IFSC Code */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">IFSC Code *</label>
+                <input
+                  type="text"
+                  required
+                  value={payoutData.payoutBankIfsc}
+                  onChange={(e) => setPayoutData(prev => ({ ...prev, payoutBankIfsc: e.target.value }))}
+                  placeholder="e.g. HDFC0000123"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono uppercase"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Save Button */}
+          <div className="flex justify-end pt-2">
+            <button
+              type="submit"
+              disabled={payoutLoading}
+              className="flex items-center space-x-1.5 px-6 py-3.5 rounded-xl bg-brand-accent hover:bg-indigo-600 disabled:opacity-40 text-xs font-bold text-white shadow-lg shadow-brand-accent/25 transition-all duration-200"
+            >
+              <Save className="w-4 h-4" />
+              <span>{payoutLoading ? 'Saving...' : 'Save Payout Settings'}</span>
             </button>
           </div>
 
