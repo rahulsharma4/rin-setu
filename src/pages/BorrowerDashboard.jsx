@@ -201,13 +201,13 @@ export default function BorrowerDashboard() {
   const upcomingInst = getUpcomingInstallment();
 
   return (
-    <div className="min-h-screen bg-brand-bg flex flex-col justify-between py-12 px-4 sm:px-6 lg:px-8">
+    <div className="w-full min-h-screen bg-brand-bg flex flex-col justify-between p-2 md:p-6">
       
       {/* Background Glows */}
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-brand-accent/5 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-brand-emerald/5 blur-[120px] pointer-events-none" />
 
-      <div className="max-w-5xl mx-auto w-full space-y-8 relative z-10">
+      <div className="max-w-5xl mx-auto w-full space-y-6 md:space-y-8 relative z-10">
         
         {/* Header Dashboard Nav */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 border-b border-brand-border/40 gap-4">
@@ -305,10 +305,10 @@ export default function BorrowerDashboard() {
         </div>
 
         {/* Tab Controls */}
-        <div className="flex border-b border-brand-border/40">
+        <div className="flex border-b border-brand-border/40 overflow-x-auto whitespace-nowrap gap-2 pb-1 scrollbar-none">
           <button
             onClick={() => setActiveSection('loans')}
-            className={`pb-3 px-6 text-xs font-bold uppercase tracking-wider border-b-2 transition ${
+            className={`pb-3 px-4 text-xs font-bold uppercase tracking-wider border-b-2 transition shrink-0 ${
               activeSection === 'loans' 
                 ? 'border-brand-accent text-white font-extrabold' 
                 : 'border-transparent text-brand-dim hover:text-white'
@@ -318,7 +318,7 @@ export default function BorrowerDashboard() {
           </button>
           <button
             onClick={() => setActiveSection('history')}
-            className={`pb-3 px-6 text-xs font-bold uppercase tracking-wider border-b-2 transition ${
+            className={`pb-3 px-4 text-xs font-bold uppercase tracking-wider border-b-2 transition shrink-0 ${
               activeSection === 'history' 
                 ? 'border-brand-accent text-white font-extrabold' 
                 : 'border-transparent text-brand-dim hover:text-white'
@@ -328,7 +328,7 @@ export default function BorrowerDashboard() {
           </button>
           <button
             onClick={() => setActiveSection('profile')}
-            className={`pb-3 px-6 text-xs font-bold uppercase tracking-wider border-b-2 transition ${
+            className={`pb-3 px-4 text-xs font-bold uppercase tracking-wider border-b-2 transition shrink-0 ${
               activeSection === 'profile' 
                 ? 'border-brand-accent text-white font-extrabold' 
                 : 'border-transparent text-brand-dim hover:text-white'
