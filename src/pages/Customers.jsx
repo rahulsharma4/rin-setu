@@ -13,7 +13,9 @@ import {
   SlidersHorizontal,
   RotateCcw,
   Upload,
-  Edit
+  Edit,
+  LayoutGrid,
+  Table as TableIcon
 } from 'lucide-react';
 import { customerAPI } from '../api';
 import NewCustomerModal from '../components/NewCustomerModal';
@@ -28,6 +30,13 @@ export default function Customers() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState(null);
+  
+  const [viewMode, setViewMode] = useState(() => localStorage.getItem('customers_view_mode') || 'table');
+
+  const handleToggleViewMode = (mode) => {
+    setViewMode(mode);
+    localStorage.setItem('customers_view_mode', mode);
+  };
 
   // Advanced Filters
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -137,6 +146,29 @@ export default function Customers() {
         >
           <SlidersHorizontal className="w-4.5 h-4.5" />
         </button>
+
+        <div className="flex items-center border border-brand-border bg-brand-card rounded-xl p-1 shrink-0">
+          <button
+            type="button"
+            onClick={() => handleToggleViewMode('grid')}
+            className={`p-2 rounded-lg transition ${
+              viewMode === 'grid' ? 'bg-brand-accent text-white font-bold' : 'text-brand-dim hover:text-white'
+            }`}
+            title="Grid View"
+          >
+            <LayoutGrid className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => handleToggleViewMode('table')}
+            className={`p-2 rounded-lg transition ${
+              viewMode === 'table' ? 'bg-brand-accent text-white font-bold' : 'text-brand-dim hover:text-white'
+            }`}
+            title="Table View"
+          >
+            <TableIcon className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Advanced Filters Panel */}
@@ -212,6 +244,96 @@ export default function Customers() {
         <div className="glass-panel rounded-2xl border border-brand-border p-12 text-center flex flex-col items-center justify-center space-y-3">
           <ShieldAlert className="w-8 h-8 text-brand-dim/30 animate-pulse" />
           <p className="text-xs text-brand-dim">No borrowers found. Register one to begin.</p>
+        </div>
+      ) : viewMode === 'table' ? (
+        <div className="glass-panel border border-brand-border bg-brand-card rounded-2xl p-6 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-brand-border/60 text-[9px] text-brand-dim uppercase font-bold tracking-wider">
+                  <th className="pb-3.5 pl-2">Borrower Name</th>
+                  <th className="pb-3.5">Phone Number</th>
+                  <th className="pb-3.5">Status</th>
+                  <th className="pb-3.5">Active Loans</th>
+                  <th className="pb-3.5">Collateral Asset (गिरवी)</th>
+                  <th className="pb-3.5">Guarantor</th>
+                  <th className="pb-3.5 text-right pr-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-brand-border/30 text-brand-text dark:text-slate-300 font-medium">
+                {filteredCustomers.map((customer) => (
+                  <tr 
+                    key={customer._id} 
+                    onClick={() => navigate(`/customers/${customer._id}`)}
+                    className="hover:bg-brand-bg/40 transition cursor-pointer"
+                  >
+                    <td className="py-3.5 pl-2 font-bold text-white text-xs">{customer.name}</td>
+                    <td className="py-3.5 font-mono text-brand-dim">{customer.phone}</td>
+                    <td className="py-3.5">
+                      <span className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${
+                        customer.status === 'Active' 
+                          ? 'bg-brand-emerald/10 text-brand-emerald border border-brand-emerald/20' 
+                          : 'bg-brand-rose/10 text-brand-rose border border-brand-rose/20'
+                      }`}>
+                        {customer.status}
+                      </span>
+                    </td>
+                    <td className="py-3.5">
+                      <span className="px-2 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wide bg-brand-accent/15 text-brand-accent border border-brand-accent/25">
+                        {customer.activeLoansCount} Active
+                      </span>
+                    </td>
+                    <td className="py-3.5">
+                      {customer.collateralType !== 'None' ? (
+                        <div className="flex items-center space-x-1.5">
+                          <Coins className="w-3.5 h-3.5 text-brand-amber" />
+                          <span className="text-[10px] text-brand-amber font-semibold">{customer.collateralType}</span>
+                        </div>
+                      ) : (
+                        <span className="text-[10px] text-brand-dim/50 italic">None</span>
+                      )}
+                    </td>
+                    <td className="py-3.5 text-brand-dim text-[11px]">
+                      {customer.guarantorName ? (
+                        <span className="flex items-center space-x-1">
+                          <ShieldCheck className="w-3.5 h-3.5 text-brand-emerald" />
+                          <span>{customer.guarantorName}</span>
+                        </span>
+                      ) : '—'}
+                    </td>
+                    <td className="py-3.5 text-right pr-2" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center justify-end space-x-2">
+                        <button
+                          onClick={() => navigate(`/customers/${customer._id}`)}
+                          className="p-1.5 rounded bg-brand-border/40 text-brand-dim hover:text-white hover:bg-brand-border transition"
+                          title="View Details"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setEditingCustomer(customer);
+                            setIsModalOpen(true);
+                          }}
+                          className="p-1.5 rounded bg-brand-accent/10 text-brand-accent hover:text-white hover:bg-brand-accent transition"
+                          title="Edit Profile"
+                        >
+                          <Edit className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={(e) => handleDelete(customer._id, e)}
+                          className="p-1.5 rounded bg-brand-rose/5 text-brand-rose/70 hover:text-white hover:bg-brand-rose transition"
+                          title="Delete Customer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
