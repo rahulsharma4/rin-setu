@@ -192,6 +192,11 @@ export default function BorrowerDashboard() {
     );
   }
 
+  const getTotalPaid = () => {
+    if (!data?.transactions) return 0;
+    return data.transactions.reduce((acc, t) => acc + (t.amount || 0), 0);
+  };
+
   const upcomingInst = getUpcomingInstallment();
 
   return (
@@ -238,17 +243,17 @@ export default function BorrowerDashboard() {
         )}
 
         {/* KPI Cards Summary */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {/* Outstanding Total */}
           <div className="glass-panel p-6 border border-brand-border bg-brand-card rounded-2xl shadow-xl flex items-center justify-between">
             <div className="space-y-1">
-              <span className="text-[9px] font-bold text-brand-dim uppercase tracking-wider block">Total Outstanding Balance</span>
-              <h2 className="text-2xl font-black text-white leading-none">
+              <span className="text-[9px] font-bold text-brand-dim uppercase tracking-wider block">Outstanding Balance</span>
+              <h2 className="text-2xl font-black text-brand-text dark:text-white leading-none">
                 ₹{getOutstandingTotal().toLocaleString('en-IN')}
               </h2>
-              <span className="text-[9px] text-brand-dim font-medium block">Total pending principal & interest</span>
+              <span className="text-[9px] text-brand-dim font-medium block">Total pending amount</span>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-brand-accent/10 text-brand-accent flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-brand-accent/10 text-brand-accent flex items-center justify-center shrink-0">
               <Coins className="w-5 h-5" />
             </div>
           </div>
@@ -264,8 +269,22 @@ export default function BorrowerDashboard() {
                 {upcomingInst ? `Due on: ${new Date(upcomingInst.dueDate).toLocaleDateString('en-IN')}` : 'All loans settled'}
               </span>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-brand-emerald/10 text-brand-emerald flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-brand-emerald/10 text-brand-emerald flex items-center justify-center shrink-0">
               <Calendar className="w-5 h-5" />
+            </div>
+          </div>
+
+          {/* Total Paid */}
+          <div className="glass-panel p-6 border border-brand-border bg-brand-card rounded-2xl shadow-xl flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-[9px] font-bold text-brand-dim uppercase tracking-wider block">Total Paid So Far</span>
+              <h2 className="text-2xl font-black text-brand-accent leading-none">
+                ₹{getTotalPaid().toLocaleString('en-IN')}
+              </h2>
+              <span className="text-[9px] text-brand-dim font-medium block">Cumulative paid principal & interest</span>
+            </div>
+            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center shrink-0">
+              <ArrowUpRight className="w-5 h-5" />
             </div>
           </div>
 
@@ -273,7 +292,7 @@ export default function BorrowerDashboard() {
           <div className="glass-panel p-6 border border-brand-border bg-brand-card rounded-2xl shadow-xl flex items-center justify-between">
             <div className="space-y-1">
               <span className="text-[9px] font-bold text-brand-dim uppercase tracking-wider block">Lender Helpline</span>
-              <h2 className="text-xl font-bold text-white leading-none truncate max-w-[200px]">
+              <h2 className="text-lg font-bold text-brand-text dark:text-white leading-none truncate max-w-[140px]">
                 {data?.lender?.name}
               </h2>
               <span className="text-[10px] text-brand-accent font-semibold block flex items-center space-x-1 mt-1">
@@ -342,7 +361,7 @@ export default function BorrowerDashboard() {
                             <span className="text-[9px] uppercase font-bold bg-indigo-500/10 text-indigo-400 px-2.5 py-0.5 rounded-full border border-indigo-500/20">
                               {loan.interestType === 'simple' ? 'Simple Interest' : 'Compound Interest'}
                             </span>
-                            <h3 className="text-md font-extrabold text-white mt-2">Principal: ₹{loan.principalAmount.toLocaleString('en-IN')}</h3>
+                            <h3 className="text-md font-extrabold text-brand-text dark:text-white mt-2">Principal: ₹{loan.principalAmount.toLocaleString('en-IN')}</h3>
                           </div>
                           <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${
                             loan.status === 'settled' ? 'bg-brand-emerald/10 text-brand-emerald' : 
@@ -356,19 +375,19 @@ export default function BorrowerDashboard() {
                         <div className="grid grid-cols-2 gap-3 text-xs text-brand-dim font-medium pt-2 border-t border-brand-border/30">
                           <div>
                             <span className="text-[9px] block">Rate of Interest</span>
-                            <span className="text-white font-bold">{loan.interestRate}% ({loan.rateType})</span>
+                            <span className="text-brand-text dark:text-white font-bold">{loan.interestRate}% ({loan.rateType})</span>
                           </div>
                           <div>
                             <span className="text-[9px] block">Remaining Balance</span>
-                            <span className="text-white font-bold text-brand-emerald">₹{remaining > 0 ? remaining.toLocaleString('en-IN') : 0}</span>
+                            <span className="text-brand-text dark:text-white font-bold text-brand-emerald">₹{remaining > 0 ? remaining.toLocaleString('en-IN') : 0}</span>
                           </div>
                           <div>
                             <span className="text-[9px] block">Installment Due</span>
-                            <span className="text-white font-bold">₹{instAmount.toLocaleString('en-IN')} / {loan.paymentFrequency}</span>
+                            <span className="text-brand-text dark:text-white font-bold">₹{instAmount.toLocaleString('en-IN')} / {loan.paymentFrequency}</span>
                           </div>
                           <div>
                             <span className="text-[9px] block">Start Date</span>
-                            <span className="text-white font-bold">{new Date(loan.startDate).toLocaleDateString('en-IN')}</span>
+                            <span className="text-brand-text dark:text-white font-bold">{new Date(loan.startDate).toLocaleDateString('en-IN')}</span>
                           </div>
                         </div>
 
@@ -399,7 +418,7 @@ export default function BorrowerDashboard() {
             {data.installments && data.installments.length > 0 && (
               <div className="glass-panel border border-brand-border bg-brand-card rounded-2xl p-6 space-y-4">
                 <div>
-                  <h3 className="text-sm font-extrabold text-white">Upcoming Repayment Schedule</h3>
+                  <h3 className="text-sm font-extrabold text-brand-text dark:text-white">Upcoming Repayment Schedule</h3>
                   <p className="text-[10px] text-brand-dim mt-0.5">Details of outstanding and upcoming monthly installment calculations.</p>
                 </div>
                 <div className="overflow-x-auto">
@@ -417,7 +436,7 @@ export default function BorrowerDashboard() {
                       {data.installments.slice(0, 10).map((inst, index) => (
                         <tr key={inst._id} className="hover:bg-brand-bg/30">
                           <td className="py-3 font-mono">{new Date(inst.dueDate).toLocaleDateString('en-IN')}</td>
-                          <td className="py-3 text-right text-white">₹{inst.totalAmount.toLocaleString('en-IN')}</td>
+                          <td className="py-3 text-right text-brand-text dark:text-white">₹{inst.totalAmount.toLocaleString('en-IN')}</td>
                           <td className="py-3 text-right">₹{inst.interestComponent?.toLocaleString('en-IN') || 0}</td>
                           <td className="py-3 text-right">₹{inst.principalComponent?.toLocaleString('en-IN') || 0}</td>
                           <td className="py-3 text-center">
@@ -439,7 +458,7 @@ export default function BorrowerDashboard() {
           /* SECTION 2: Completed Payments List */
           <div className="glass-panel border border-brand-border bg-brand-card rounded-2xl p-6 space-y-6">
             <div>
-              <h3 className="text-sm font-extrabold text-white">Repayment Transaction Ledger</h3>
+              <h3 className="text-sm font-extrabold text-brand-text dark:text-white">Repayment Transaction Ledger</h3>
               <p className="text-[10px] text-brand-dim mt-0.5">Repayment statements received and approved by lender admin.</p>
             </div>
 
@@ -486,7 +505,7 @@ export default function BorrowerDashboard() {
           /* SECTION 3: Profile settings Form */
           <div className="glass-panel border border-brand-border bg-brand-card rounded-2xl p-6 max-w-xl mx-auto space-y-6">
             <div>
-              <h3 className="text-sm font-extrabold text-white flex items-center gap-1.5">
+              <h3 className="text-sm font-extrabold text-brand-text dark:text-white flex items-center gap-1.5">
                 <Settings className="w-5 h-5 text-brand-accent" />
                 <span>Account Access Settings</span>
               </h3>
