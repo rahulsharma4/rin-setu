@@ -554,7 +554,7 @@ export default function BorrowerDashboard() {
             <div className="flex items-center justify-between pb-3 border-b border-brand-border/40">
               <h3 className="text-xs font-extrabold text-white uppercase tracking-wider flex items-center gap-1.5">
                 <QrCode className="w-5 h-5 text-brand-accent" />
-                <span>UPI repyamnet QR</span>
+                <span>UPI Repayment QR</span>
               </h3>
               {!qrModal.polling && (
                 <button
