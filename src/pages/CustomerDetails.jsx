@@ -612,6 +612,11 @@ export default function CustomerDetails() {
                         <div>
                           <div className="flex items-center space-x-2">
                             <h4 className="text-sm font-bold text-white">₹{loan.principalAmount.toLocaleString('en-IN')}</h4>
+                            {loan.isExistingLoan && (
+                              <span className="text-[9px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-1.5 py-0.5 rounded font-extrabold">
+                                Existing / पुराना
+                              </span>
+                            )}
                             {loan.processingFee > 0 && (
                               <span className="text-[9px] bg-brand-border px-1.5 py-0.5 rounded text-brand-dim">+₹{loan.processingFee} Fee</span>
                             )}

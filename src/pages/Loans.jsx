@@ -312,15 +312,22 @@ export default function Loans() {
                       <span className="text-[10px] text-brand-dim font-medium mt-1 block">Phone: {loan.customerId?.phone || '—'}</span>
                     </div>
                     
-                    <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
-                      loan.status === 'paid' 
-                        ? 'bg-brand-emerald/10 text-brand-emerald border border-brand-emerald/20' 
-                        : loan.status === 'overdue'
-                        ? 'bg-brand-rose/10 text-brand-rose border border-brand-rose/20'
-                        : 'bg-brand-accent/10 text-brand-accent border border-brand-accent/20'
-                    }`}>
-                      {loan.status === 'paid' ? 'Settled' : loan.status}
-                    </span>
+                    <div className="flex items-center space-x-1.5">
+                      {loan.isExistingLoan && (
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                          Existing / पुराना
+                        </span>
+                      )}
+                      <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                        loan.status === 'paid' 
+                          ? 'bg-brand-emerald/10 text-brand-emerald border border-brand-emerald/20' 
+                          : loan.status === 'overdue'
+                          ? 'bg-brand-rose/10 text-brand-rose border border-brand-rose/20'
+                          : 'bg-brand-accent/10 text-brand-accent border border-brand-accent/20'
+                      }`}>
+                        {loan.status === 'paid' ? 'Settled' : loan.status}
+                      </span>
+                    </div>
                   </div>
 
                   {/* Rules details grid */}
