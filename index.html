@@ -21,7 +21,7 @@
     <meta name="apple-mobile-web-app-title" content="RinSetu" />
     <link rel="apple-touch-icon" href="https://img.icons8.com/color/192/percentage.png" />
 
-    <!-- Prevent screen flashing on light mode load -->
+    <!-- Prevent screen flashing on light mode load & dynamic API base setup -->
     <script>
       if (localStorage.getItem('byaj_theme') === 'light') {
         document.documentElement.classList.remove('dark');
@@ -30,7 +30,7 @@
       }
       window.API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         ? 'http://localhost:5001'
-        : 'https://api-rinsetu.onrender.com';
+        : (import.meta.env?.VITE_API_URL || 'https://api-rinsetu.onrender.com');
     </script>
 
     <!-- Google Fonts: Outfit & Inter -->
