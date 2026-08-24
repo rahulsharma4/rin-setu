@@ -1,21 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
-const getBaseUrl = () => {
-  if (import.meta.env && import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL.replace(/\/$/, '');
-  }
-  if (window.API_BASE) {
-    return window.API_BASE.replace(/\/$/, '');
-  }
-  return (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://localhost:5001'
-    : 'https://api-rinsetu.onrender.com';
-};
-
-const API_BASE = `${getBaseUrl()}/api`;
-
 const AuthContext = createContext(null);
+
+const API_BASE = `${window.API_BASE}/api`;
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem('byaj_admin_token'));
