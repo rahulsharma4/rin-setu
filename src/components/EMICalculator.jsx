@@ -3,17 +3,19 @@ import { X, Calculator, Table, CircleDollarSign, CalendarDays } from 'lucide-rea
 import { createPortal } from 'react-dom';
 
 function getPeriodicRateFraction(interestRate, rateType, paymentFrequency) {
-  let annualRateFraction = 0;
-  if (rateType === 'daily') annualRateFraction = (interestRate * 365) / 100;
-  else if (rateType === 'weekly') annualRateFraction = (interestRate * 52) / 100;
-  else if (rateType === 'monthly') annualRateFraction = (interestRate * 12) / 100;
-  else if (rateType === 'yearly') annualRateFraction = interestRate / 100;
-  
-  if (paymentFrequency === 'daily') return annualRateFraction / 365;
-  if (paymentFrequency === 'weekly') return annualRateFraction / 52;
-  if (paymentFrequency === 'monthly') return annualRateFraction / 12;
-  if (paymentFrequency === 'yearly') return annualRateFraction;
-  return annualRateFraction / 12;
+  // Convert rateType to daily rate fraction (assuming 1 Month = 30 Days, 1 Year = 360 Days)
+  let dailyRateFraction = 0;
+  if (rateType === 'daily') dailyRateFraction = interestRate / 100;
+  else if (rateType === 'weekly') dailyRateFraction = (interestRate / 7) / 100;
+  else if (rateType === 'monthly') dailyRateFraction = (interestRate / 30) / 100;
+  else if (rateType === 'yearly') dailyRateFraction = (interestRate / 360) / 100;
+
+  // Scale daily rate fraction to selected paymentFrequency
+  if (paymentFrequency === 'daily') return dailyRateFraction;
+  if (paymentFrequency === 'weekly') return dailyRateFraction * 7;
+  if (paymentFrequency === 'monthly') return dailyRateFraction * 30;
+  if (paymentFrequency === 'yearly') return dailyRateFraction * 360;
+  return dailyRateFraction * 30;
 }
 
 function getNextDate(startDate, paymentFrequency, index) {
@@ -37,7 +39,7 @@ function calculateSchedule(loan) {
   if (P <= 0 || R <= 0 || N <= 0) return [];
 
   const list = [];
-  const r = getPeriodicRateFraction(R, rateType, paymentFrequency);
+  const r = getPeriodicRateFraction(R, rateType, paymentFrequency, loan.dayCountBasis);
 
   if (interestType === 'flat') {
     const totalInterest = P * r * N;
@@ -127,6 +129,7 @@ export default function EMICalculator({ isOpen, onClose }) {
     paymentFrequency: 'monthly',
     startDate: new Date().toISOString().split('T')[0],
     tenure: '12',
+    dayCountBasis: '30_360',
   });
 
   const [schedule, setSchedule] = useState([]);
@@ -267,6 +270,20 @@ export default function EMICalculator({ isOpen, onClose }) {
                 onChange={handleChange}
                 className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
               />
+            </div>
+
+            {/* Day Count Basis */}
+            <div className="space-y-1.5 md:col-span-2">
+              <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Interest Day Count (ब्याज दिन नियम)</label>
+              <select
+                name="dayCountBasis"
+                value={formData.dayCountBasis}
+                onChange={handleChange}
+                className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+              >
+                <option value="30_360">Traditional (स्थिर 30 दिन महीना / 360 दिन साल) - Default</option>
+                <option value="act_365">Calendar (वास्तविक कैलेंडर दिन - 365 दिन साल)</option>
+              </select>
             </div>
 
           </div>

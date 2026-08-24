@@ -4,18 +4,34 @@ import { X, HandCoins, Calculator, ShieldAlert, Table } from 'lucide-react';
 import { customerAPI, loanAPI } from '../api';
 
 // Helper functions for preview schedule calculation matching backend
-function getPeriodicRateFraction(interestRate, rateType, paymentFrequency) {
-  let annualRateFraction = 0;
-  if (rateType === 'daily') annualRateFraction = (interestRate * 365) / 100;
-  else if (rateType === 'weekly') annualRateFraction = (interestRate * 52) / 100;
-  else if (rateType === 'monthly') annualRateFraction = (interestRate * 12) / 100;
-  else if (rateType === 'yearly') annualRateFraction = interestRate / 100;
-  
-  if (paymentFrequency === 'daily') return annualRateFraction / 365;
-  if (paymentFrequency === 'weekly') return annualRateFraction / 52;
-  if (paymentFrequency === 'monthly') return annualRateFraction / 12;
-  if (paymentFrequency === 'yearly') return annualRateFraction;
-  return annualRateFraction / 12;
+function getPeriodicRateFraction(interestRate, rateType, paymentFrequency, dayCountBasis = '30_360') {
+  if (dayCountBasis === 'act_365') {
+    let annualRateFraction = 0;
+    if (rateType === 'daily') annualRateFraction = (interestRate * 365) / 100;
+    else if (rateType === 'weekly') annualRateFraction = (interestRate * 52) / 100;
+    else if (rateType === 'monthly') annualRateFraction = (interestRate * 12) / 100;
+    else if (rateType === 'yearly') annualRateFraction = interestRate / 100;
+    
+    if (paymentFrequency === 'daily') return annualRateFraction / 365;
+    if (paymentFrequency === 'weekly') return annualRateFraction / 52;
+    if (paymentFrequency === 'monthly') return annualRateFraction / 12;
+    if (paymentFrequency === 'yearly') return annualRateFraction;
+    return annualRateFraction / 12;
+  } else {
+    // Convert rateType to daily rate fraction (assuming 1 Month = 30 Days, 1 Year = 360 Days)
+    let dailyRateFraction = 0;
+    if (rateType === 'daily') dailyRateFraction = interestRate / 100;
+    else if (rateType === 'weekly') dailyRateFraction = (interestRate / 7) / 100;
+    else if (rateType === 'monthly') dailyRateFraction = (interestRate / 30) / 100;
+    else if (rateType === 'yearly') dailyRateFraction = (interestRate / 360) / 100;
+
+    // Scale daily rate fraction to selected paymentFrequency
+    if (paymentFrequency === 'daily') return dailyRateFraction;
+    if (paymentFrequency === 'weekly') return dailyRateFraction * 7;
+    if (paymentFrequency === 'monthly') return dailyRateFraction * 30;
+    if (paymentFrequency === 'yearly') return dailyRateFraction * 360;
+    return dailyRateFraction * 30;
+  }
 }
 
 function getNextDate(startDate, paymentFrequency, index) {
@@ -70,7 +86,7 @@ function generateLocalPreviewSchedule(loan) {
   const R = parseFloat(loan.interestRate) || 0;
   if (R <= 0) return [];
 
-  const r = getPeriodicRateFraction(R, loan.rateType, paymentFrequency);
+  const r = getPeriodicRateFraction(R, loan.rateType, paymentFrequency, loan.dayCountBasis);
   const interestType = loan.interestType;
 
   if (interestType === 'flat') {
@@ -174,6 +190,7 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
     skipCashBookOutflow: true,
     calculationMode: 'percent',
     installmentAmount: '',
+    dayCountBasis: '30_360',
   });
 
   const [loading, setLoading] = useState(false);
@@ -196,10 +213,11 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
   useEffect(() => {
     const list = generateLocalPreviewSchedule(formData);
     setPreviewSchedule(list);
-  }, [formData.principalAmount, formData.interestRate, formData.tenure, formData.rateType, formData.interestType, formData.paymentFrequency, formData.startDate, formData.calculationMode, formData.installmentAmount]);
+  }, [formData.principalAmount, formData.interestRate, formData.tenure, formData.rateType, formData.interestType, formData.paymentFrequency, formData.startDate, formData.calculationMode, formData.installmentAmount, formData.dayCountBasis]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    setError('');
     setFormData((prev) => ({ 
       ...prev, 
       [name]: type === 'checkbox' ? checked : value 
@@ -619,6 +637,23 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                   </select>
                 </div>
 
+                {/* Day Count Basis */}
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Interest Day Count (ब्याज दिन नियम)</label>
+                  <select
+                    name="dayCountBasis"
+                    value={formData.dayCountBasis}
+                    onChange={handleChange}
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                  >
+                    <option value="30_360">Traditional (स्थिर 30 दिन महीना / 360 दिन साल) - Default</option>
+                    <option value="act_365">Calendar (वास्तविक कैलेंडर दिन - 365/366 दिन साल)</option>
+                  </select>
+                  <p className="text-[9.5px] text-brand-dim italic mt-1">
+                    * Traditional me ₹10k/9% monthly/100 days kist ₹130 aur ₹100k kist ₹1,300 aayegi. Calendar me exact decimals aur leap year count honge.
+                  </p>
+                </div>
+
                 {/* Simplified Overdue Late Fee Settings */}
                 <div className="space-y-1.5 md:col-span-2 bg-brand-bg/30 border border-brand-border p-4 rounded-xl space-y-3">
                   <span className="text-[10px] font-extrabold text-white uppercase tracking-wider block">
@@ -730,8 +765,13 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                 </div>
                 {formData.isExistingLoan && (
                   <div>
-                    <span className="text-[9px] uppercase font-bold text-brand-dim block">Already Received Asal</span>
-                    <p className="text-base font-extrabold text-emerald-400 mt-0.5">₹{Math.round(historicalPrincipalPaid).toLocaleString('en-IN')}</p>
+                    <span className="text-[9px] uppercase font-bold text-brand-dim block">Already Received (कुल प्राप्त)</span>
+                    <p className="text-base font-extrabold text-brand-emerald mt-0.5">
+                      ₹{Math.round(historicalPrincipalPaid + historicalInterestPaid).toLocaleString('en-IN')}
+                    </p>
+                    <span className="text-[9px] text-brand-dim block mt-0.5 font-medium leading-none">
+                      ₹{Math.round(historicalPrincipalPaid)} asal / ₹{Math.round(historicalInterestPaid)} byaj
+                    </span>
                   </div>
                 )}
               </div>
