@@ -13,7 +13,9 @@ import {
   SlidersHorizontal,
   RotateCcw,
   Printer,
-  X
+  X,
+  LayoutGrid,
+  Table as TableIcon
 } from 'lucide-react';
 import { loanAPI } from '../api';
 import api from '../api';
@@ -30,6 +32,13 @@ export default function Loans() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const [viewMode, setViewMode] = useState(() => localStorage.getItem('loans_view_mode') || 'grid');
+
+  const handleToggleViewMode = (mode) => {
+    setViewMode(mode);
+    localStorage.setItem('loans_view_mode', mode);
+  };
 
   // Modals state
   const [selectedLoan, setSelectedLoan] = useState(null);
@@ -203,6 +212,29 @@ export default function Loans() {
           >
             <SlidersHorizontal className="w-4.5 h-4.5" />
           </button>
+
+          <div className="flex items-center border border-brand-border bg-brand-card rounded-xl p-1 shrink-0">
+            <button
+              type="button"
+              onClick={() => handleToggleViewMode('grid')}
+              className={`p-2 rounded-lg transition ${
+                viewMode === 'grid' ? 'bg-brand-accent text-white font-bold' : 'text-brand-dim hover:text-white'
+              }`}
+              title="Grid View"
+            >
+              <LayoutGrid className="w-4.5 h-4.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => handleToggleViewMode('table')}
+              className={`p-2 rounded-lg transition ${
+                viewMode === 'table' ? 'bg-brand-accent text-white font-bold' : 'text-brand-dim hover:text-white'
+              }`}
+              title="Table View"
+            >
+              <TableIcon className="w-4.5 h-4.5" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -290,6 +322,112 @@ export default function Loans() {
         <div className="glass-panel rounded-2xl border border-brand-border p-12 text-center flex flex-col items-center justify-center space-y-3">
           <AlertCircle className="w-8 h-8 text-brand-dim/30 animate-pulse" />
           <p className="text-xs text-brand-dim">No matching loan agreements found.</p>
+        </div>
+      ) : viewMode === 'table' ? (
+        <div className="glass-panel border border-brand-border bg-brand-card rounded-2xl p-6 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-brand-border/60 text-[9px] text-brand-dim uppercase font-bold tracking-wider">
+                  <th className="pb-3.5 pl-2">Borrower Name</th>
+                  <th className="pb-3.5">Principal Amount</th>
+                  <th className="pb-3.5">Rate & Interest Type</th>
+                  <th className="pb-3.5">Status</th>
+                  <th className="pb-3.5">Remaining Outstanding</th>
+                  <th className="pb-3.5">Disbursement Date</th>
+                  <th className="pb-3.5 text-right pr-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-brand-border/30 text-brand-text dark:text-slate-300 font-medium">
+                {filteredLoans.map((loan) => {
+                  const calc = loan.calculations || {};
+                  return (
+                    <tr 
+                      key={loan._id} 
+                      onClick={() => navigate(`/customers/${loan.customerId?._id}`)}
+                      className="hover:bg-brand-bg/40 transition cursor-pointer"
+                    >
+                      <td className="py-3.5 pl-2">
+                        <div className="font-bold text-brand-text dark:text-white text-xs">{loan.customerId?.name || 'Deleted Borrower'}</div>
+                        <div className="text-[10px] text-brand-dim mt-0.5">{loan.customerId?.phone || '—'}</div>
+                      </td>
+                      <td className="py-3.5 text-brand-text dark:text-slate-300 font-semibold">
+                        ₹{loan.principalAmount.toLocaleString('en-IN')}
+                        {loan.processingFee > 0 && (
+                          <div className="text-[9px] text-brand-dim mt-0.5 font-normal">Fee: ₹{loan.processingFee}</div>
+                        )}
+                      </td>
+                      <td className="py-3.5">
+                        <div className="text-brand-text dark:text-slate-300 font-semibold">{loan.interestRate}% ({loan.rateType})</div>
+                        <div className="text-[9px] text-brand-dim mt-0.5 capitalize">{loan.interestType}</div>
+                      </td>
+                      <td className="py-3.5">
+                        <div className="flex items-center space-x-1.5">
+                          {loan.isExistingLoan && (
+                            <span className="px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                              Old
+                            </span>
+                          )}
+                          <span className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${
+                            loan.status === 'paid' 
+                              ? 'bg-brand-emerald/10 text-brand-emerald border border-brand-emerald/20' 
+                              : loan.status === 'overdue'
+                              ? 'bg-brand-rose/10 text-brand-rose border border-brand-rose/20'
+                              : 'bg-brand-accent/10 text-brand-accent border border-brand-accent/20'
+                          }`}>
+                            {loan.status === 'paid' ? 'Settled' : loan.status}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="py-3.5 font-extrabold text-brand-accent">
+                        ₹{calc.totalOutstanding?.toLocaleString('en-IN')}
+                      </td>
+                      <td className="py-3.5 text-brand-dim font-mono">
+                        {new Date(loan.startDate).toLocaleDateString('en-IN')}
+                      </td>
+                      <td className="py-3.5 text-right pr-2" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-end space-x-2">
+                          <button
+                            onClick={() => handleEditClick(loan)}
+                            className="p-1.5 rounded bg-brand-accent/10 text-brand-accent hover:text-white hover:bg-brand-accent transition"
+                            title="Edit Remarks/Status"
+                          >
+                            <Edit className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(loan._id)}
+                            className="p-1.5 rounded bg-brand-rose/5 text-brand-rose/70 hover:text-white hover:bg-brand-rose transition"
+                            title="Delete Loan"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                          {loan.status !== 'paid' ? (
+                            <button
+                              onClick={() => {
+                                setSelectedLoan(loan);
+                                setIsPaymentModalOpen(true);
+                              }}
+                              className="px-2.5 py-1.5 rounded-lg bg-brand-emerald hover:bg-emerald-600 text-[10px] font-bold text-white transition"
+                            >
+                              Repay
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handlePrintCertificate(loan)}
+                              className="p-1.5 rounded bg-brand-emerald/10 text-brand-emerald hover:bg-brand-emerald hover:text-white transition"
+                              title="Print No Dues"
+                            >
+                              <Printer className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
