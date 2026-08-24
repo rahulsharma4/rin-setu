@@ -44,6 +44,8 @@ export default function Dashboard() {
   const [dailySummary, setDailySummary] = useState(null);
   const [eodSummary, setEodSummary] = useState(null);
   const [anomalies, setAnomalies] = useState([]);
+  const [showAnomalyDetails, setShowAnomalyDetails] = useState(false);
+  const [isAlertDismissed, setIsAlertDismissed] = useState(false);
 
   // Chat Bot states
   const [chatInput, setChatInput] = useState('');
@@ -321,23 +323,56 @@ Aap is guide ke zariye poora system manage kar sakte hain! Koi aur doubt ho to b
       )}
 
       {/* Anomalies Warning Badge */}
-      {anomalies.length > 0 && (
-        <div className="bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/30 rounded-xl p-4 flex items-center justify-between gap-4">
-          <div className="flex items-center space-x-3">
-            <AlertTriangle className="w-5 h-5 text-brand-rose shrink-0 animate-pulse" />
-            <div>
-              <p className="text-xs font-bold text-rose-900 dark:text-rose-200">System Audit Alert: {anomalies.length} Suspicious Warnings Flagged</p>
-              <span className="text-[10px] text-rose-700 dark:text-slate-400 block mt-0.5">Gemini AI detected potential duplicate contacts or shared collateral documents.</span>
+      {anomalies.length > 0 && !isAlertDismissed && (
+        <div className="bg-rose-50 dark:bg-rose-950/10 border border-rose-200 dark:border-rose-900/30 rounded-2xl p-5 space-y-3.5 shadow-sm transition-all">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start space-x-3">
+              <AlertTriangle className="w-5 h-5 text-brand-rose shrink-0 animate-pulse mt-0.5" />
+              <div>
+                <p className="text-xs font-bold text-rose-900 dark:text-rose-200">
+                  System Audit Alert: {anomalies.length} Suspicious Warnings Flagged
+                </p>
+                <span className="text-[10px] text-rose-700 dark:text-slate-400 block mt-0.5">
+                  Gemini AI credit ledger scanner found duplicate borrower contacts or shared assets.
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2 shrink-0">
+              <button 
+                type="button"
+                onClick={() => setShowAnomalyDetails(!showAnomalyDetails)}
+                className="px-3 py-1.5 rounded-xl bg-brand-rose/10 hover:bg-brand-rose/25 text-[10px] font-bold text-brand-rose transition"
+              >
+                {showAnomalyDetails ? 'Hide Details' : 'Review Flags'}
+              </button>
+              <button 
+                type="button"
+                onClick={() => setIsAlertDismissed(true)}
+                className="px-3 py-1.5 rounded-xl bg-brand-border/40 hover:bg-brand-border/85 text-[10px] font-bold text-brand-dim hover:text-white transition"
+              >
+                Dismiss
+              </button>
             </div>
           </div>
-          <button 
-            onClick={() => {
-              alert(anomalies.map(a => `[${a.type}] ${a.description}`).join('\n\n'));
-            }}
-            className="px-3 py-1.5 rounded-lg bg-brand-rose/20 hover:bg-brand-rose text-[10px] font-bold text-white hover:text-white transition shrink-0"
-          >
-            Review Flags
-          </button>
+
+          {showAnomalyDetails && (
+            <div className="bg-brand-bg/60 border border-brand-border/50 rounded-xl p-3.5 space-y-2.5 max-h-56 overflow-y-auto animate-fade-in">
+              <span className="text-[9px] font-bold text-brand-dim uppercase tracking-wider block">Flagged Ledger Anomalies:</span>
+              <div className="space-y-2">
+                {anomalies.map((a, idx) => (
+                  <div key={idx} className="flex items-start space-x-2 text-[11px] text-brand-text dark:text-slate-300">
+                    <span className="text-brand-rose font-bold select-none">•</span>
+                    <div>
+                      <strong className="text-brand-rose dark:text-rose-400 font-extrabold text-[10px] uppercase tracking-wide">
+                        [{a.type}]
+                      </strong>
+                      <p className="mt-0.5 leading-relaxed">{a.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

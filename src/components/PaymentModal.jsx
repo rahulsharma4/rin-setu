@@ -17,6 +17,7 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [customOverride, setCustomOverride] = useState(false);
 
   // ── UPI QR Code State ────────────────────────────────────────────────
   const [qrPhase, setQrPhase] = useState('idle'); // idle | generating | waiting | success | error
@@ -311,18 +312,7 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                {/* Payment Type */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wide">Allocate Payment To *</label>
-                  <select name="paymentType" value={formData.paymentType} onChange={handleChange}
-                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2.5 text-xs text-brand-text dark:text-white outline-none transition" required>
-                    <option value="both">Waterfall (Byaj + Asal)</option>
-                    <option value="interest">Interest Only (Byaj)</option>
-                    <option value="principal">Principal Only (Asal)</option>
-                  </select>
-                </div>
-
+              <div className="space-y-4">
                 {/* Payment Mode */}
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wide">Payment Mode *</label>
@@ -334,6 +324,41 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
                     <option value="bank_transfer">Bank Account Transfer</option>
                   </select>
                 </div>
+
+                {/* Custom allocation toggle checkbox */}
+                <div className="flex items-center space-x-2 bg-brand-bg/50 p-2 border border-brand-border/60 rounded-xl">
+                  <input
+                    type="checkbox"
+                    id="customAllocationOverride"
+                    checked={customOverride}
+                    onChange={(e) => {
+                      setCustomOverride(e.target.checked);
+                      if (!e.target.checked) {
+                        setFormData(prev => ({ ...prev, paymentType: 'both' }));
+                      }
+                    }}
+                    className="w-3.5 h-3.5 rounded border-brand-border text-brand-accent focus:ring-0 bg-brand-card cursor-pointer"
+                  />
+                  <label htmlFor="customAllocationOverride" className="text-[10px] font-bold text-brand-dim uppercase tracking-wider cursor-pointer">
+                    Custom Allocation Override (पेमेंट अलग तरीके से बाँटें)
+                  </label>
+                </div>
+
+                {/* Conditionally show payment type selector if override checked */}
+                {customOverride && (
+                  <div className="space-y-1.5 p-3 bg-brand-bg/50 border border-brand-border/60 rounded-xl animate-fade-in">
+                    <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wide">Allocate Payment To *</label>
+                    <select name="paymentType" value={formData.paymentType} onChange={handleChange}
+                      className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2.5 text-xs text-brand-text dark:text-white outline-none transition" required>
+                      <option value="both">Waterfall (Byaj + Asal)</option>
+                      <option value="interest">Interest Only (Byaj)</option>
+                      <option value="principal">Principal Only (Asal)</option>
+                    </select>
+                    <p className="text-[9px] text-brand-dim italic mt-1">
+                      * Default setting: Waterfall automatically pays penalties first, then interest, then principal.
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Payment Date (hidden for UPI auto mode) */}

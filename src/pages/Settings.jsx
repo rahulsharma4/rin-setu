@@ -448,20 +448,46 @@ export default function Settings() {
               <ListOrdered className="w-4 h-4 text-brand-accent" />
               <h3 className="text-xs font-bold text-white uppercase tracking-wider">Configurable Repayment Waterfall</h3>
             </div>
-            <p className="text-[11px] text-brand-dim leading-relaxed">
-              Drag/Move elements to decide the priority sequence when repayments are logged. Payments will clear components from top-to-bottom automatically.
-            </p>
+            
+            {/* Simple Visual Helper Box */}
+            <div className="p-4 bg-brand-bg/85 border border-brand-border/60 rounded-xl space-y-3.5">
+              <span className="text-[10px] font-extrabold text-brand-accent uppercase tracking-wider block">
+                ℹ️ Waterfall Payment Rule (भुगतान बांटने का नियम)
+              </span>
+              <p className="text-[11px] text-brand-dim leading-relaxed">
+                RinSetu me jab bhi koi borrower payment karta hai, to system paise ko automatically neeche diye gaye order me distribute (allocate) karta hai. Aap inko aapas me **Up/Down** karke priority badal sakte hain.
+              </p>
+              
+              {/* Visual Flow diagram */}
+              <div className="grid grid-cols-4 gap-2 pt-1 text-center font-bold text-[9px] uppercase tracking-wide text-white">
+                <div className="bg-brand-rose/20 border border-brand-rose/30 p-2.5 rounded-lg">
+                  1. Penalty ➔
+                </div>
+                <div className="bg-brand-amber/20 border border-brand-amber/30 p-2.5 rounded-lg">
+                  2. Fines ➔
+                </div>
+                <div className="bg-indigo-500/20 border border-indigo-500/30 p-2.5 rounded-lg">
+                  3. Byaj ➔
+                </div>
+                <div className="bg-brand-emerald/20 border border-brand-emerald/30 p-2.5 rounded-lg">
+                  4. Asal (End)
+                </div>
+              </div>
+              <p className="text-[9.5px] text-brand-dim italic">
+                * Example: Agar ₹1,000 payment aayi, to pehle penalty kategi, fir late fines, fir bacha hua byaj me jayega aur aakhir me bacha paisa asal (principal) me jama hoga.
+              </p>
+            </div>
 
             <div className="space-y-2.5">
               {priority.map((step, idx) => (
-                <div key={step} className="flex items-center justify-between bg-brand-bg/50 border border-brand-border px-4 py-3 rounded-xl">
+                <div key={step} className="flex items-center justify-between bg-brand-bg/50 border border-brand-border px-4 py-3 rounded-xl hover:border-brand-border/80 transition">
                   <span className="text-xs text-white font-semibold">{idx + 1}. {stepLabels[step]}</span>
                   <div className="flex space-x-1">
                     <button
                       type="button"
                       onClick={() => handleMoveUp(idx)}
                       disabled={idx === 0}
-                      className="px-2 py-1 bg-brand-border hover:bg-brand-border/80 disabled:opacity-30 rounded text-[10px] text-white font-bold transition"
+                      className="px-3 py-1 bg-brand-border hover:bg-brand-border/80 disabled:opacity-30 rounded text-[10px] text-white font-bold transition"
                     >
                       ▲ Up
                     </button>
@@ -469,7 +495,7 @@ export default function Settings() {
                       type="button"
                       onClick={() => handleMoveDown(idx)}
                       disabled={idx === priority.length - 1}
-                      className="px-2 py-1 bg-brand-border hover:bg-brand-border/80 disabled:opacity-30 rounded text-[10px] text-white font-bold transition"
+                      className="px-3 py-1 bg-brand-border hover:bg-brand-border/80 disabled:opacity-30 rounded text-[10px] text-white font-bold transition"
                     >
                       ▼ Down
                     </button>

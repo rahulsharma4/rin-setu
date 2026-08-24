@@ -29,17 +29,49 @@ function getNextDate(startDate, paymentFrequency, index) {
 
 function generateLocalPreviewSchedule(loan) {
   const P = parseFloat(loan.principalAmount) || 0;
-  const R = parseFloat(loan.interestRate) || 0;
   const N = parseInt(loan.tenure) || 0;
   const startDate = loan.startDate ? new Date(loan.startDate) : new Date();
-  const interestType = loan.interestType;
-  const rateType = loan.rateType;
   const paymentFrequency = loan.paymentFrequency;
 
-  if (P <= 0 || R <= 0 || N <= 0) return [];
+  if (P <= 0 || N <= 0) return [];
 
   const list = [];
-  const r = getPeriodicRateFraction(R, rateType, paymentFrequency);
+
+  if (loan.calculationMode === 'amount') {
+    const E = parseFloat(loan.installmentAmount) || 0;
+    if (E <= 0) return [];
+    
+    const totalInterest = (E * N) - P;
+    const principalPerInstallment = Math.round((P / N) * 100) / 100;
+    const interestPerInstallment = Math.round((totalInterest / N) * 100) / 100;
+    
+    let principalRemaining = P;
+    let interestRemaining = totalInterest;
+
+    for (let i = 1; i <= N; i++) {
+      const isLast = i === N;
+      const pComp = isLast ? principalRemaining : principalPerInstallment;
+      const iComp = isLast ? interestRemaining : interestPerInstallment;
+      
+      list.push({
+        installmentNumber: i,
+        dueDate: getNextDate(startDate, paymentFrequency, i),
+        principalComponent: pComp,
+        interestComponent: iComp,
+        totalAmount: pComp + iComp
+      });
+      
+      principalRemaining -= pComp;
+      interestRemaining -= iComp;
+    }
+    return list;
+  }
+
+  const R = parseFloat(loan.interestRate) || 0;
+  if (R <= 0) return [];
+
+  const r = getPeriodicRateFraction(R, loan.rateType, paymentFrequency);
+  const interestType = loan.interestType;
 
   if (interestType === 'flat') {
     const totalInterest = P * r * N;
@@ -140,11 +172,14 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
     isExistingLoan: false,
     alreadyPaidInstallments: '0',
     skipCashBookOutflow: true,
+    calculationMode: 'percent',
+    installmentAmount: '',
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [previewSchedule, setPreviewSchedule] = useState([]);
+  const [showAdvancedPenalty, setShowAdvancedPenalty] = useState(false);
 
   useEffect(() => {
     customerAPI.getAll()
@@ -161,7 +196,7 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
   useEffect(() => {
     const list = generateLocalPreviewSchedule(formData);
     setPreviewSchedule(list);
-  }, [formData.principalAmount, formData.interestRate, formData.tenure, formData.rateType, formData.interestType, formData.paymentFrequency, formData.startDate]);
+  }, [formData.principalAmount, formData.interestRate, formData.tenure, formData.rateType, formData.interestType, formData.paymentFrequency, formData.startDate, formData.calculationMode, formData.installmentAmount]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -173,16 +208,63 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.customerId || !formData.principalAmount || !formData.interestRate || !formData.tenure) {
+    if (!formData.customerId || !formData.principalAmount || !formData.tenure) {
       setError('Please provide all required fields.');
       return;
+    }
+
+    if (formData.calculationMode === 'amount') {
+      const E = parseFloat(formData.installmentAmount) || 0;
+      const P = parseFloat(formData.principalAmount) || 0;
+      const N = parseInt(formData.tenure) || 0;
+
+      if (E <= 0) {
+        setError('Please enter a valid installment amount.');
+        return;
+      }
+      if (E * N < P) {
+        setError('Total repayment (Installment × Tenure) must be greater than or equal to Principal.');
+        return;
+      }
+    } else {
+      if (!formData.interestRate) {
+        setError('Please enter the interest rate.');
+        return;
+      }
     }
 
     setLoading(true);
     setError('');
 
     try {
-      await loanAPI.create(formData);
+      let submitData = { ...formData };
+      
+      // Calculate implicit interest rate for direct amount mode
+      if (formData.calculationMode === 'amount') {
+        const E = parseFloat(formData.installmentAmount);
+        const P = parseFloat(formData.principalAmount);
+        const N = parseInt(formData.tenure);
+        
+        const totalInterest = (E * N) - P;
+        const rPeriodic = totalInterest / (P * N);
+        
+        let rDaily = rPeriodic;
+        if (formData.paymentFrequency === 'weekly') rDaily = rPeriodic / 7;
+        else if (formData.paymentFrequency === 'monthly') rDaily = rPeriodic / 30;
+        else if (formData.paymentFrequency === 'yearly') rDaily = rPeriodic / 365;
+        
+        const rAnnual = rDaily * 365;
+        let R = 0;
+        if (formData.rateType === 'daily') R = (rAnnual / 365) * 100;
+        else if (formData.rateType === 'weekly') R = (rAnnual / 52) * 100;
+        else if (formData.rateType === 'monthly') R = (rAnnual / 12) * 100;
+        else if (formData.rateType === 'yearly') R = rAnnual * 100;
+        
+        submitData.interestRate = (Math.round(R * 10000) / 10000).toString();
+        submitData.interestType = 'flat'; // fixed installment is Flat EMI
+      }
+
+      await loanAPI.create(submitData);
       onRefresh();
       onClose();
     } catch (err) {
@@ -338,6 +420,37 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                   />
                 </div>
 
+                {/* Interest Calculation Mode Selection */}
+                <div className="space-y-1.5 md:col-span-2 bg-brand-bg/40 border border-brand-border p-3.5 rounded-xl">
+                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider block">
+                    Interest Calculation Method (ब्याज तय करने का तरीका)
+                  </label>
+                  <div className="grid grid-cols-2 gap-2.5 mt-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, calculationMode: 'percent' }))}
+                      className={`py-2 px-3 rounded-lg text-xs font-semibold border transition ${
+                        formData.calculationMode === 'percent'
+                          ? 'bg-brand-accent text-white border-brand-accent shadow-sm'
+                          : 'bg-brand-card hover:bg-brand-bg text-brand-dim border-brand-border'
+                      }`}
+                    >
+                      Interest Rate (%) (ब्याज प्रतिशत)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, calculationMode: 'amount', interestType: 'flat' }))}
+                      className={`py-2 px-3 rounded-lg text-xs font-semibold border transition ${
+                        formData.calculationMode === 'amount'
+                          ? 'bg-brand-accent text-white border-brand-accent shadow-sm'
+                          : 'bg-brand-card hover:bg-brand-bg text-brand-dim border-brand-border'
+                      }`}
+                    >
+                      Fixed Installment (किस्त की रकम)
+                    </button>
+                  </div>
+                </div>
+
                 {/* Processing Fee */}
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Processing Fee</label>
@@ -352,34 +465,50 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                   />
                 </div>
 
-                {/* Interest Rate */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Interest Rate (%) *</label>
-                  <div className="flex space-x-2">
+                {/* Interest rate / Installment Amount field based on calculationMode */}
+                {formData.calculationMode === 'percent' ? (
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Interest Rate (%) *</label>
+                    <div className="flex space-x-2">
+                      <input
+                        type="number"
+                        name="interestRate"
+                        value={formData.interestRate}
+                        onChange={handleChange}
+                        placeholder="e.g. 2"
+                        step="0.01"
+                        className="flex-1 bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
+                        required
+                        min="0"
+                      />
+                      <select
+                        name="rateType"
+                        value={formData.rateType}
+                        onChange={handleChange}
+                        className="w-28 bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-2 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                      >
+                        <option value="daily">Per Day</option>
+                        <option value="weekly">Per Week</option>
+                        <option value="monthly">Per Month</option>
+                        <option value="yearly">Per Year</option>
+                      </select>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Installment Amount (किस्त की राशि) *</label>
                     <input
                       type="number"
-                      name="interestRate"
-                      value={formData.interestRate}
+                      name="installmentAmount"
+                      value={formData.installmentAmount}
                       onChange={handleChange}
-                      placeholder="e.g. 2"
-                      step="0.01"
-                      className="flex-1 bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
+                      placeholder="e.g. 1300"
+                      className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
                       required
-                      min="0"
+                      min="1"
                     />
-                    <select
-                      name="rateType"
-                      value={formData.rateType}
-                      onChange={handleChange}
-                      className="w-28 bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-2 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
-                    >
-                      <option value="daily">Per Day</option>
-                      <option value="weekly">Per Week</option>
-                      <option value="monthly">Per Month</option>
-                      <option value="yearly">Per Year</option>
-                    </select>
                   </div>
-                </div>
+                )}
 
                 {/* Tenure */}
                 <div className="space-y-1.5">
@@ -442,7 +571,7 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                 )}
 
                 {/* Interest Type */}
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 md:col-span-2">
                   <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Interest Type</label>
                   <select
                     name="interestType"
@@ -450,14 +579,32 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                     onChange={handleChange}
                     className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
                   >
-                    <option value="simple">Simple Interest (Sadharan)</option>
-                    <option value="flat">Flat Rate (EMI)</option>
-                    <option value="reducing">Reducing Balance (EMI)</option>
+                    <option value="simple">Simple Interest (Sadharan / साधारण ब्याज)</option>
+                    <option value="flat">Flat Rate (EMI / फ्लैट ब्याज)</option>
+                    <option value="reducing">Reducing Balance (EMI / घटता ब्याज)</option>
                   </select>
+                  {/* Dynamic formula explanation card */}
+                  <div className="mt-2 p-3 bg-brand-bg/60 border border-brand-border/60 rounded-xl text-[10.5px] leading-relaxed text-brand-dim">
+                    {formData.interestType === 'simple' && (
+                      <p>
+                        💡 <strong className="text-white font-bold">Simple Interest:</strong> ब्याज केवल बचे हुए मूलधन पर लगता है। इसमें किस्त में केवल ब्याज लिया जाता है, और मूलधन सबसे आखिरी किस्त में एक साथ वापस किया जाता है।
+                      </p>
+                    )}
+                    {formData.interestType === 'flat' && (
+                      <p>
+                        💡 <strong className="text-white font-bold">Flat Rate (EMI):</strong> ब्याज हमेशा शुरूआती मूलधन पर ही फिक्स रहता है। इसमें हर किस्त (EMI) में मूलधन और ब्याज का हिस्सा शुरू से अंत तक बिल्कुल समान रहता है।
+                      </p>
+                    )}
+                    {formData.interestType === 'reducing' && (
+                      <p>
+                        💡 <strong className="text-white font-bold">Reducing Balance:</strong> जैसे-benefit/मूलधन कम होता है, ब्याज भी केवल बचे हुए मूलधन पर घटता जाता है। बैंक लोन (Home/Car Loan) इसी नियम पर चलते हैं।
+                      </p>
+                    )}
+                  </div>
                 </div>
 
                 {/* Payment Frequency */}
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 md:col-span-2">
                   <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Repayment Frequency</label>
                   <select
                     name="paymentFrequency"
@@ -465,68 +612,92 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                     onChange={handleChange}
                     className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
                   >
-                    <option value="daily">Daily Collection</option>
-                    <option value="weekly">Weekly Collection</option>
-                    <option value="monthly">Monthly Collection</option>
-                    <option value="yearly">Yearly Collection</option>
+                    <option value="daily">Daily Collection (रोज का कलेक्शन)</option>
+                    <option value="weekly">Weekly Collection (हफ़्ते का कलेक्शन)</option>
+                    <option value="monthly">Monthly Collection (महीने का कलेक्शन)</option>
+                    <option value="yearly">Yearly Collection (सालाना कलेक्शन)</option>
                   </select>
                 </div>
 
-                {/* Due Penalty Charges */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wide">Due Penalty Charges</label>
-                  <input
-                    type="number"
-                    name="dueCharges"
-                    value={formData.dueCharges}
-                    onChange={handleChange}
-                    placeholder="e.g. 500 (one-time penalty)"
-                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
-                    min="0"
-                  />
-                </div>
+                {/* Simplified Overdue Late Fee Settings */}
+                <div className="space-y-1.5 md:col-span-2 bg-brand-bg/30 border border-brand-border p-4 rounded-xl space-y-3">
+                  <span className="text-[10px] font-extrabold text-white uppercase tracking-wider block">
+                    Late Penalty Settings (जुर्माना सेटिंग्स)
+                  </span>
 
-                {/* Late Fines Charges */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wide">Late Fine Charges</label>
-                  <input
-                    type="number"
-                    name="lateCharges"
-                    value={formData.lateCharges}
-                    onChange={handleChange}
-                    placeholder="e.g. 1000 (accumulated fines)"
-                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
-                    min="0"
-                  />
-                </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Auto Late Fee Rate */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wide">Late Fee Amount (जुर्माना राशि) *</label>
+                      <input
+                        type="number"
+                        name="lateFeeRate"
+                        value={formData.lateFeeRate}
+                        onChange={handleChange}
+                        placeholder="e.g. 50"
+                        className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                        min="0"
+                        required
+                      />
+                    </div>
 
-                {/* Auto Late Fee Rate */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wide">Auto Late Fee Rate (₹) *</label>
-                  <input
-                    type="number"
-                    name="lateFeeRate"
-                    value={formData.lateFeeRate}
-                    onChange={handleChange}
-                    placeholder="e.g. 50"
-                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
-                    min="0"
-                    required
-                  />
-                </div>
+                    {/* Auto Late Fee Type */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wide">Late Fee Accrual Type</label>
+                      <select
+                        name="lateFeeType"
+                        value={formData.lateFeeType}
+                        onChange={handleChange}
+                        className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                      >
+                        <option value="daily">Daily (रोज का जुर्माना)</option>
+                        <option value="flat">Flat (एक बार का जुर्माना)</option>
+                      </select>
+                    </div>
+                  </div>
 
-                {/* Auto Late Fee Type */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wide">Late Fee Accrual Type</label>
-                  <select
-                    name="lateFeeType"
-                    value={formData.lateFeeType}
-                    onChange={handleChange}
-                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
-                  >
-                    <option value="daily">Daily (रोज का)</option>
-                    <option value="flat">Flat (एक बार का)</option>
-                  </select>
+                  {/* Advanced button toggle */}
+                  <div className="pt-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setShowAdvancedPenalty(!showAdvancedPenalty)}
+                      className="text-[10px] text-brand-accent hover:underline font-bold transition outline-none"
+                    >
+                      {showAdvancedPenalty ? 'Hide Advanced Fines ▴' : 'Show Advanced Fines (अतिरिक्त शुल्क सेटिंग्स) ▾'}
+                    </button>
+                  </div>
+
+                  {showAdvancedPenalty && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-3 bg-brand-bg border border-brand-border/60 rounded-xl animate-fade-in">
+                      {/* One-Time Due Penalty Charges */}
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wide">One-Time Overdue Penalty (₹)</label>
+                        <input
+                          type="number"
+                          name="dueCharges"
+                          value={formData.dueCharges}
+                          onChange={handleChange}
+                          placeholder="e.g. 500"
+                          className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
+                          min="0"
+                        />
+                      </div>
+
+                      {/* Late Fines Charges */}
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wide">Accumulated Fine Charge (₹)</label>
+                        <input
+                          type="number"
+                          name="lateCharges"
+                          value={formData.lateCharges}
+                          onChange={handleChange}
+                          placeholder="e.g. 1000"
+                          className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
+                          min="0"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
