@@ -247,15 +247,7 @@ html:not(.dark) .border-brand-border {
 }
 
 /* 2. Global text-white Overrides for High-Contrast Light Mode readability */
-html:not(.dark) h1.text-white,
-html:not(.dark) h2.text-white,
-html:not(.dark) h3.text-white,
-html:not(.dark) h4.text-white,
-html:not(.dark) h5.text-white,
-html:not(.dark) p.text-white,
-html:not(.dark) label.text-white,
-html:not(.dark) div.text-white:not(.bg-brand-accent *):not(.bg-brand-emerald *):not(.bg-brand-rose *):not(.bg-brand-amber *):not(button *):not([class*="bg-indigo-600"]):not([class*="bg-emerald-600"]):not([class*="bg-rose-600"]):not([class*="bg-red-600"]):not([class*="bg-amber-600"]),
-html:not(.dark) span.text-white:not(.bg-brand-accent *):not(.bg-brand-emerald *):not(.bg-brand-rose *):not(.bg-brand-amber *):not(button *):not([class*="bg-indigo-600"]):not([class*="bg-emerald-600"]):not([class*="bg-rose-600"]):not([class*="bg-red-600"]):not([class*="bg-amber-600"]) {
+html:not(.dark) .text-white:not(.bg-brand-accent *):not(.bg-brand-emerald *):not(.bg-brand-rose *):not(.bg-brand-amber *):not(button *):not([class*="bg-indigo-600"]):not([class*="bg-emerald-600"]):not([class*="bg-rose-600"]):not([class*="bg-red-600"]):not([class*="bg-amber-600"]) {
   color: var(--brand-text) !important;
 }
 
