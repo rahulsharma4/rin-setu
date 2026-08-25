@@ -12,8 +12,9 @@ import {
 } from 'lucide-react';
 
 // Create a standalone instance of axios or use raw requests because this is a public unauthenticated page
+const API_BASE = `${window.API_BASE || 'http://localhost:5001'}/api/`;
 const publicApi = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api/',
+  baseURL: API_BASE,
 });
 
 export default function PublicPaymentPage() {
