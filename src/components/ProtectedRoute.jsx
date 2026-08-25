@@ -37,16 +37,16 @@ function VerificationLoadingScreen() {
   return (
     <div className="min-h-screen bg-brand-bg flex items-center justify-center relative overflow-hidden font-sans select-none">
       {/* Dynamic glow blobs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-brand-accent/5 blur-[120px] pointer-events-none animate-pulse-soft" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-brand-emerald/5 blur-[120px] pointer-events-none animate-pulse-soft" />
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none animate-pulse-soft" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-pink-500/10 blur-[120px] pointer-events-none animate-pulse-soft" />
       
       <div className="text-center space-y-7 z-10 px-4">
         {/* Animated RinSetu Logo Box */}
-        <div className="relative w-20 h-20 mx-auto flex items-center justify-center rounded-2xl bg-gradient-to-tr from-brand-accent to-indigo-400 shadow-2xl shadow-brand-accent/20 animate-logo-pulse">
+        <div className="relative w-20 h-20 mx-auto flex items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 shadow-2xl shadow-brand-accent/25 animate-logo-pulse">
           {/* Inner ring overlay */}
           <div className="absolute inset-1.5 border border-white/20 rounded-[10px] pointer-events-none" />
           {/* Spin/pulse particle */}
-          <div className="absolute inset-0 border border-brand-accent rounded-2xl animate-ping opacity-40 scale-110" style={{ animationDuration: '2s' }} />
+          <div className="absolute inset-0 border border-brand-accent rounded-2xl animate-ping opacity-35 scale-110" style={{ animationDuration: '2.5s' }} />
           
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 text-white animate-percent-morph">
             <line x1="19" y1="5" x2="5" y2="19"></line>

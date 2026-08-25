@@ -27,9 +27,9 @@ const BorrowerDashboard = lazy(() => import('./pages/BorrowerDashboard'));
 const PageLoader = () => (
   <div className="h-full flex flex-col items-center justify-center py-24 space-y-4 animate-fade-in font-sans select-none">
     {/* Mini Animated RinSetu Logo Box */}
-    <div className="relative w-12 h-12 flex items-center justify-center rounded-xl bg-gradient-to-tr from-brand-accent to-indigo-400 shadow-lg shadow-brand-accent/20 animate-bounce-slow">
+    <div className="relative w-12 h-12 flex items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 shadow-lg shadow-brand-accent/25 animate-logo-pulse">
       <div className="absolute inset-1 border border-white/20 rounded-[8px] pointer-events-none" />
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-white animate-spin-slow">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-white animate-percent-morph">
         <line x1="19" y1="5" x2="5" y2="19"></line>
         <circle cx="6.5" cy="6.5" r="2.5"></circle>
         <circle cx="17.5" cy="17.5" r="2.5"></circle>
