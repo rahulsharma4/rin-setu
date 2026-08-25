@@ -405,7 +405,7 @@ Aap is guide ke zariye poora system manage kar sakte hain! Koi aur doubt ho to b
 
       {/* P2P UPI Payment Approvals Queue */}
       {pendingP2P.length > 0 && (
-        <div className="bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 border border-brand-border rounded-2xl p-5 shadow-xl space-y-4 animate-fade-in relative overflow-hidden">
+        <div className="bg-brand-accent/5 dark:bg-indigo-500/10 border border-brand-border dark:border-brand-accent/20 rounded-2xl p-5 shadow-xl space-y-4 animate-fade-in relative overflow-hidden">
           {/* Neon Border Glow */}
           <div className="absolute top-0 left-0 w-2.5 h-full bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500" />
           

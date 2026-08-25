@@ -47,6 +47,52 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleCopyLink = () => {
+    const paymentUrl = `${window.location.origin}/pay/loan/${loanId}?am=${formData.amount}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(paymentUrl)
+        .then(() => {
+          setCopiedLink(true);
+          setTimeout(() => setCopiedLink(false), 2000);
+        })
+        .catch(() => {
+          fallbackCopyText(paymentUrl);
+        });
+    } else {
+      fallbackCopyText(paymentUrl);
+    }
+  };
+
+  const fallbackCopyText = (text) => {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.width = "2em";
+    textArea.style.height = "2em";
+    textArea.style.padding = "0";
+    textArea.style.border = "none";
+    textArea.style.outline = "none";
+    textArea.style.boxShadow = "none";
+    textArea.style.background = "transparent";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      const successful = document.execCommand('copy');
+      if (successful) {
+        setCopiedLink(true);
+        setTimeout(() => setCopiedLink(false), 2000);
+      } else {
+        console.warn("Fallback copy failed");
+      }
+    } catch (err) {
+      console.warn("Fallback copy error:", err);
+    }
+    document.body.removeChild(textArea);
+  };
+
   // ── Manual Cash Submit ───────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -190,12 +236,8 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
                 {/* Copy Link button */}
                 <button
                   type="button"
-                  onClick={() => {
-                    navigator.clipboard.writeText(paymentUrl);
-                    setCopiedLink(true);
-                    setTimeout(() => setCopiedLink(false), 2000);
-                  }}
-                  className="w-full py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-brand-accent text-xs font-bold rounded-xl transition border border-brand-accent/20"
+                  onClick={handleCopyLink}
+                  className="w-full py-2.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-brand-accent text-xs font-bold rounded-xl transition border border-brand-accent/20"
                 >
                   {copiedLink ? 'Link Copied! ✅' : 'Copy Public Payment Link'}
                 </button>

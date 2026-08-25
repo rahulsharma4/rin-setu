@@ -364,30 +364,42 @@ html:not(.dark) tbody tr:nth-child(even) {
 
 /* Premium Gradient buttons in light mode */
 html:not(.dark) button.bg-brand-accent,
+html:not(.dark) a.bg-brand-accent,
 html:not(.dark) button.bg-brand-accent *,
+html:not(.dark) a.bg-brand-accent *,
 html:not(.dark) button.bg-indigo-600,
-html:not(.dark) button.bg-indigo-600 * {
-  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+html:not(.dark) a.bg-indigo-600,
+html:not(.dark) button.bg-indigo-600 *,
+html:not(.dark) a.bg-indigo-600 * {
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25) !important;
   color: #ffffff !important;
   stroke: #ffffff !important;
 }
 html:not(.dark) button.bg-brand-accent:hover,
-html:not(.dark) button.bg-indigo-600:hover {
+html:not(.dark) a.bg-brand-accent:hover,
+html:not(.dark) button.bg-indigo-600:hover,
+html:not(.dark) a.bg-indigo-600:hover {
   background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%) !important;
 }
 
 html:not(.dark) button.bg-brand-emerald,
+html:not(.dark) a.bg-brand-emerald,
 html:not(.dark) button.bg-brand-emerald *,
+html:not(.dark) a.bg-brand-emerald *,
 html:not(.dark) button.bg-emerald-600,
-html:not(.dark) button.bg-emerald-600 * {
-  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+html:not(.dark) a.bg-emerald-600,
+html:not(.dark) button.bg-emerald-600 *,
+html:not(.dark) a.bg-emerald-600 * {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25) !important;
   color: #ffffff !important;
   stroke: #ffffff !important;
 }
 html:not(.dark) button.bg-brand-emerald:hover,
-html:not(.dark) button.bg-emerald-600:hover {
+html:not(.dark) a.bg-brand-emerald:hover,
+html:not(.dark) button.bg-emerald-600:hover,
+html:not(.dark) a.bg-emerald-600:hover {
   background: linear-gradient(135deg, #047857 0%, #059669 100%) !important;
 }
 
