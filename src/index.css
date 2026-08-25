@@ -459,17 +459,12 @@ html:not(.dark) aside a:not(.bg-brand-accent):hover * {
   color: #4f46e5 !important;
   stroke: #4f46e5 !important;
 }
-html:not(.dark) aside a.bg-brand-accent {
-  background: #f5f3ff !important;
-  border-left: 3px solid #4f46e5 !important;
-  box-shadow: none !important;
-}
 html:not(.dark) aside a.bg-brand-accent,
 html:not(.dark) aside a.bg-brand-accent *,
 html:not(.dark) aside a.bg-brand-accent.text-white,
 html:not(.dark) aside a.bg-brand-accent.text-white * {
-  color: #4f46e5 !important;
-  stroke: #4f46e5 !important;
+  color: #ffffff !important;
+  stroke: #ffffff !important;
 }
 
 /* Dark Mode active and hover states */
@@ -488,17 +483,12 @@ html:not(.dark) aside a.bg-brand-accent.text-white * {
   color: #818cf8 !important;
   stroke: #818cf8 !important;
 }
-.dark aside a.bg-brand-accent {
-  background: rgba(99, 102, 241, 0.1) !important;
-  border-left: 3px solid #6366f1 !important;
-  box-shadow: none !important;
-}
 .dark aside a.bg-brand-accent,
 .dark aside a.bg-brand-accent *,
 .dark aside a.bg-brand-accent.text-white,
 .dark aside a.bg-brand-accent.text-white * {
-  color: #818cf8 !important;
-  stroke: #818cf8 !important;
+  color: #ffffff !important;
+  stroke: #ffffff !important;
 }
 
 /* Admin Profile Drawer footer */
