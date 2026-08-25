@@ -25,13 +25,17 @@ const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
 const BorrowerDashboard = lazy(() => import('./pages/BorrowerDashboard'));
 
 const PageLoader = () => (
-  <div className="h-full flex flex-col items-center justify-center py-24 space-y-4 animate-fade-in font-sans">
-    <div className="relative w-12 h-12 flex items-center justify-center">
-      <div className="absolute inset-0 border-2 border-brand-accent/20 rounded-full" />
-      <div className="absolute inset-0 border-2 border-brand-accent border-t-transparent rounded-full animate-spin" style={{ animationDuration: '0.7s' }} />
-      <div className="w-6 h-6 rounded-full bg-brand-accent/15 animate-ping" />
+  <div className="h-full flex flex-col items-center justify-center py-24 space-y-4 animate-fade-in font-sans select-none">
+    {/* Mini Animated RinSetu Logo Box */}
+    <div className="relative w-12 h-12 flex items-center justify-center rounded-xl bg-gradient-to-tr from-brand-accent to-indigo-400 shadow-lg shadow-brand-accent/20 animate-bounce-slow">
+      <div className="absolute inset-1 border border-white/20 rounded-[8px] pointer-events-none" />
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-white animate-spin-slow">
+        <line x1="19" y1="5" x2="5" y2="19"></line>
+        <circle cx="6.5" cy="6.5" r="2.5"></circle>
+        <circle cx="17.5" cy="17.5" r="2.5"></circle>
+      </svg>
     </div>
-    <span className="text-[10px] text-brand-dim font-bold uppercase tracking-wider">Loading panel data...</span>
+    <span className="text-[9px] text-brand-dim font-bold uppercase tracking-wider animate-pulse-soft">Loading panel data...</span>
   </div>
 );
 
