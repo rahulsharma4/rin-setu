@@ -465,7 +465,9 @@ html:not(.dark) aside a.bg-brand-accent {
   box-shadow: none !important;
 }
 html:not(.dark) aside a.bg-brand-accent,
-html:not(.dark) aside a.bg-brand-accent * {
+html:not(.dark) aside a.bg-brand-accent *,
+html:not(.dark) aside a.bg-brand-accent.text-white,
+html:not(.dark) aside a.bg-brand-accent.text-white * {
   color: #4f46e5 !important;
   stroke: #4f46e5 !important;
 }
@@ -492,7 +494,9 @@ html:not(.dark) aside a.bg-brand-accent * {
   box-shadow: none !important;
 }
 .dark aside a.bg-brand-accent,
-.dark aside a.bg-brand-accent * {
+.dark aside a.bg-brand-accent *,
+.dark aside a.bg-brand-accent.text-white,
+.dark aside a.bg-brand-accent.text-white * {
   color: #818cf8 !important;
   stroke: #818cf8 !important;
 }
