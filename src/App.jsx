@@ -25,8 +25,13 @@ const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
 const BorrowerDashboard = lazy(() => import('./pages/BorrowerDashboard'));
 
 const PageLoader = () => (
-  <div className="h-full flex items-center justify-center py-24">
-    <div className="w-8 h-8 border-2 border-brand-accent border-t-transparent rounded-full animate-spin" />
+  <div className="h-full flex flex-col items-center justify-center py-24 space-y-4 animate-fade-in font-sans">
+    <div className="relative w-12 h-12 flex items-center justify-center">
+      <div className="absolute inset-0 border-2 border-brand-accent/20 rounded-full" />
+      <div className="absolute inset-0 border-2 border-brand-accent border-t-transparent rounded-full animate-spin" style={{ animationDuration: '0.7s' }} />
+      <div className="w-6 h-6 rounded-full bg-brand-accent/15 animate-ping" />
+    </div>
+    <span className="text-[10px] text-brand-dim font-bold uppercase tracking-wider">Loading panel data...</span>
   </div>
 );
 
