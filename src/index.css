@@ -435,30 +435,54 @@ aside a {
 html:not(.dark) aside a:not(.bg-brand-accent) {
   color: #475569 !important;
 }
+html:not(.dark) aside a:not(.bg-brand-accent) * {
+  color: #475569 !important;
+  stroke: #475569 !important;
+}
 html:not(.dark) aside a:not(.bg-brand-accent):hover {
   background-color: rgba(79, 70, 229, 0.04) !important;
+}
+html:not(.dark) aside a:not(.bg-brand-accent):hover,
+html:not(.dark) aside a:not(.bg-brand-accent):hover * {
   color: #4f46e5 !important;
+  stroke: #4f46e5 !important;
 }
 html:not(.dark) aside a.bg-brand-accent {
   background: #f5f3ff !important;
   border-left: 3px solid #4f46e5 !important;
-  color: #4f46e5 !important;
   box-shadow: none !important;
+}
+html:not(.dark) aside a.bg-brand-accent,
+html:not(.dark) aside a.bg-brand-accent * {
+  color: #4f46e5 !important;
+  stroke: #4f46e5 !important;
 }
 
 /* Dark Mode active and hover states */
 .dark aside a:not(.bg-brand-accent) {
   color: #94a3b8 !important;
 }
+.dark aside a:not(.bg-brand-accent) * {
+  color: #94a3b8 !important;
+  stroke: #94a3b8 !important;
+}
 .dark aside a:not(.bg-brand-accent):hover {
   background-color: rgba(99, 102, 241, 0.05) !important;
+}
+.dark aside a:not(.bg-brand-accent):hover,
+.dark aside a:not(.bg-brand-accent):hover * {
   color: #818cf8 !important;
+  stroke: #818cf8 !important;
 }
 .dark aside a.bg-brand-accent {
   background: rgba(99, 102, 241, 0.1) !important;
   border-left: 3px solid #6366f1 !important;
-  color: #818cf8 !important;
   box-shadow: none !important;
+}
+.dark aside a.bg-brand-accent,
+.dark aside a.bg-brand-accent * {
+  color: #818cf8 !important;
+  stroke: #818cf8 !important;
 }
 
 /* Admin Profile Drawer footer */
