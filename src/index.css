@@ -207,6 +207,7 @@ html:not(.dark) .glow-indigo {
 }
 html:not(.dark) .glow-indigo h3,
 html:not(.dark) .glow-indigo p,
+html:not(.dark) .glow-indigo div,
 html:not(.dark) .glow-indigo span {
   color: #3730a3 !important;
 }
@@ -217,6 +218,7 @@ html:not(.dark) .glow-emerald {
 }
 html:not(.dark) .glow-emerald h3,
 html:not(.dark) .glow-emerald p,
+html:not(.dark) .glow-emerald div,
 html:not(.dark) .glow-emerald span {
   color: #065f46 !important;
 }
@@ -227,6 +229,7 @@ html:not(.dark) .glow-amber {
 }
 html:not(.dark) .glow-amber h3,
 html:not(.dark) .glow-amber p,
+html:not(.dark) .glow-amber div,
 html:not(.dark) .glow-amber span {
   color: #92400e !important;
 }
@@ -238,6 +241,7 @@ html:not(.dark) .glow-rose {
 }
 html:not(.dark) .glow-rose h3,
 html:not(.dark) .glow-rose p,
+html:not(.dark) .glow-rose div,
 html:not(.dark) .glow-rose span {
   color: #9b1c1c !important;
 }
@@ -247,7 +251,7 @@ html:not(.dark) .border-brand-border {
 }
 
 /* 2. Global text-white Overrides for High-Contrast Light Mode readability */
-html:not(.dark) .text-white:not(button):not(a):not([class*="bg-brand-"]):not([class*="bg-indigo-"]):not([class*="bg-emerald-"]):not([class*="bg-rose-"]):not([class*="bg-amber-"]):not([class*="bg-red-"]):not(button *):not(a *):not([class*="bg-brand-"] *):not([class*="bg-indigo-"] *):not([class*="bg-emerald-"] *):not([class*="bg-rose-"] *):not([class*="bg-amber-"] *):not([class*="bg-red-"] *) {
+html:not(.dark) .text-white:not(button):not(a):not([class*="bg-brand-"]):not([class*="bg-indigo-"]):not([class*="bg-emerald-"]):not([class*="bg-rose-"]):not([class*="bg-amber-"]):not([class*="bg-red-"]):not([class*="from-"]):not([class*="to-"]):not([class*="bg-gradient-"]):not(button *):not(a *):not([class*="bg-brand-"] *):not([class*="bg-indigo-"] *):not([class*="bg-emerald-"] *):not([class*="bg-rose-"] *):not([class*="bg-amber-"] *):not([class*="bg-red-"] *):not([class*="from-"] *):not([class*="to-"] *):not([class*="bg-gradient-"] *) {
   color: var(--brand-text) !important;
 }
 
@@ -469,20 +473,32 @@ html:not(.dark) .glass-panel [class*="bg-brand-bg/50"] * {
 }
 
 /* Custom premium animations for RinSetu branding loader */
-@keyframes bounceSlow {
+@keyframes logoPulse {
   0%, 100% {
-    transform: translateY(0);
+    transform: translateY(0) scale(1) rotate(0deg);
+    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
   }
-  50% {
-    transform: translateY(-10px);
+  33% {
+    transform: translateY(-8px) scale(1.04) rotate(3deg);
+    box-shadow: 0 20px 35px rgba(99, 102, 241, 0.35);
+  }
+  66% {
+    transform: translateY(4px) scale(0.96) rotate(-3deg);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.15);
   }
 }
-@keyframes spinSlow {
+@keyframes percentIconAnim {
   0% {
-    transform: rotate(0deg);
+    transform: scale(1) rotate(0deg) rotateY(0deg);
+  }
+  30% {
+    transform: scale(1.15) rotate(-15deg) rotateY(180deg);
+  }
+  70% {
+    transform: scale(0.9) rotate(15deg) rotateY(360deg);
   }
   100% {
-    transform: rotate(360deg);
+    transform: scale(1) rotate(0deg) rotateY(360deg);
   }
 }
 @keyframes pulseSoft {
@@ -495,11 +511,11 @@ html:not(.dark) .glass-panel [class*="bg-brand-bg/50"] * {
     transform: scale(1);
   }
 }
-.animate-bounce-slow {
-  animation: bounceSlow 3s ease-in-out infinite;
+.animate-logo-pulse {
+  animation: logoPulse 3s ease-in-out infinite;
 }
-.animate-spin-slow {
-  animation: spinSlow 6s linear infinite;
+.animate-percent-morph {
+  animation: percentIconAnim 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 .animate-pulse-soft {
   animation: pulseSoft 2.5s ease-in-out infinite;
