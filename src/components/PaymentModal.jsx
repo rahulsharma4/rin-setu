@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Receipt, ShieldAlert, QrCode, CheckCircle2, Loader2, Wifi, Clock } from 'lucide-react';
+import { X, Receipt, ShieldAlert, QrCode, CheckCircle2, Loader2, Wifi, Clock, ArrowUpRight } from 'lucide-react';
 import { transactionAPI } from '../api';
 import api from '../api';
 
-export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, customerId, customerName }) {
+export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, customerId, customerName, customerPhone }) {
   if (!isOpen) return null;
 
   const [formData, setFormData] = useState({
@@ -23,6 +23,7 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
   const [qrPhase, setQrPhase] = useState('idle'); // idle | generating | waiting | success | error
   const [qrData, setQrData] = useState(null); // { orderId, upiIntent, amount, keyId }
   const [qrSuccess, setQrSuccess] = useState(null);
+  const [copiedLink, setCopiedLink] = useState(false);
   const pollingRef = useRef(null);
   const pollingCountRef = useRef(0);
 
@@ -94,7 +95,9 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
       });
       setQrData(res.data);
       setQrPhase('waiting');
-      startPolling(res.data.qrCodeId);
+      if (!res.data.isP2P) {
+        startPolling(res.data.qrCodeId);
+      }
     } catch (err) {
       const msg = err.response?.data?.message || err.message || 'Failed to generate QR code.';
       const code = err.response?.data?.code;
@@ -148,61 +151,98 @@ export default function PaymentModal({ isOpen, onClose, onRefresh, loanId, custo
     }
 
     if (qrPhase === 'waiting' && qrData) {
+      const cleanPhone = (phone) => {
+        if (!phone) return '';
+        const digits = phone.replace(/\D/g, '');
+        if (digits.length === 10) return `91${digits}`;
+        return digits;
+      };
+      const phoneNum = cleanPhone(customerPhone);
+      const paymentUrl = `${window.location.origin}/pay/loan/${loanId}?am=${formData.amount}`;
+      const whatsappShareUrl = `https://api.whatsapp.com/send?phone=${phoneNum}&text=${encodeURIComponent(`Dear customer, please click this link to pay your installment of ₹${formData.amount}: ${paymentUrl}`)}`;
+
       return (
-        <div className="flex flex-col items-center space-y-4">
+        <div className="flex flex-col items-center space-y-4 animate-fade-in">
           {/* QR Placeholder + UPI link */}
           <div className="w-52 h-52 bg-white rounded-2xl p-3 flex items-center justify-center shadow-lg shadow-black/20 border-2 border-brand-accent/30 relative">
-            {/* Visual QR frame pattern */}
             <div className="w-full h-full border-4 border-gray-900 rounded-xl flex items-center justify-center relative overflow-hidden">
-              <div className="hidden">
-                {Array.from({ length: 64 }).map((_, i) => (
-                  <div key={i} className={`${Math.random() > 0.5 ? 'bg-gray-900' : 'bg-transparent'}`} />
-                ))}
-              </div>
               <a
                 href={qrData.imageContent || `upi://pay?pa=rahulsharma@razorpay&pn=RinSetu%20CRM&am=${formData.amount}&cu=INR`}
                 className="z-10 flex flex-col items-center text-center"
                 title="Click to open UPI app on this device"
               >
-                <img src={qrData.qrImageUrl} alt="Razorpay UPI payment QR" className="w-36 h-36 object-contain" />
+                <img src={qrData.qrImageUrl} alt="UPI payment QR" className="w-36 h-36 object-contain" />
                 <span className="text-[9px] font-bold text-gray-900 mt-1">Tap to Pay</span>
                 <span className="text-[8px] text-gray-600">₹{parseFloat(formData.amount).toLocaleString('en-IN')}</span>
               </a>
             </div>
-            {/* Animated pulse ring */}
             <div className="absolute inset-0 rounded-2xl border-2 border-brand-accent/50 animate-ping opacity-30" />
           </div>
 
           <div className="text-center space-y-1 w-full px-4">
             <p className="text-xs font-bold text-brand-text dark:text-white">
-              ₹{parseFloat(formData.amount).toLocaleString('en-IN')} — Scan with any UPI App
+              ₹{parseFloat(formData.amount).toLocaleString('en-IN')} — {qrData.isP2P ? 'Direct P2P UPI Transfer' : 'Scan with any UPI App'}
             </p>
             <p className="text-[10px] text-brand-dim mb-2">GPay • PhonePe • Paytm • Any UPI</p>
             
-            {/* Direct Pay Link Button (extremely convenient on Mobile devices!) */}
-            <a
-              href={qrData.imageContent || `upi://pay?pa=rahulsharma@razorpay&pn=RinSetu%20CRM&am=${formData.amount}&cu=INR`}
-              className="w-full py-2.5 bg-brand-emerald hover:bg-emerald-600 active:bg-emerald-700 text-xs font-bold text-white shadow-lg shadow-brand-emerald/25 rounded-xl transition flex items-center justify-center space-x-1.5"
-            >
-              <Wifi className="w-4 h-4 text-white" />
-              <span>Pay Instantly via UPI App</span>
-            </a>
+            {qrData.isP2P ? (
+              <div className="space-y-2">
+                {/* Copy Link button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(paymentUrl);
+                    setCopiedLink(true);
+                    setTimeout(() => setCopiedLink(false), 2000);
+                  }}
+                  className="w-full py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-brand-accent text-xs font-bold rounded-xl transition border border-brand-accent/20"
+                >
+                  {copiedLink ? 'Link Copied! ✅' : 'Copy Public Payment Link'}
+                </button>
+
+                {/* Share on WhatsApp */}
+                <a
+                  href={whatsappShareUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full py-2.5 bg-brand-emerald hover:bg-emerald-600 active:bg-emerald-700 text-xs font-bold text-white rounded-xl shadow-lg shadow-brand-emerald/25 transition flex items-center justify-center space-x-1.5"
+                >
+                  <ArrowUpRight className="w-4 h-4 text-white" />
+                  <span>Share Repayment Link on WhatsApp</span>
+                </a>
+              </div>
+            ) : (
+              <a
+                href={qrData.imageContent || `upi://pay?pa=rahulsharma@razorpay&pn=RinSetu%20CRM&am=${formData.amount}&cu=INR`}
+                className="w-full py-2.5 bg-brand-emerald hover:bg-emerald-600 active:bg-emerald-700 text-xs font-bold text-white shadow-lg shadow-brand-emerald/25 rounded-xl transition flex items-center justify-center space-x-1.5"
+              >
+                <Wifi className="w-4 h-4 text-white" />
+                <span>Pay Instantly via UPI App</span>
+              </a>
+            )}
           </div>
 
-          {/* Waiting indicator */}
-          <div className="flex items-center space-x-2 px-4 py-2 bg-brand-amber/10 border border-brand-amber/30 rounded-xl">
-            <Wifi className="w-4 h-4 text-brand-amber animate-pulse" />
-            <span className="text-[10px] font-semibold text-brand-amber">Waiting for payment confirmation...</span>
-          </div>
-
-          <p className="text-[9px] text-brand-dim text-center">
-            Entry will be recorded automatically once payment is received.
-          </p>
+          {/* Status Indicators */}
+          {qrData.isP2P ? (
+            <div className="bg-brand-bg/60 border border-brand-border p-3 rounded-xl text-[9px] text-brand-dim leading-relaxed w-full">
+              💡 <strong>P2P VPA Mode:</strong> Borrower ko payment link share karein. Woh bina login kare pay karke transaction reference (UTR) submit karenge, jo aapke <strong>Dashboard</strong> par approve ke liye highlight hoga.
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center space-x-2 px-4 py-2 bg-brand-amber/10 border border-brand-amber/30 rounded-xl">
+                <Wifi className="w-4 h-4 text-brand-amber animate-pulse" />
+                <span className="text-[10px] font-semibold text-brand-amber">Waiting for payment confirmation...</span>
+              </div>
+              <p className="text-[9px] text-brand-dim text-center">
+                Entry will be recorded automatically once payment is received.
+              </p>
+            </>
+          )}
 
           {/* Manual fallback */}
           <button
             type="button"
-            onClick={() => { clearInterval(pollingRef.current); setQrPhase('idle'); }}
+            onClick={() => { if (pollingRef.current) clearInterval(pollingRef.current); setQrPhase('idle'); }}
             className="text-[10px] text-brand-dim underline hover:text-white transition"
           >
             Cancel / Switch to manual entry

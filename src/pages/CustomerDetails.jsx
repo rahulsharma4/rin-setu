@@ -1116,6 +1116,7 @@ export default function CustomerDetails() {
           loanId={selectedLoan._id}
           customerId={customer._id}
           customerName={customer.name}
+          customerPhone={customer.phone}
         />
       )}
 
