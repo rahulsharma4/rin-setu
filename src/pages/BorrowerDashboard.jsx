@@ -50,6 +50,8 @@ export default function BorrowerDashboard() {
   });
   const [qrError, setQrError] = useState('');
   const [qrLoading, setQrLoading] = useState(false);
+  const [utrNumber, setUtrNumber] = useState('');
+  const [utrSubmitting, setUtrSubmitting] = useState(false);
 
   const fetchDashboardData = async () => {
     try {
@@ -133,6 +135,7 @@ export default function BorrowerDashboard() {
 
   const handleOpenPayModal = (loanId, suggestedAmount = '') => {
     setQrError('');
+    setUtrNumber('');
     setQrModal({
       isOpen: true,
       loanId,
@@ -141,6 +144,35 @@ export default function BorrowerDashboard() {
       qrImageUrl: '',
       polling: false
     });
+  };
+
+  const handleSubmitUTR = async () => {
+    if (!utrNumber || utrNumber.trim().length < 6) {
+      setQrError('Kripya ek valid UTR/Reference number darj karein.');
+      return;
+    }
+
+    try {
+      setUtrSubmitting(true);
+      setQrError('');
+      const res = await api.post('borrower/submit-p2p-reference', {
+        loanId: qrModal.loanId,
+        amount: Number(qrModal.amount),
+        referenceNumber: utrNumber.trim()
+      });
+
+      setSuccess(res.data.message || 'Reference number submitted successfully! Verification pending.');
+      setUtrNumber('');
+      setTimeout(() => {
+        setQrModal({ isOpen: false, loanId: null, amount: '', qrCodeId: '', qrImageUrl: '', polling: false });
+        setSuccess('');
+        fetchDashboardData();
+      }, 3000);
+    } catch (err) {
+      setQrError(err.response?.data?.message || 'Failed to submit reference number.');
+    } finally {
+      setUtrSubmitting(false);
+    }
   };
 
   const handleGenerateQR = async () => {
@@ -162,7 +194,8 @@ export default function BorrowerDashboard() {
         qrCodeId: res.data.qrCodeId,
         qrImageUrl: res.data.qrImageUrl,
         upiString: res.data.imageContent || `upi://pay?pa=rahulsharma@razorpay&pn=RinSetu%20CRM&am=${res.data.amount}&cu=INR`,
-        polling: true
+        keyId: res.data.keyId,
+        polling: res.data.keyId !== 'p2p_upi'
       }));
     } catch (err) {
       setQrError(err.response?.data?.message || 'Failed to generate repayment QR.');
@@ -647,57 +680,110 @@ export default function BorrowerDashboard() {
                   )}
                 </div>
 
-                 {/* Direct Pay Link Button (extremely convenient on Mobile devices!) */}
-                 <div className="px-4">
-                   <a
-                     href={qrModal.upiString}
-                     className="w-full py-2.5 bg-brand-emerald hover:bg-emerald-600 active:bg-emerald-700 text-xs font-bold text-white rounded-xl shadow-lg shadow-brand-emerald/20 transition flex items-center justify-center space-x-1.5"
-                   >
-                     <ArrowUpRight className="w-4 h-4 text-white" />
-                     <span>Pay Instantly via UPI App</span>
-                   </a>
-                 </div>
+                  {/* Direct Pay Link Button (extremely convenient on Mobile devices!) */}
+                  <div className="px-4">
+                    <a
+                      href={qrModal.upiString}
+                      className="w-full py-2.5 bg-brand-emerald hover:bg-emerald-600 active:bg-emerald-700 text-xs font-bold text-white rounded-xl shadow-lg shadow-brand-emerald/20 transition flex items-center justify-center space-x-1.5"
+                    >
+                      <ArrowUpRight className="w-4 h-4 text-white" />
+                      <span>Pay Instantly via UPI App</span>
+                    </a>
+                  </div>
 
-                <div className="space-y-1">
-                  <p className="text-sm font-black text-brand-text dark:text-white">Amount: ₹{qrModal.amount}</p>
-                  <p className="text-[9px] text-brand-dim font-semibold uppercase tracking-wider animate-pulse flex items-center justify-center gap-1.5">
-                    <Loader2 className="w-3 h-3 animate-spin text-brand-accent" />
-                    <span>Waiting for scan & payment verification...</span>
-                  </p>
-                </div>
-                <div className="bg-brand-bg/50 border border-brand-border p-3 rounded-xl text-[9px] text-brand-dim leading-relaxed">
-                  💡 QR code scan karke payment karein. Hamara webhook payment detect karte hi portal ko automatic update kar dega.
-                </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-black text-brand-text dark:text-white">Amount: ₹{qrModal.amount}</p>
+                    {qrModal.keyId !== 'p2p_upi' ? (
+                      <p className="text-[9px] text-brand-dim font-semibold uppercase tracking-wider animate-pulse flex items-center justify-center gap-1.5">
+                        <Loader2 className="w-3 h-3 animate-spin text-brand-accent" />
+                        <span>Waiting for scan & payment verification...</span>
+                      </p>
+                    ) : (
+                      <span className="text-[10px] text-brand-emerald font-extrabold uppercase tracking-wider block bg-brand-emerald/10 py-1 px-3 rounded-full w-fit mx-auto mt-2">
+                        Direct P2P UPI Transfer (0% Fee)
+                      </span>
+                    )}
+                  </div>
 
-                <div className="flex items-center space-x-2">
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      // Trigger Simulated Webhook for testing!
-                      try {
-                        await api.post('webhooks/razorpay/test-webhook-simulate', {
-                          qrCodeId: qrModal.qrCodeId,
-                          amount: Number(qrModal.amount),
-                          loanId: qrModal.loanId,
-                          customerId: admin.tenantId ? admin.id : undefined // borrower id
-                        });
-                        alert('Simulated payment captured webhook sent! Webhook processing in background...');
-                      } catch {
-                        alert('Simulation endpoint only works in local development environments.');
-                      }
-                    }}
-                    className="flex-1 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-[10px] font-bold rounded-lg border border-indigo-500/25 transition"
-                  >
-                    Simulate Payment Capture
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setQrModal({ isOpen: false, loanId: null, amount: '', qrCodeId: '', qrImageUrl: '', polling: false })}
-                    className="py-2 px-3 border border-brand-border text-brand-dim hover:text-white rounded-lg text-[10px] transition font-semibold"
-                  >
-                    Cancel
-                  </button>
-                </div>
+                  {qrModal.keyId === 'p2p_upi' ? (
+                    <div className="space-y-4">
+                      <div className="space-y-1.5 text-left bg-brand-bg/40 border border-brand-border p-3.5 rounded-xl">
+                        <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider block">Transaction UTR / Ref Number (12 Digits) *</label>
+                        <input
+                          type="text"
+                          maxLength="12"
+                          value={utrNumber}
+                          onChange={(e) => setUtrNumber(e.target.value.replace(/\D/g, ''))}
+                          placeholder="e.g. 423456789012"
+                          className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono animate-pulse-soft"
+                        />
+                        <p className="text-[9px] text-brand-dim mt-1.5 leading-normal">
+                          💡 QR Code scan karke payment karne ke baad, screen par aane wale <strong>12-digit UTR/Ref Number</strong> ko yahan enter karein aur Submit button dabaayein. Admin ise confirm karke approve karenge.
+                        </p>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <button
+                          type="button"
+                          onClick={handleSubmitUTR}
+                          disabled={utrSubmitting}
+                          className="flex-1 py-2.5 bg-brand-emerald hover:bg-emerald-600 disabled:bg-emerald-400 text-xs font-bold text-white rounded-xl shadow-lg shadow-brand-emerald/20 transition flex items-center justify-center space-x-1.5"
+                        >
+                          {utrSubmitting ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              <span>Submitting Reference...</span>
+                            </>
+                          ) : (
+                            <span>Submit UTR Reference</span>
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setQrModal({ isOpen: false, loanId: null, amount: '', qrCodeId: '', qrImageUrl: '', polling: false })}
+                          className="py-2.5 px-4 border border-brand-border text-brand-dim hover:text-white rounded-xl text-xs transition font-semibold"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="bg-brand-bg/50 border border-brand-border p-3 rounded-xl text-[9px] text-brand-dim leading-relaxed">
+                        💡 QR code scan karke payment karein. Hamara webhook payment detect karte hi portal ko automatic update kar dega.
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            // Trigger Simulated Webhook for testing!
+                            try {
+                              await api.post('webhooks/razorpay/test-webhook-simulate', {
+                                qrCodeId: qrModal.qrCodeId,
+                                amount: Number(qrModal.amount),
+                                loanId: qrModal.loanId,
+                                customerId: admin.tenantId ? admin.id : undefined // borrower id
+                              });
+                              alert('Simulated payment captured webhook sent! Webhook processing in background...');
+                            } catch {
+                              alert('Simulation endpoint only works in local development environments.');
+                            }
+                          }}
+                          className="flex-1 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-[10px] font-bold rounded-lg border border-indigo-500/25 transition"
+                        >
+                          Simulate Payment Capture
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setQrModal({ isOpen: false, loanId: null, amount: '', qrCodeId: '', qrImageUrl: '', polling: false })}
+                          className="py-2 px-3 border border-brand-border text-brand-dim hover:text-white rounded-lg text-[10px] transition font-semibold"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </>
+                  )}
               </div>
             )}
           </div>

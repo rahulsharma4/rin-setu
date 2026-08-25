@@ -251,49 +251,78 @@ html:not(.dark) .border-brand-border {
 }
 
 /* 2. Global text-white Overrides for High-Contrast Light Mode readability */
-html:not(.dark) .text-white:not(button):not(a):not([class*="bg-brand-"]):not([class*="bg-indigo-"]):not([class*="bg-emerald-"]):not([class*="bg-rose-"]):not([class*="bg-amber-"]):not([class*="bg-red-"]):not([class*="from-"]):not([class*="to-"]):not([class*="bg-gradient-"]):not(button *):not(a *):not([class*="bg-brand-"] *):not([class*="bg-indigo-"] *):not([class*="bg-emerald-"] *):not([class*="bg-rose-"] *):not([class*="bg-amber-"] *):not([class*="bg-red-"] *):not([class*="from-"] *):not([class*="to-"] *):not([class*="bg-gradient-"] *) {
+html:not(.dark) .text-white {
   color: var(--brand-text) !important;
 }
 
-/* Force standard brand variables for AI text & prompt text in light mode */
-html:not(.dark) .text-brand-text {
-  color: #1e293b !important;
-}
-html:not(.dark) .text-brand-dim {
-  color: #64748b !important;
-}
-
-/* Maintain crisp white text on solid dark buttons, indicators, and user chat bubbles */
+/* Maintain crisp white text on solid dark buttons, indicators, gradients, and user chat bubbles */
 html:not(.dark) button.text-white,
 html:not(.dark) button .text-white,
-html:not(.dark) .bg-brand-accent .text-white,
+html:not(.dark) button.bg-brand-accent,
+html:not(.dark) button.bg-brand-accent *,
+html:not(.dark) button.bg-brand-emerald,
+html:not(.dark) button.bg-brand-emerald *,
+html:not(.dark) button.bg-brand-rose,
+html:not(.dark) button.bg-brand-rose *,
+html:not(.dark) button.bg-brand-amber,
+html:not(.dark) button.bg-brand-amber *,
+html:not(.dark) button.bg-indigo-600,
+html:not(.dark) button.bg-indigo-600 *,
+html:not(.dark) button.bg-emerald-600,
+html:not(.dark) button.bg-emerald-600 *,
+html:not(.dark) button.bg-rose-600,
+html:not(.dark) button.bg-rose-600 *,
+html:not(.dark) button.bg-red-600,
+html:not(.dark) button.bg-red-600 *,
+html:not(.dark) button.bg-amber-600,
+html:not(.dark) button.bg-amber-600 *,
+html:not(.dark) a.text-white,
+html:not(.dark) a .text-white,
+html:not(.dark) a.bg-brand-accent,
+html:not(.dark) a.bg-brand-accent *,
+html:not(.dark) a.bg-indigo-600,
+html:not(.dark) a.bg-indigo-600 *,
+html:not(.dark) a.bg-brand-emerald,
+html:not(.dark) a.bg-brand-emerald *,
 html:not(.dark) .bg-brand-accent.text-white,
 html:not(.dark) .bg-brand-accent.text-white *,
-html:not(.dark) .bg-brand-accent * .text-white,
-html:not(.dark) .bg-brand-emerald .text-white,
+html:not(.dark) .bg-brand-accent .text-white,
 html:not(.dark) .bg-brand-emerald.text-white,
-html:not(.dark) .bg-brand-rose .text-white,
+html:not(.dark) .bg-brand-emerald.text-white *,
+html:not(.dark) .bg-brand-emerald .text-white,
 html:not(.dark) .bg-brand-rose.text-white,
-html:not(.dark) .bg-brand-amber .text-white,
+html:not(.dark) .bg-brand-rose.text-white *,
+html:not(.dark) .bg-brand-rose .text-white,
 html:not(.dark) .bg-brand-amber.text-white,
-html:not(.dark) a.bg-brand-accent .text-white,
-html:not(.dark) a.bg-brand-accent.text-white,
-html:not(.dark) .bg-indigo-600 .text-white,
-html:not(.dark) .bg-indigo-600.text-white,
-html:not(.dark) .bg-emerald-600 .text-white,
-html:not(.dark) .bg-emerald-600.text-white,
-html:not(.dark) .bg-rose-600 .text-white,
-html:not(.dark) .bg-rose-600.text-white,
-html:not(.dark) .bg-red-600 .text-white,
-html:not(.dark) .bg-red-600.text-white,
-html:not(.dark) .bg-amber-600 .text-white,
-html:not(.dark) .bg-amber-600.text-white,
-html:not(.dark) .bg-brand-rose/20 .text-white,
+html:not(.dark) .bg-brand-amber.text-white *,
+html:not(.dark) .bg-brand-amber .text-white,
+html:not(.dark) [class*="bg-indigo-600"].text-white,
+html:not(.dark) [class*="bg-indigo-600"].text-white *,
+html:not(.dark) [class*="bg-emerald-600"].text-white,
+html:not(.dark) [class*="bg-emerald-600"].text-white *,
+html:not(.dark) [class*="bg-rose-600"].text-white,
+html:not(.dark) [class*="bg-rose-600"].text-white *,
+html:not(.dark) [class*="bg-red-600"].text-white,
+html:not(.dark) [class*="bg-red-600"].text-white *,
+html:not(.dark) [class*="bg-amber-600"].text-white,
+html:not(.dark) [class*="bg-amber-600"].text-white *,
+html:not(.dark) [class*="bg-gradient-"].text-white,
+html:not(.dark) [class*="bg-gradient-"].text-white *,
+html:not(.dark) [class*="bg-gradient-"] .text-white,
+html:not(.dark) [class*="bg-gradient-"] *,
+html:not(.dark) [class*="bg-gradient-"] svg,
+html:not(.dark) [class*="from-brand-accent"] svg,
+html:not(.dark) [class*="from-indigo-600"] svg,
+html:not(.dark) .bg-slate-900.text-white,
+html:not(.dark) .bg-slate-900.text-white *,
+html:not(.dark) .bg-black.text-white,
+html:not(.dark) .bg-black.text-white *,
 html:not(.dark) [class*="bg-brand-rose/20"] .text-white,
 html:not(.dark) [class*="bg-brand-amber/15"] .text-white,
 html:not(.dark) [class*="bg-brand-emerald/15"] .text-white,
 html:not(.dark) [class*="bg-brand-accent/25"] .text-white {
   color: #ffffff !important;
+  stroke: #ffffff !important;
 }
 
 /* Ensure placeholder texts are readable but styled */

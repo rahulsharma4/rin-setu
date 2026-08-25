@@ -55,6 +55,8 @@ export default function Settings() {
     gatewayKeyId: '',
     gatewayKeySecret: '',
     gatewayWebhookSecret: '',
+    upiId: '',
+    upiName: '',
   });
   const [gatewayInfo, setGatewayInfo] = useState(null); // { isConfigured, webhookUrl }
   const [gatewayLoading, setGatewayLoading] = useState(false);
@@ -64,7 +66,13 @@ export default function Settings() {
   const fetchGatewaySettings = async () => {
     try {
       const res = await api.get('auth/gateway-settings');
-      setGatewayData(prev => ({ ...prev, gatewayKeyId: res.data.gatewayKeyId, gatewayWebhookSecret: res.data.gatewayWebhookSecret }));
+      setGatewayData(prev => ({
+        ...prev,
+        gatewayKeyId: res.data.gatewayKeyId,
+        gatewayWebhookSecret: res.data.gatewayWebhookSecret,
+        upiId: res.data.upiId || '',
+        upiName: res.data.upiName || ''
+      }));
       setGatewayInfo({ isConfigured: res.data.isConfigured, webhookUrl: res.data.webhookUrl });
     } catch (_) {}
   };
@@ -76,11 +84,11 @@ export default function Settings() {
     setError('');
     try {
       await api.put('auth/gateway-settings', gatewayData);
-      setSuccess('Payment gateway settings saved! Your Razorpay UPI QR integration is now active.');
+      setSuccess('Payment & P2P settings saved successfully! ✅');
       setTimeout(() => setSuccess(''), 4000);
       fetchGatewaySettings();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to save gateway settings.');
+      setError(err.response?.data?.message || 'Failed to save settings.');
     } finally {
       setGatewayLoading(false);
     }
@@ -971,6 +979,43 @@ export default function Settings() {
                       autoComplete="new-password"
                     />
                     <p className="text-[9px] text-brand-dim">This is used to verify that payment notifications truly come from Razorpay (prevents fraud).</p>
+                  </div>
+                </div>
+
+                {/* Direct P2P UPI VPA Section */}
+                <div className="border-t border-brand-border/40 pt-5 mt-5 space-y-4">
+                  <div>
+                    <h4 className="text-xs font-bold text-brand-text dark:text-white uppercase tracking-wider">Direct VPA P2P UPI Settings (0% Commission)</h4>
+                    <p className="text-[10px] text-brand-dim mt-0.5">
+                      Configure your personal or business UPI ID. When borrower scans this QR, 100% of the payment goes directly bank-to-bank without any gateway fees. 
+                      Borrower will submit UTR transaction number which you can approve below to mark as paid.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* UPI VPA ID */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Lender UPI VPA ID</label>
+                      <input
+                        type="text"
+                        value={gatewayData.upiId}
+                        onChange={(e) => setGatewayData(prev => ({ ...prev, upiId: e.target.value }))}
+                        placeholder="e.g. rahulsharma@oksbi or 9876543210@paytm"
+                        className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
+                      />
+                    </div>
+
+                    {/* UPI Display Name */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Lender UPI Display Name (Business Name)</label>
+                      <input
+                        type="text"
+                        value={gatewayData.upiName}
+                        onChange={(e) => setGatewayData(prev => ({ ...prev, upiName: e.target.value }))}
+                        placeholder="e.g. RinSetu CRM or Advika Enterprises"
+                        className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

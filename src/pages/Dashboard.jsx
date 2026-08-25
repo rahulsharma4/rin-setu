@@ -40,6 +40,31 @@ export default function Dashboard() {
   const [allTransactions, setAllTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   
+  // Custom Direct P2P UPI Pending Verification Queue
+  const [pendingP2P, setPendingP2P] = useState([]);
+
+  const handleApproveP2P = async (id) => {
+    if (!window.confirm('Kya aap sure hain ki aapne bank account me payment receive kar li hai aur ise approve karna chahte hain?')) return;
+    try {
+      await api.put(`transactions/pending/${id}/approve`);
+      alert('Repayment reference approved successfully! ✅');
+      fetchDashboardData();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to approve payment.');
+    }
+  };
+
+  const handleRejectP2P = async (id) => {
+    if (!window.confirm('Kya aap is payment request ko decline/reject karna chahte hain?')) return;
+    try {
+      await api.put(`transactions/pending/${id}/reject`);
+      alert('Repayment reference rejected! ❌');
+      fetchDashboardData();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to reject payment.');
+    }
+  };
+  
   // Dashboard Summaries & Audit state
   const [dailySummary, setDailySummary] = useState(null);
   const [eodSummary, setEodSummary] = useState(null);
@@ -80,12 +105,13 @@ export default function Dashboard() {
         eodUrl += `?startDate=${filterStartDate}&endDate=${filterEndDate}`;
       }
 
-      const [loansData, txData, dailyRes, eodRes, anomalyRes] = await Promise.all([
+      const [loansData, txData, dailyRes, eodRes, anomalyRes, pendingRes] = await Promise.all([
         loanAPI.getAll(),
         transactionAPI.getAll(),
         api.get('reports/daily-summary'),
         api.get(eodUrl),
-        api.get('reports/anomalies')
+        api.get('reports/anomalies'),
+        api.get('transactions/pending')
       ]);
       setLoans(loansData);
       setAllTransactions(txData);
@@ -93,6 +119,7 @@ export default function Dashboard() {
       setDailySummary(dailyRes.data);
       setEodSummary(eodRes.data);
       setAnomalies(anomalyRes.data);
+      setPendingP2P(pendingRes.data);
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
     } finally {
@@ -373,6 +400,68 @@ Aap is guide ke zariye poora system manage kar sakte hain! Koi aur doubt ho to b
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* P2P UPI Payment Approvals Queue */}
+      {pendingP2P.length > 0 && (
+        <div className="bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 border border-brand-border rounded-2xl p-5 shadow-xl space-y-4 animate-fade-in relative overflow-hidden">
+          {/* Neon Border Glow */}
+          <div className="absolute top-0 left-0 w-2.5 h-full bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500" />
+          
+          <div className="flex items-center justify-between flex-wrap gap-2.5 pl-2">
+            <div className="flex items-center space-x-3">
+              <span className="relative flex h-3.5 w-3.5 shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-emerald opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-brand-emerald"></span>
+              </span>
+              <div>
+                <h3 className="text-xs font-black text-brand-text dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+                  Pending P2P UPI Repayments ({pendingP2P.length})
+                </h3>
+                <p className="text-[10px] text-brand-dim mt-0.5">
+                  Borrowers have submitted manual UPI transfer references. Please check your bank account and approve if received.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3 mt-3 pl-2">
+            {pendingP2P.map((tx) => (
+              <div key={tx._id} className="bg-brand-card/60 border border-brand-border/60 rounded-xl p-3.5 flex flex-col md:flex-row md:items-center justify-between gap-4 transition hover:bg-brand-card">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] font-black text-brand-text dark:text-white">
+                      {tx.customerId?.name || 'Borrower'}
+                    </span>
+                    <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-brand-accent/10 text-brand-accent">
+                      {tx.loanId?.loanNumber || 'Active File'}
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-brand-dim space-y-0.5">
+                    <p>Amount claimed: <strong className="text-brand-emerald font-extrabold">₹{tx.amount?.toLocaleString('en-IN')}</strong></p>
+                    <p>Transaction UTR: <code className="bg-brand-bg px-1.5 py-0.5 rounded text-[9px] font-mono text-brand-text dark:text-white">{tx.razorpayPaymentId}</code></p>
+                    <p className="text-[9px] text-slate-400">Submitted: {new Date(tx.createdAt).toLocaleString('en-IN')}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => handleApproveP2P(tx._id)}
+                    className="px-3.5 py-1.5 bg-brand-emerald hover:bg-emerald-600 active:bg-emerald-700 text-[10px] font-bold text-white rounded-lg shadow-sm shadow-brand-emerald/15 transition flex items-center space-x-1"
+                  >
+                    <span>Approve</span>
+                  </button>
+                  <button
+                    onClick={() => handleRejectP2P(tx._id)}
+                    className="px-3.5 py-1.5 bg-brand-rose/10 hover:bg-brand-rose/20 text-brand-rose text-[10px] font-bold rounded-lg border border-brand-rose/25 transition"
+                  >
+                    Reject
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

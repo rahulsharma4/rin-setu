@@ -114,17 +114,11 @@ export default function Sidebar({ isOpen, onClose }) {
             <ShieldCheck className="w-4 h-4 text-brand-accent" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-white truncate">{admin?.username || 'Admin'}</p>
+            <p className="text-xs font-bold text-brand-text dark:text-white truncate">{admin?.username || 'Admin'}</p>
             <span className="text-[9px] text-brand-emerald font-semibold uppercase tracking-wider">
               {admin?.role === 'super-admin' ? 'Super Admin' : 'Administrator'}
             </span>
           </div>
-        </div>
-
-        {/* Connection Status */}
-        <div className="flex items-center space-x-2 px-2">
-          <div className="w-2 h-2 rounded-full bg-brand-emerald animate-pulse shrink-0" />
-          <span className="text-[10px] font-semibold text-brand-dim tracking-wide">Connected to Atlas</span>
         </div>
 
         {/* Logout Button */}
