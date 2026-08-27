@@ -49,10 +49,16 @@ export default function PrintModal({ isOpen, onClose, type, data }) {
             </div>
             <div>
               <h2 className="text-xs font-bold text-white uppercase tracking-wider">
-                {isReceipt ? 'Print Payment Receipt' : 'Print No Dues Certificate'}
+                {type === 'receipt' ? 'Print Payment Receipt' : 
+                 type === 'no_dues' ? 'Print No Dues Certificate' : 
+                 type === 'agreement' ? 'Print Loan Agreement' : 
+                 'Print Repayment Schedule'}
               </h2>
               <span className="text-[9px] text-brand-dim font-semibold block mt-0.5">
-                {isReceipt ? 'Bhugtan Raseed' : 'Rin Mukti Praman Patra'}
+                {type === 'receipt' ? 'Bhugtan Raseed' : 
+                 type === 'no_dues' ? 'Rin Mukti Praman Patra' : 
+                 type === 'agreement' ? 'Legal agreement' : 
+                 'Repayment Schedule Ledger'}
               </span>
             </div>
           </div>
@@ -288,6 +294,82 @@ export default function PrintModal({ isOpen, onClose, type, data }) {
                     <p className="text-[9px] font-bold text-slate-800 uppercase tracking-wide">Lender Sign & Stamp</p>
                     <span className="text-[8px] text-slate-400 block">RinSetu Verified Ledger</span>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {type === 'schedule' && (
+              // ==================== REPAYMENT SCHEDULE LAYOUT ====================
+              <div className="space-y-6 text-slate-800 bg-white">
+                {/* Header */}
+                <div className="text-center space-y-1.5 border-b border-double border-slate-300 pb-4">
+                  <h1 className="text-lg font-black tracking-tight text-slate-900 uppercase">Repayment Schedule</h1>
+                  <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">RinSetu Loan Installment Details</p>
+                  <p className="text-[9px] text-slate-400">Date Generated: {new Date().toLocaleDateString('en-IN')}</p>
+                </div>
+
+                {/* Loan Details summary */}
+                <div className="grid grid-cols-2 gap-4 text-[10px] bg-slate-50 p-3 rounded-lg border border-slate-100">
+                  <div>
+                    <span className="text-[8px] font-bold text-slate-400 uppercase block">Borrower Name</span>
+                    <span className="font-bold text-slate-700">{data.customerId?.name || 'Customer'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[8px] font-bold text-slate-400 uppercase block">Principal Amount</span>
+                    <span className="font-bold text-slate-700">₹{data.principalAmount?.toLocaleString('en-IN')}</span>
+                  </div>
+                  <div>
+                    <span className="text-[8px] font-bold text-slate-400 uppercase block">Interest terms</span>
+                    <span className="font-bold text-slate-700">{data.interestRate}% ({data.rateType}) - {data.interestType}</span>
+                  </div>
+                  <div>
+                    <span className="text-[8px] font-bold text-slate-400 uppercase block">Installment Frequency</span>
+                    <span className="font-bold text-slate-700 capitalize">{data.paymentFrequency}</span>
+                  </div>
+                </div>
+
+                {/* Installment Table */}
+                <div className="space-y-2">
+                  <h3 className="text-[9px] font-extrabold text-slate-400 uppercase">EMI Installments List</h3>
+                  <table className="w-full text-left border-collapse text-[10px]">
+                    <thead>
+                      <tr className="border-b border-slate-300 text-[8px] text-slate-400 uppercase font-extrabold">
+                        <th className="pb-1.5">No.</th>
+                        <th className="pb-1.5">Due Date</th>
+                        <th className="pb-1.5 text-right">Principal</th>
+                        <th className="pb-1.5 text-right">Interest</th>
+                        <th className="pb-1.5 text-right">Total EMI</th>
+                        <th className="pb-1.5 text-right">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-slate-700">
+                      {data.installments?.map((inst, index) => (
+                        <tr key={index}>
+                          <td className="py-2 font-semibold">#{inst.installmentNumber}</td>
+                          <td className="py-2">
+                            {new Date(inst.dueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                          </td>
+                          <td className="py-2 text-right">₹{Math.round(inst.principalComponent).toLocaleString('en-IN')}</td>
+                          <td className="py-2 text-right">₹{Math.round(inst.interestComponent).toLocaleString('en-IN')}</td>
+                          <td className="py-2 text-right font-bold text-slate-900">₹{Math.round(inst.totalAmount).toLocaleString('en-IN')}</td>
+                          <td className="py-2 text-right capitalize font-bold text-[9px]">
+                            <span className={
+                              inst.status === 'paid' ? 'text-emerald-600' :
+                              inst.status === 'partially_paid' ? 'text-amber-600' : 'text-slate-500'
+                            }>
+                              {inst.status?.replace('_', ' ')}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Footer */}
+                <div className="pt-4 border-t border-slate-200 flex justify-between items-center text-[9px] text-slate-400">
+                  <span>RinSetu Certified Schedule Statement</span>
+                  <span>Authorized Signature: _____________________</span>
                 </div>
               </div>
             )}

@@ -43,11 +43,26 @@ function getNextDate(startDate, paymentFrequency, index) {
   return nextDate;
 }
 
+function adjustPreviewDueDateForHoliday(dueDate, holidayRule) {
+  const adjusted = new Date(dueDate);
+  const day = adjusted.getDay(); // 0 = Sunday
+  
+  if (day === 0 && holidayRule && holidayRule !== 'none') {
+    if (holidayRule === 'next_working_day') {
+      adjusted.setDate(adjusted.getDate() + 1); // Move to Monday
+    } else if (holidayRule === 'prev_working_day') {
+      adjusted.setDate(adjusted.getDate() - 1); // Move to Saturday
+    }
+  }
+  return adjusted;
+}
+
 function generateLocalPreviewSchedule(loan) {
   const P = parseFloat(loan.principalAmount) || 0;
   const N = parseInt(loan.tenure) || 0;
   const startDate = loan.startDate ? new Date(loan.startDate) : new Date();
   const paymentFrequency = loan.paymentFrequency;
+  const holidayRule = loan.holidayRule || 'none';
 
   if (P <= 0 || N <= 0) return [];
 
@@ -71,7 +86,7 @@ function generateLocalPreviewSchedule(loan) {
       
       list.push({
         installmentNumber: i,
-        dueDate: getNextDate(startDate, paymentFrequency, i),
+        dueDate: adjustPreviewDueDateForHoliday(getNextDate(startDate, paymentFrequency, i), holidayRule),
         principalComponent: pComp,
         interestComponent: iComp,
         totalAmount: pComp + iComp
@@ -104,7 +119,7 @@ function generateLocalPreviewSchedule(loan) {
       
       list.push({
         installmentNumber: i,
-        dueDate: getNextDate(startDate, paymentFrequency, i),
+        dueDate: adjustPreviewDueDateForHoliday(getNextDate(startDate, paymentFrequency, i), holidayRule),
         principalComponent: pComp,
         interestComponent: iComp,
         totalAmount: pComp + iComp
@@ -135,7 +150,7 @@ function generateLocalPreviewSchedule(loan) {
 
       list.push({
         installmentNumber: i,
-        dueDate: getNextDate(startDate, paymentFrequency, i),
+        dueDate: adjustPreviewDueDateForHoliday(getNextDate(startDate, paymentFrequency, i), holidayRule),
         principalComponent: Math.round(pComp * 100) / 100,
         interestComponent: Math.round(iComp * 100) / 100,
         totalAmount: Math.round((pComp + iComp) * 100) / 100
@@ -155,7 +170,7 @@ function generateLocalPreviewSchedule(loan) {
 
       list.push({
         installmentNumber: i,
-        dueDate: getNextDate(startDate, paymentFrequency, i),
+        dueDate: adjustPreviewDueDateForHoliday(getNextDate(startDate, paymentFrequency, i), holidayRule),
         principalComponent: pComp,
         interestComponent: iComp,
         totalAmount: pComp + iComp
@@ -184,6 +199,8 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
     lateCharges: '',
     lateFeeRate: '50',
     lateFeeType: 'daily',
+    gracePeriodDays: '0',
+    holidayRule: 'none',
     remarks: '',
     isExistingLoan: false,
     alreadyPaidInstallments: '0',
@@ -688,6 +705,39 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                         <option value="daily">Daily (रोज का जुर्माना)</option>
                         <option value="flat">Flat (एक बार का जुर्माना)</option>
                       </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-brand-border/40 pt-3">
+                    {/* Grace Period Days */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wide">Grace Period (छूट के दिन)</label>
+                      <input
+                        type="number"
+                        name="gracePeriodDays"
+                        value={formData.gracePeriodDays}
+                        onChange={handleChange}
+                        placeholder="e.g. 3"
+                        className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                        min="0"
+                      />
+                      <p className="text-[9px] text-brand-dim italic">Due date ke kitne dino baad late fees shuru ho?</p>
+                    </div>
+
+                    {/* Holiday Rule */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wide">Sunday / Holiday Rule</label>
+                      <select
+                        name="holidayRule"
+                        value={formData.holidayRule}
+                        onChange={handleChange}
+                        className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                      >
+                        <option value="none">No Change (Keep Sunday)</option>
+                        <option value="next_working_day">Move to Monday (अगले कार्यदिवस)</option>
+                        <option value="prev_working_day">Move to Saturday (पिछले कार्यदिवस)</option>
+                      </select>
+                      <p className="text-[9px] text-brand-dim italic">Kist ka din Sunday hone par kya ho?</p>
                     </div>
                   </div>
 

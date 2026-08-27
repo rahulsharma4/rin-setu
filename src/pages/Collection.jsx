@@ -41,7 +41,12 @@ export default function Collection() {
     try {
       const res = await api.post(
         'ai/draft-reminder',
-        { customerId: item.customer?._id, loanId: item.loan?._id }
+        {
+          customerId: item.customer?._id,
+          loanId: item.loan?._id,
+          installmentId: item._id,
+          type: activeTab
+        }
       );
       setReminderModal(prev => ({ ...prev, text: res.data.message }));
     } catch {

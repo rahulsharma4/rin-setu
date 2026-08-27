@@ -73,6 +73,7 @@ export default function CustomerDetails() {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isNewLoanModalOpen, setIsNewLoanModalOpen] = useState(false);
   const [isEditCustomerModalOpen, setIsEditCustomerModalOpen] = useState(false);
+  const [isCollateralListModalOpen, setIsCollateralListModalOpen] = useState(false);
   const [viewingDoc, setViewingDoc] = useState(null);
 
   // Print Modal states
@@ -83,6 +84,22 @@ export default function CustomerDetails() {
   // AI Credit Risk Analysis states
   const [creditAnalysis, setCreditAnalysis] = useState(null);
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
+
+  // Smart Collection Predictions states
+  const [prediction, setPrediction] = useState(null);
+  const [loadingPrediction, setLoadingPrediction] = useState(false);
+
+  const fetchPrediction = async () => {
+    setLoadingPrediction(true);
+    try {
+      const res = await api.get(`reports/predictions/borrower/${id}`);
+      setPrediction(res.data);
+    } catch (err) {
+      console.error('Failed to load predictions:', err);
+    } finally {
+      setLoadingPrediction(false);
+    }
+  };
 
   const handleRunAnalysis = async () => {
     setLoadingAnalysis(true);
@@ -120,8 +137,104 @@ export default function CustomerDetails() {
     }
   };
 
+  // Collateral states
+  const [collateralAssets, setCollateralAssets] = useState([]);
+  const [loadingCollateral, setLoadingCollateral] = useState(false);
+  const [isCollateralModalOpen, setIsCollateralModalOpen] = useState(false);
+  const [editingCollateral, setEditingCollateral] = useState(null);
+  const [collateralForm, setCollateralForm] = useState({
+    assetName: '',
+    assetType: 'other',
+    weight: '',
+    quantity: '1',
+    estimatedValue: '',
+    status: 'pledged',
+    remarks: '',
+    loanId: ''
+  });
+  const [collateralSaving, setCollateralSaving] = useState(false);
+
+  const fetchCollateral = async () => {
+    setLoadingCollateral(true);
+    try {
+      const res = await api.get(`collateral/customer/${id}`);
+      setCollateralAssets(res.data);
+    } catch (err) {
+      console.error('Failed to load collateral assets:', err);
+    } finally {
+      setLoadingCollateral(false);
+    }
+  };
+
+  const handleOpenCollateralModal = (asset = null) => {
+    if (asset) {
+      setEditingCollateral(asset);
+      setCollateralForm({
+        assetName: asset.assetName,
+        assetType: asset.assetType,
+        weight: asset.weight || '',
+        quantity: asset.quantity || '1',
+        estimatedValue: asset.estimatedValue,
+        status: asset.status,
+        remarks: asset.remarks || '',
+        loanId: asset.loanId?._id || asset.loanId || ''
+      });
+    } else {
+      setEditingCollateral(null);
+      setCollateralForm({
+        assetName: '',
+        assetType: 'other',
+        weight: '',
+        quantity: '1',
+        estimatedValue: '',
+        status: 'pledged',
+        remarks: '',
+        loanId: loans[0]?._id || ''
+      });
+    }
+    setIsCollateralModalOpen(true);
+  };
+
+  const handleCollateralSubmit = async (e) => {
+    e.preventDefault();
+    if (!collateralForm.assetName || !collateralForm.estimatedValue) return;
+
+    setCollateralSaving(true);
+    try {
+      if (editingCollateral) {
+        await api.put(`collateral/${editingCollateral._id}`, {
+          ...collateralForm,
+          customerId: id
+        });
+      } else {
+        await api.post('collateral', {
+          ...collateralForm,
+          customerId: id
+        });
+      }
+      setIsCollateralModalOpen(false);
+      fetchCollateral();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to save collateral record.');
+    } finally {
+      setCollateralSaving(false);
+    }
+  };
+
+  const handleDeleteCollateral = async (assetId) => {
+    if (!window.confirm('Kya aap sure hain ki aap is collateral record ko delete karna chahte hain?')) return;
+    try {
+      await api.delete(`collateral/${assetId}`);
+      fetchCollateral();
+    } catch (err) {
+      alert('Failed to delete collateral record.');
+    }
+  };
+
   useEffect(() => {
     fetchCustomerData();
+    fetchCollateral();
+    fetchPrediction();
   }, [id]);
 
   const handleViewSchedule = async (loanId) => {
@@ -419,21 +532,65 @@ export default function CustomerDetails() {
       </div>
 
       {/* Customer profile items */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Collateral (Girvi) */}
         <div className="glass-panel rounded-2xl border border-brand-border p-5 flex items-start space-x-4">
           <div className="w-12 h-12 rounded-xl bg-brand-amber/10 flex items-center justify-center text-brand-amber shrink-0">
             <Coins className="w-6 h-6 animate-float" />
           </div>
-          <div className="space-y-1">
-            <span className="text-[10px] uppercase font-bold text-brand-amber tracking-wider">Girvi Assets (Collaterals)</span>
-            <div className="flex items-center space-x-2">
-              <h3 className="text-sm font-bold text-white">{customer.collateralType === 'None' ? 'No Assets Held' : customer.collateralType}</h3>
-              {customer.collateralValue > 0 && (
-                <span className="text-xs text-brand-dim">(Valued at ₹{customer.collateralValue.toLocaleString('en-IN')})</span>
+          <div className="space-y-1.5 flex-1">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] uppercase font-bold text-brand-amber tracking-wider">Girvi Assets (Collaterals)</span>
+              <button
+                onClick={() => handleOpenCollateralModal()}
+                className="text-[9px] font-bold text-brand-amber hover:underline uppercase tracking-wider outline-none"
+              >
+                + Add Item
+              </button>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-bold text-white">
+                  {collateralAssets.length === 0 
+                    ? 'No Assets Held' 
+                    : `${collateralAssets.filter(a => a.status === 'pledged').length} Active Pledges`}
+                </h3>
+                {collateralAssets.length > 0 && (
+                  <p className="text-[10px] text-brand-dim mt-0.5 font-medium">
+                    Est. Value: <strong className="text-brand-emerald">₹{collateralAssets.reduce((acc, a) => acc + (a.status === 'pledged' ? a.estimatedValue : 0), 0).toLocaleString('en-IN')}</strong>
+                  </p>
+                )}
+              </div>
+              {collateralAssets.length > 0 && (
+                <button
+                  onClick={() => setIsCollateralListModalOpen(true)}
+                  className="px-2.5 py-1 bg-brand-amber/10 hover:bg-brand-amber/20 text-brand-amber text-[9px] font-bold uppercase rounded-lg border border-brand-amber/25 transition"
+                >
+                  Manage ({collateralAssets.length})
+                </button>
               )}
             </div>
-            <p className="text-xs text-brand-dim leading-relaxed">{customer.collateralDescription || 'No collateral assets were submitted by this borrower.'}</p>
+            {collateralAssets.length > 0 ? (
+              <div className="flex flex-wrap gap-1.5 pt-1.5">
+                {collateralAssets.slice(0, 3).map((a, idx) => (
+                  <span 
+                    key={idx} 
+                    className={`px-2 py-0.5 rounded-md text-[9px] font-semibold border ${
+                      a.status === 'pledged' ? 'bg-brand-amber/10 text-brand-amber border-brand-amber/20' :
+                      a.status === 'released' ? 'bg-brand-emerald/10 text-brand-emerald border-brand-emerald/20' :
+                      'bg-brand-rose/10 text-brand-rose border-brand-rose/20'
+                    }`}
+                  >
+                    {a.assetName} ({a.assetType})
+                  </span>
+                ))}
+                {collateralAssets.length > 3 && (
+                  <span className="text-[9px] text-brand-dim font-bold self-center">+{collateralAssets.length - 3} more</span>
+                )}
+              </div>
+            ) : (
+              <p className="text-xs text-brand-dim leading-relaxed">No collateral assets were submitted by this borrower yet.</p>
+            )}
           </div>
         </div>
 
@@ -452,6 +609,43 @@ export default function CustomerDetails() {
               </p>
             )}
             <p className="text-xs text-brand-dim/75 leading-relaxed">{!customer.guarantorName && 'No security guarantor was assigned to this ledger profile.'}</p>
+          </div>
+        </div>
+
+        {/* AI Collection Forecast (Smart Collection Predictions) */}
+        <div className="glass-panel rounded-2xl border border-brand-border p-5 flex items-start space-x-4">
+          <div className="w-12 h-12 rounded-xl bg-brand-accent/10 flex items-center justify-center text-brand-accent shrink-0">
+            <Sparkles className="w-6 h-6 animate-pulse" />
+          </div>
+          <div className="space-y-1.5 flex-1">
+            <span className="text-[10px] uppercase font-bold text-brand-accent tracking-wider block">AI Collection Forecast</span>
+            {loadingPrediction ? (
+              <div className="py-2 flex items-center space-x-2 text-brand-dim">
+                <div className="w-3.5 h-3.5 border border-brand-accent border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-xs">Analyzing payment lag...</span>
+              </div>
+            ) : !prediction || prediction.totalPaidInstallments === 0 ? (
+              <p className="text-xs text-brand-dim leading-relaxed">No repayment history available to build AI collection predictions.</p>
+            ) : (
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase border ${
+                    prediction.riskLevel === 'low' ? 'bg-brand-emerald/10 text-brand-emerald border-brand-emerald/20' :
+                    prediction.riskLevel === 'medium' ? 'bg-brand-amber/10 text-brand-amber border-brand-amber/20' :
+                    'bg-brand-rose/10 text-brand-rose border-brand-rose/20'
+                  }`}>
+                    {prediction.riskLevel} Delay Risk
+                  </span>
+                  <span className="text-[10px] font-bold text-white">{prediction.onTimePercentage}% On-Time</span>
+                </div>
+                <p className="text-xs text-brand-dim font-medium leading-relaxed">
+                  {prediction.forecastMessage}
+                </p>
+                <div className="text-[9px] text-brand-dim/80">
+                  Average Delay Lag: <strong className="text-white">{prediction.averageLagDays} days</strong>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -776,9 +970,29 @@ export default function CustomerDetails() {
       {/* Selected Loan Repayment Schedule Table */}
       {activeScheduleLoanId && (
         <div className="glass-panel rounded-2xl border border-brand-border p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-white tracking-wide uppercase">Repayment Installment Schedule</h3>
-            <span className="text-[10px] text-brand-dim font-bold uppercase">Loan ID: {activeScheduleLoanId.slice(-6)}</span>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center space-x-3">
+              <h3 className="text-sm font-bold text-white tracking-wide uppercase">Repayment Installment Schedule</h3>
+              <span className="text-[10px] text-brand-dim font-bold uppercase">Loan ID: {activeScheduleLoanId.slice(-6)}</span>
+            </div>
+            {scheduleInstallments.length > 0 && (
+              <button
+                onClick={() => {
+                  const loanDoc = loans.find(l => l._id === activeScheduleLoanId);
+                  setPrintType('schedule');
+                  setPrintData({
+                    ...loanDoc,
+                    customerId: customer,
+                    installments: scheduleInstallments
+                  });
+                  setIsPrintOpen(true);
+                }}
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-brand-border hover:bg-brand-border/40 text-[10px] font-bold text-brand-dim hover:text-white transition"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>Print Schedule PDF</span>
+              </button>
+            )}
           </div>
 
           {loadingSchedule ? (
@@ -1176,6 +1390,265 @@ export default function CustomerDetails() {
                 </div>
               )}
             </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Collateral List Modal */}
+      {isCollateralListModalOpen && createPortal(
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="w-full max-w-4xl bg-brand-card border border-brand-border rounded-2xl shadow-2xl p-6 space-y-5 my-auto overflow-hidden animate-slide-up">
+            <div className="flex justify-between items-center border-b border-brand-border/40 pb-3">
+              <div className="flex items-center space-x-2">
+                <Coins className="w-5 h-5 text-brand-amber" />
+                <h3 className="text-sm font-bold text-white uppercase tracking-wider">Girvi (Collateral) Assets Ledger</h3>
+              </div>
+              <button 
+                type="button"
+                onClick={() => setIsCollateralListModalOpen(false)} 
+                className="text-brand-dim hover:text-white text-base font-bold outline-none"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="overflow-x-auto border border-brand-border rounded-xl">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="border-b border-brand-border bg-brand-bg/50 text-[10px] uppercase font-bold text-brand-dim">
+                    <th className="p-3">Asset Details</th>
+                    <th className="p-3">Type</th>
+                    <th className="p-3">Weight / Qty</th>
+                    <th className="p-3">Estimated Value</th>
+                    <th className="p-3">Pledged For</th>
+                    <th className="p-3">Status</th>
+                    <th className="p-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-brand-border/40 text-brand-dim">
+                  {collateralAssets.length === 0 ? (
+                    <tr>
+                      <td colSpan="7" className="p-8 text-center text-xs">No assets registered.</td>
+                    </tr>
+                  ) : (
+                    collateralAssets.map((asset) => (
+                      <tr key={asset._id} className="hover:bg-brand-border/5">
+                        <td className="p-3 font-semibold text-white">
+                          <p>{asset.assetName}</p>
+                          {asset.remarks && <span className="text-[9px] text-brand-dim block mt-0.5">{asset.remarks}</span>}
+                        </td>
+                        <td className="p-3 capitalize">{asset.assetType}</td>
+                        <td className="p-3">
+                          {asset.weight > 0 ? `${asset.weight}g` : '—'} / {asset.quantity || 1} unit
+                        </td>
+                        <td className="p-3 font-bold text-brand-emerald">₹{asset.estimatedValue?.toLocaleString('en-IN')}</td>
+                        <td className="p-3 text-[10px] font-mono">
+                          {asset.loanId?.loanNumber || (asset.loanId?._id ? asset.loanId._id.slice(-6) : 'General Security')}
+                        </td>
+                        <td className="p-3">
+                          <select
+                            value={asset.status}
+                            onChange={async (e) => {
+                              try {
+                                await api.put(`collateral/${asset._id}`, { status: e.target.value });
+                                fetchCollateral();
+                              } catch {
+                                alert('Failed to update status.');
+                              }
+                            }}
+                            className={`px-2 py-0.5 rounded-lg text-[9px] font-bold border outline-none bg-brand-bg cursor-pointer ${
+                              asset.status === 'pledged' ? 'text-brand-amber border-brand-amber/30' :
+                              asset.status === 'released' ? 'text-brand-emerald border-brand-emerald/30' :
+                              'text-brand-rose border-brand-rose/30'
+                            }`}
+                          >
+                            <option value="pledged">Pledged (जब्त)</option>
+                            <option value="released">Released (मुक्त)</option>
+                            <option value="liquidated">Liquidated (बिक्री)</option>
+                          </select>
+                        </td>
+                        <td className="p-3 text-right space-x-2">
+                          <button
+                            onClick={() => {
+                              handleOpenCollateralModal(asset);
+                            }}
+                            className="text-brand-accent hover:underline text-[10px] font-bold"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteCollateral(asset._id)}
+                            className="text-brand-rose hover:underline text-[10px] font-bold"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="flex justify-between items-center pt-2">
+              <span className="text-[10px] text-brand-dim">
+                Total Pledged Valuation: <strong className="text-brand-emerald">₹{collateralAssets.reduce((acc, a) => acc + (a.status === 'pledged' ? a.estimatedValue : 0), 0).toLocaleString('en-IN')}</strong>
+              </span>
+              <button
+                type="button"
+                onClick={() => handleOpenCollateralModal()}
+                className="px-4 py-2 bg-brand-accent hover:bg-indigo-600 text-xs font-bold text-white rounded-xl shadow transition"
+              >
+                + Add New Asset
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Add/Edit Collateral Modal */}
+      {isCollateralModalOpen && createPortal(
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="w-full max-w-md bg-brand-card border border-brand-border rounded-2xl shadow-2xl p-6 space-y-4 my-auto overflow-hidden animate-slide-up">
+            <div className="flex justify-between items-center border-b border-brand-border/40 pb-3">
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                {editingCollateral ? 'Edit Collateral Asset (गिरवी)' : 'Add Collateral Asset (गिरवी)'}
+              </h3>
+              <button 
+                type="button"
+                onClick={() => setIsCollateralModalOpen(false)} 
+                className="text-brand-dim hover:text-white text-base font-bold outline-none"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleCollateralSubmit} className="space-y-4 text-xs">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Asset Title / Name *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Gold Chain 22K, silver brick, Car RC"
+                  value={collateralForm.assetName}
+                  onChange={(e) => setCollateralForm(prev => ({ ...prev, assetName: e.target.value }))}
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Asset Category</label>
+                  <select
+                    value={collateralForm.assetType}
+                    onChange={(e) => setCollateralForm(prev => ({ ...prev, assetType: e.target.value }))}
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                  >
+                    <option value="gold">Gold (सोना)</option>
+                    <option value="silver">Silver (चांदी)</option>
+                    <option value="vehicle">Vehicle (गाड़ी)</option>
+                    <option value="property">Property (जमीन/मकान)</option>
+                    <option value="documents">Documents (कागजात)</option>
+                    <option value="other">Other (अन्य)</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Estimated Value (₹) *</label>
+                  <input
+                    type="number"
+                    required
+                    placeholder="Valuation Amount"
+                    value={collateralForm.estimatedValue}
+                    onChange={(e) => setCollateralForm(prev => ({ ...prev, estimatedValue: e.target.value }))}
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Weight (Grams, optional)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    placeholder="e.g. 18.5"
+                    value={collateralForm.weight}
+                    onChange={(e) => setCollateralForm(prev => ({ ...prev, weight: e.target.value }))}
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Quantity</label>
+                  <input
+                    type="number"
+                    value={collateralForm.quantity}
+                    onChange={(e) => setCollateralForm(prev => ({ ...prev, quantity: e.target.value }))}
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Pledge Status</label>
+                <select
+                  value={collateralForm.status}
+                  onChange={(e) => setCollateralForm(prev => ({ ...prev, status: e.target.value }))}
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                >
+                  <option value="pledged">Pledged (गिरवी रखा है)</option>
+                  <option value="released">Released (छोड़ दिया/मुक्त)</option>
+                  <option value="liquidated">Liquidated (बेच दिया/वसूल)</option>
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Link to Active Agreement / Loan</label>
+                <select
+                  value={collateralForm.loanId}
+                  onChange={(e) => setCollateralForm(prev => ({ ...prev, loanId: e.target.value }))}
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                >
+                  <option value="">General Security (No Specific Loan)</option>
+                  {loans.map(l => (
+                    <option key={l._id} value={l._id}>
+                      Loan #{l.loanNumber || l._id.slice(-6)} - ₹{l.principalAmount.toLocaleString('en-IN')} ({l.status})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Internal Remarks / Description</label>
+                <input
+                  type="text"
+                  placeholder="Any details, gold purity (e.g. 18k, 22k), condition..."
+                  value={collateralForm.remarks}
+                  onChange={(e) => setCollateralForm(prev => ({ ...prev, remarks: e.target.value }))}
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
+                />
+              </div>
+
+              <div className="flex space-x-3 pt-3 border-t border-brand-border/40">
+                <button
+                  type="button"
+                  onClick={() => setIsCollateralModalOpen(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-brand-border text-xs font-semibold text-brand-dim hover:text-white transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={collateralSaving}
+                  className="flex-1 py-2.5 rounded-xl bg-brand-amber hover:bg-amber-600 disabled:opacity-40 text-xs font-bold text-white shadow-lg shadow-brand-amber/15 transition-all"
+                >
+                  {collateralSaving ? 'Saving...' : 'Save Asset Record'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>,
         document.body

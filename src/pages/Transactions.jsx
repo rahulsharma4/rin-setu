@@ -38,6 +38,30 @@ export default function Transactions() {
     }
   };
 
+  const exportToCSV = () => {
+    if (!filteredTransactions || filteredTransactions.length === 0) return;
+    const headers = ['Payment Date', 'Borrower Name', 'Phone', 'Amount (INR)', 'Payment Type', 'Notes'];
+    const rows = filteredTransactions.map(tx => [
+      new Date(tx.paymentDate).toLocaleDateString('en-IN'),
+      tx.customerId?.name || 'Deleted Borrower',
+      tx.customerId?.phone || '',
+      tx.amount,
+      tx.paymentType,
+      `"${(tx.notes || '').replace(/"/g, '""')}"`
+    ]);
+    
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `payment-ledger-export-${Date.now()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   useEffect(() => {
     fetchTransactions();
   }, [showReversed]);
@@ -68,11 +92,20 @@ export default function Transactions() {
     <div className="space-y-6 animate-fade-in">
       
       {/* Page Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-brand-text">Payment Ledger</h1>
           <p className="text-xs text-brand-dim mt-1.5 font-medium">Historical audit of all byaj (interest) and asal (principal) repayments received.</p>
         </div>
+        {filteredTransactions.length > 0 && (
+          <button
+            onClick={exportToCSV}
+            className="flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-brand-accent hover:bg-indigo-600 text-xs font-bold text-white shadow-lg shadow-brand-accent/25 transition"
+          >
+            <Download className="w-4 h-4" />
+            <span>Export CSV Ledger</span>
+          </button>
+        )}
       </div>
 
       {/* Filter Options & Search */}

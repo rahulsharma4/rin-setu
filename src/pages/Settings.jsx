@@ -1242,66 +1242,73 @@ export default function Settings() {
           <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-5">
             <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
               <MessageSquare className="w-4 h-4 text-brand-accent" />
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider">Meta Template Names</h3>
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider">Custom Message Templates (Hinglish/English)</h3>
             </div>
-            <p className="text-[10px] text-brand-dim leading-relaxed">
-              Enter the exact template names (created in Meta dashboard) that we should map to loan events.
-            </p>
+            
+            <div className="bg-brand-bg/50 border border-brand-border p-4 rounded-xl space-y-2 text-[10px] text-brand-dim leading-relaxed">
+              <p className="font-bold text-brand-text dark:text-white uppercase tracking-wider text-[9px] mb-1">💡 Supported Dynamic Placeholders:</p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 font-semibold">
+                <div><code className="bg-brand-card px-1.5 py-0.5 rounded text-brand-accent">{"{{customerName}}"}</code>: Borrower Name</div>
+                <div><code className="bg-brand-card px-1.5 py-0.5 rounded text-brand-accent">{"{{amount}}"}</code>: EMI Amount</div>
+                <div><code className="bg-brand-card px-1.5 py-0.5 rounded text-brand-accent">{"{{dueDate}}"}</code>: Installment Date</div>
+                <div><code className="bg-brand-card px-1.5 py-0.5 rounded text-brand-accent">{"{{paymentLink}}"}</code>: P2P Payment Link</div>
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Upcoming Due Template */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Upcoming Due Template Name</label>
-                <input
-                  type="text"
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Upcoming Due Reminder Message</label>
+                <textarea
+                  rows="3"
                   value={whatsappData.whatsappTemplates.upcomingDue}
                   onChange={(e) => setWhatsappData(prev => ({
                     ...prev,
                     whatsappTemplates: { ...prev.whatsappTemplates, upcomingDue: e.target.value }
                   }))}
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition resize-none"
                 />
               </div>
 
               {/* Due Today Template */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Due Today Template Name</label>
-                <input
-                  type="text"
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Due Today Reminder Message</label>
+                <textarea
+                  rows="3"
                   value={whatsappData.whatsappTemplates.dueToday}
                   onChange={(e) => setWhatsappData(prev => ({
                     ...prev,
                     whatsappTemplates: { ...prev.whatsappTemplates, dueToday: e.target.value }
                   }))}
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition resize-none"
                 />
               </div>
 
               {/* Payment Received Template */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Payment Received Template Name</label>
-                <input
-                  type="text"
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Payment Confirmation Message</label>
+                <textarea
+                  rows="3"
                   value={whatsappData.whatsappTemplates.paymentReceived}
                   onChange={(e) => setWhatsappData(prev => ({
                     ...prev,
                     whatsappTemplates: { ...prev.whatsappTemplates, paymentReceived: e.target.value }
                   }))}
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition resize-none"
                 />
               </div>
 
               {/* Overdue Warning Template */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Overdue Warning Template Name</label>
-                <input
-                  type="text"
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Overdue Warning Message</label>
+                <textarea
+                  rows="3"
                   value={whatsappData.whatsappTemplates.overdueWarning}
                   onChange={(e) => setWhatsappData(prev => ({
                     ...prev,
                     whatsappTemplates: { ...prev.whatsappTemplates, overdueWarning: e.target.value }
                   }))}
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition resize-none"
                 />
               </div>
             </div>

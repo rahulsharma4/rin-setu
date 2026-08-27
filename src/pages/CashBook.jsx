@@ -32,6 +32,29 @@ export default function CashBook() {
     }
   };
 
+  const exportToCSV = () => {
+    if (!data?.entries || data.entries.length === 0) return;
+    const headers = ['Date', 'Type', 'Amount', 'Mode', 'Notes'];
+    const rows = data.entries.map(e => [
+      new Date(e.paymentDate).toLocaleDateString('en-IN'),
+      e.type,
+      e.amount,
+      e.paymentMode,
+      `"${(e.notes || '').replace(/"/g, '""')}"`
+    ]);
+    
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `cashbook-export-${Date.now()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   useEffect(() => { fetchCashBook(); }, []);
 
   const handleManualSubmit = async (e) => {
@@ -155,7 +178,17 @@ export default function CashBook() {
         {/* Left column: Journal Entries */}
         <div className="lg:col-span-2 space-y-5">
           <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-4">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wide">Cash Book Journal Table</h3>
+            <div className="flex items-center justify-between border-b border-brand-border/40 pb-3 flex-wrap gap-2">
+              <h3 className="text-xs font-bold text-white uppercase tracking-wide">Cash Book Journal Table</h3>
+              {entries.length > 0 && (
+                <button
+                  onClick={exportToCSV}
+                  className="px-2.5 py-1 bg-brand-accent/10 hover:bg-brand-accent/20 text-brand-accent text-[9px] font-bold uppercase rounded-lg border border-brand-accent/25 transition"
+                >
+                  Export CSV
+                </button>
+              )}
+            </div>
             
             {entries.length === 0 ? (
               <div className="h-48 flex items-center justify-center text-xs text-brand-dim">
