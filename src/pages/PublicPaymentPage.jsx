@@ -121,8 +121,8 @@ export default function PublicPaymentPage() {
         
         {/* Brand header */}
         <div className="flex items-center justify-center space-x-2.5">
-          <div className="w-9 h-9 rounded-xl shadow-lg shadow-brand-accent/25 flex items-center justify-center overflow-hidden bg-black border border-brand-border">
-            <img src="/Logo.png" alt="RinSetu Logo" className="w-full h-full object-cover" />
+          <div className="w-9 h-9 rounded-xl shadow-lg shadow-brand-accent/25 flex items-center justify-center overflow-hidden bg-transparent border border-brand-border/10">
+            <img src="/Logo.png" alt="RinSetu Logo" className="w-full h-full object-contain" />
           </div>
           <span className="text-lg font-black text-brand-text dark:text-white tracking-tight">Rin<span className="text-brand-accent">Setu</span></span>
         </div>

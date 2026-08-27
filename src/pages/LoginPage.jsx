@@ -54,8 +54,8 @@ export default function LoginPage() {
       <div className="w-full max-w-md relative z-10 animate-fade-in">
         {/* Logo Card */}
         <div className="text-center mb-8 space-y-3">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl shadow-2xl shadow-brand-accent/30 mx-auto overflow-hidden bg-black border border-brand-border">
-            <img src="/Logo.png" alt="RinSetu Logo" className="w-full h-full object-cover" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl shadow-2xl shadow-brand-accent/30 mx-auto overflow-hidden bg-transparent border border-brand-border/10">
+            <img src="/Logo.png" alt="RinSetu Logo" className="w-full h-full object-contain" />
           </div>
           <div>
             <h1 className="text-3xl font-extrabold text-brand-text dark:text-white tracking-tight">
