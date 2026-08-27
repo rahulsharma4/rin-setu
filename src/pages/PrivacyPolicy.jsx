@@ -25,7 +25,7 @@ export default function PrivacyPolicy() {
             <Shield className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-xl font-black text-white">Privacy Policy</h1>
+            <h1 className="text-xl font-black text-brand-text dark:text-white">Privacy Policy</h1>
             <p className="text-[10px] text-brand-dim font-bold uppercase mt-0.5">Last Updated: August 27, 2026</p>
           </div>
         </div>
@@ -35,7 +35,7 @@ export default function PrivacyPolicy() {
             Welcome to <strong>RinSetu</strong>. We value your privacy and are committed to protecting your personal data. This Privacy Policy explains how we collect, use, and safeguard your information when you use our micro-lending CRM SaaS application.
           </p>
 
-          <h3 className="text-sm font-bold text-white pt-2">1. Information We Collect</h3>
+          <h3 className="text-sm font-bold text-brand-text dark:text-white pt-2">1. Information We Collect</h3>
           <p>
             We collect information that you provide directly to us when registering a tenant account or using the portal, including:
           </p>
@@ -45,24 +45,24 @@ export default function PrivacyPolicy() {
             <li><strong>Integration Parameters:</strong> Merchant API configuration keys (e.g. Razorpay Key ID, UPI ID) used strictly to verify P2P collections.</li>
           </ul>
 
-          <h3 className="text-sm font-bold text-white pt-2">2. How We Use Your Information</h3>
+          <h3 className="text-sm font-bold text-brand-text dark:text-white pt-2">2. How We Use Your Information</h3>
           <p>
             Your information is used solely to run database operations, manage loan repayment schedules, record audit trails, send transactional collection messages (WhatsApp alerts), and complete payment verification flows. We do NOT sell, trade, or rent user data to third parties.
           </p>
 
-          <h3 className="text-sm font-bold text-white pt-2">3. Data Security</h3>
+          <h3 className="text-sm font-bold text-brand-text dark:text-white pt-2">3. Data Security</h3>
           <p>
             We use industry-standard SSL encryption and secure cloud servers to host and protect ledger transactions. However, please remember that no method of transmission over the internet is 100% secure, and we cannot guarantee absolute security.
           </p>
 
-          <h3 className="text-sm font-bold text-white pt-2">4. Your Rights</h3>
+          <h3 className="text-sm font-bold text-brand-text dark:text-white pt-2">4. Your Rights</h3>
           <p>
             Lenders and tenant administrators can access, edit, or delete their profile information and customer data directly from the system settings panel at any time.
           </p>
 
-          <h3 className="text-sm font-bold text-white pt-2">5. Contact Support</h3>
+          <h3 className="text-sm font-bold text-brand-text dark:text-white pt-2">5. Contact Support</h3>
           <p>
-            If you have questions about this policy, please reach out to us at <strong className="text-brand-accent">support@rinsetu.com</strong>.
+            If you have questions about this policy, please reach out to us at <strong className="text-brand-accent">rahulbhardwaz2k1@gmail.com</strong>.
           </p>
         </div>
       </div>

@@ -25,7 +25,7 @@ export default function RefundPolicy() {
             <RefreshCw className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-xl font-black text-white">Cancellation & Refund Policy</h1>
+            <h1 className="text-xl font-black text-brand-text dark:text-white">Cancellation & Refund Policy</h1>
             <p className="text-[10px] text-brand-dim font-bold uppercase mt-0.5">Last Updated: August 27, 2026</p>
           </div>
         </div>
@@ -35,21 +35,21 @@ export default function RefundPolicy() {
             Thank you for choosing <strong>RinSetu</strong>. We want to ensure you have a transparent experience with our SaaS payment subscription plans. Please read our Cancellation and Refund terms below:
           </p>
 
-          <h3 className="text-sm font-bold text-white pt-2">1. Subscription Cancellations</h3>
+          <h3 className="text-sm font-bold text-brand-text dark:text-white pt-2">1. Subscription Cancellations</h3>
           <p>
             Admins can cancel their RinSetu subscription renewals at any time directly through the Billing dashboard. 
             Upon cancellation, your license remains active with full dashboard access until the end of your current active billing cycle. No further automatic renewals will occur.
           </p>
 
-          <h3 className="text-sm font-bold text-white pt-2">2. 7-Day Refund Policy</h3>
+          <h3 className="text-sm font-bold text-brand-text dark:text-white pt-2">2. 7-Day Refund Policy</h3>
           <p>
             If you are not satisfied with your subscription, you are eligible to request a full refund within **7 days** of your initial plan purchase. 
             Refund requests made after the 7-day window are not eligible for a refund.
           </p>
 
-          <h3 className="text-sm font-bold text-white pt-2">3. Refund Processing</h3>
+          <h3 className="text-sm font-bold text-brand-text dark:text-white pt-2">3. Refund Processing</h3>
           <p>
-            To request a refund, please send an email to <strong className="text-brand-accent">support@rinsetu.com</strong> containing your account credentials and payment invoice receipt. 
+            To request a refund, please send an email to <strong className="text-brand-accent">rahulbhardwaz2k1@gmail.com</strong> containing your account credentials and payment invoice receipt. 
             Once approved, refunds are processed electronically and will be credited back to your original payment method (bank account/UPI/credit card) within **5 to 7 working days**.
           </p>
         </div>

@@ -25,7 +25,7 @@ export default function TermsConditions() {
             <FileText className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-xl font-black text-white">Terms & Conditions</h1>
+            <h1 className="text-xl font-black text-brand-text dark:text-white">Terms & Conditions</h1>
             <p className="text-[10px] text-brand-dim font-bold uppercase mt-0.5">Last Updated: August 27, 2026</p>
           </div>
         </div>
@@ -35,28 +35,28 @@ export default function TermsConditions() {
             These Terms & Conditions govern your access to and use of <strong>RinSetu</strong> micro-lending CRM SaaS application. By signing up or logging into the portal, you agree to comply with these terms.
           </p>
 
-          <h3 className="text-sm font-bold text-white pt-2">1. SaaS License & Accounts</h3>
+          <h3 className="text-sm font-bold text-brand-text dark:text-white pt-2">1. SaaS License & Accounts</h3>
           <p>
             We grant you a non-transferable, non-exclusive license to use the RinSetu portal to manage your private lending logbooks. You are solely responsible for protecting your account credentials and password.
           </p>
 
-          <h3 className="text-sm font-bold text-white pt-2">2. Local Lending Compliances</h3>
+          <h3 className="text-sm font-bold text-brand-text dark:text-white pt-2">2. Local Lending Compliances</h3>
           <p>
             RinSetu is a record-keeping CRM software utilities provider. We do NOT act as a bank, NBFC, or direct lender. 
             Lenders (Admins/Tenants) are solely responsible for complying with local regulations, including interest caps, registration certificates, and the Reserve Bank of India (RBI) money-lending rules.
           </p>
 
-          <h3 className="text-sm font-bold text-white pt-2">3. Subscriptions & Fees</h3>
+          <h3 className="text-sm font-bold text-brand-text dark:text-white pt-2">3. Subscriptions & Fees</h3>
           <p>
             Use of our service requires active subscription payments. Fees are billed on a monthly or yearly cycle. Non-payment of dues may lead to account suspension or limited access to ledger reporting views.
           </p>
 
-          <h3 className="text-sm font-bold text-white pt-2">4. Limitation of Liability</h3>
+          <h3 className="text-sm font-bold text-brand-text dark:text-white pt-2">4. Limitation of Liability</h3>
           <p>
             In no event shall RinSetu, its developers, or parent company be held liable for database loss, recovery mismatches, calculations, or penalties incurred through transaction tracking error defaults. Lenders are advised to regularly backup cashbooks.
           </p>
 
-          <h3 className="text-sm font-bold text-white pt-2">5. Governing Law</h3>
+          <h3 className="text-sm font-bold text-brand-text dark:text-white pt-2">5. Governing Law</h3>
           <p>
             These terms are governed by and construed in accordance with the laws of India. Any disputes arising out of usage shall be subject to the exclusive jurisdiction of the courts in Noida, Uttar Pradesh.
           </p>
