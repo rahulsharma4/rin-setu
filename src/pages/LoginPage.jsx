@@ -43,18 +43,18 @@ export default function LoginPage() {
       {/* Background Glow Effects */}
       <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-brand-accent/8 blur-[140px] pointer-events-none" />
       <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-brand-emerald/5 blur-[140px] pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30%] h-[30%] rounded-full bg-indigo-900/20 blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30%] h-[30%] rounded-full bg-purple-900/20 blur-[100px] pointer-events-none" />
 
       {/* Grid pattern overlay */}
       <div 
         className="absolute inset-0 opacity-[0.03] pointer-events-none"
-        style={{ backgroundImage: 'linear-gradient(rgba(99,102,241,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.5) 1px, transparent 1px)', backgroundSize: '40px 40px' }} 
+        style={{ backgroundImage: 'linear-gradient(rgba(139,92,246,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.5) 1px, transparent 1px)', backgroundSize: '40px 40px' }} 
       />
 
       <div className="w-full max-w-md relative z-10 animate-fade-in">
         {/* Logo Card */}
         <div className="text-center mb-8 space-y-3">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-accent to-indigo-400 shadow-2xl shadow-brand-accent/30 mx-auto">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-accent to-purple-400 shadow-2xl shadow-brand-accent/30 mx-auto">
             <Percent className="w-8 h-8 text-white" />
           </div>
           <div>
@@ -133,7 +133,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-xl bg-brand-accent hover:bg-indigo-600 disabled:bg-indigo-400 text-sm font-bold text-white shadow-lg shadow-brand-accent/20 transition flex items-center justify-center space-x-2"
+              className="w-full py-3 rounded-xl bg-brand-accent hover:bg-purple-600 disabled:bg-purple-400 text-sm font-bold text-white shadow-lg shadow-brand-accent/20 transition flex items-center justify-center space-x-2"
             >
               {loading ? (
                 <>

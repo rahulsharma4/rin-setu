@@ -79,7 +79,7 @@ export default function SubscriptionPage() {
           email: res.data.userEmail,
         },
         theme: {
-          color: '#6366f1', // Indigo accent
+          color: '#7c3aed', // Purple accent
         },
         handler: async function (paymentResponse) {
           try {
@@ -144,7 +144,7 @@ export default function SubscriptionPage() {
               <button
                 type="button"
                 onClick={() => window.location.href = '/'}
-                className="px-4 py-2 bg-brand-accent hover:bg-indigo-600 text-white text-xs font-extrabold rounded-xl transition shadow-lg shadow-brand-accent/20"
+                className="px-4 py-2 bg-brand-accent hover:bg-purple-600 text-white text-xs font-extrabold rounded-xl transition shadow-lg shadow-brand-accent/20"
               >
                 Go back to Dashboard
               </button>
@@ -276,7 +276,7 @@ export default function SubscriptionPage() {
                       className={`w-full py-2.5 rounded-xl text-xs font-extrabold shadow-lg transition flex items-center justify-center space-x-1.5 ${
                         isCurrentPlan 
                           ? 'bg-brand-emerald hover:bg-emerald-600 text-white shadow-brand-emerald/25'
-                          : 'bg-brand-accent hover:bg-indigo-600 text-white shadow-brand-accent/25'
+                          : 'bg-brand-accent hover:bg-purple-600 text-white shadow-brand-accent/25'
                       }`}
                     >
                       {renewLoadingPlanId === p._id ? (

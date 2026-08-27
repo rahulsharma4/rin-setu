@@ -114,7 +114,7 @@ export default function Customers() {
               setEditingCustomer(null);
               setIsModalOpen(true);
             }}
-            className="flex items-center justify-center space-x-1.5 px-4 py-2.5 rounded-xl bg-brand-accent hover:bg-indigo-600 text-xs font-bold text-white shadow-lg shadow-brand-accent/25 transition"
+            className="flex items-center justify-center space-x-1.5 px-4 py-2.5 rounded-xl bg-brand-accent hover:bg-purple-600 text-xs font-bold text-white shadow-lg shadow-brand-accent/25 transition"
           >
             <UserPlus className="w-4.5 h-4.5" />
             <span>Register Borrower</span>
