@@ -52,15 +52,26 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Network First strategy for navigation / index.html requests to avoid caching old index hashes
+  if (event.request.mode === 'navigate' || url.pathname === '/' || url.pathname === '/index.html') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const responseCopy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseCopy));
+          return response;
+        })
+        .catch(() => caches.match('/index.html'))
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
         return cachedResponse;
       }
       return fetch(event.request).catch((err) => {
-        if (event.request.mode === 'navigate') {
-          return caches.match('/index.html');
-        }
         throw err;
       });
     })
