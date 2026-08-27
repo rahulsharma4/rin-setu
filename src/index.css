@@ -338,13 +338,13 @@ html:not(.dark) .hover\:text-white:hover *:not([class*="bg-brand-accent"]):not([
 
 /* Logo Gradient Text styling */
 .logo-gradient-text {
-  background: linear-gradient(to right, #4f46e5, #0ea5e9) !important;
+  background: linear-gradient(to right, #7c3aed, #a78bfa) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   font-weight: 800 !important;
 }
 .dark .logo-gradient-text {
-  background: linear-gradient(to right, #ffffff, #818cf8) !important;
+  background: linear-gradient(to right, #ffffff, #c084fc) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   font-weight: 800 !important;
@@ -371,8 +371,8 @@ html:not(.dark) button.bg-indigo-600,
 html:not(.dark) a.bg-indigo-600,
 html:not(.dark) button.bg-indigo-600 *,
 html:not(.dark) a.bg-indigo-600 * {
-  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25) !important;
+  background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%) !important;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25) !important;
   color: #ffffff !important;
   stroke: #ffffff !important;
 }
@@ -380,7 +380,7 @@ html:not(.dark) button.bg-brand-accent:hover,
 html:not(.dark) a.bg-brand-accent:hover,
 html:not(.dark) button.bg-indigo-600:hover,
 html:not(.dark) a.bg-indigo-600:hover {
-  background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%) !important;
+  background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%) !important;
 }
 
 html:not(.dark) button.bg-brand-emerald,
@@ -416,9 +416,9 @@ html:not(.dark) textarea {
 html:not(.dark) input:focus,
 html:not(.dark) select:focus,
 html:not(.dark) textarea:focus {
-  border-color: #4f46e5 !important;
+  border-color: #7c3aed !important;
   background-color: #ffffff !important;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12) !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12) !important;
 }
 
 html:not(.dark) input::placeholder,
