@@ -1350,7 +1350,7 @@ export default function CustomerDetails() {
                   <button
                     onClick={handleSendWhatsApp}
                     disabled={drafting || !draftText}
-                    className="flex-1 flex items-center justify-center space-x-1.5 px-4 py-2 rounded-xl bg-brand-bg hover:bg-brand-border text-xs font-bold text-white shadow-lg transition border border-brand-border"
+                    className="flex-1 flex items-center justify-center space-x-1.5 px-4 py-2 rounded-xl bg-brand-bg hover:bg-brand-border text-xs font-bold text-brand-text shadow-lg transition border border-brand-border"
                   >
                     <Send className="w-3.5 h-3.5" />
                     <span>Send Manually</span>

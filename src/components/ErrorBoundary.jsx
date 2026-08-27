@@ -52,7 +52,7 @@ export default class ErrorBoundary extends React.Component {
               <button
                 type="button"
                 onClick={this.handleGoHome}
-                className="flex-1 py-2.5 bg-brand-bg hover:bg-brand-border/40 border border-brand-border rounded-xl text-xs font-bold text-white transition flex items-center justify-center space-x-1.5"
+                className="flex-1 py-2.5 bg-brand-bg hover:bg-brand-border/40 border border-brand-border rounded-xl text-xs font-bold text-brand-text transition flex items-center justify-center space-x-1.5"
               >
                 <Home className="w-4 h-4" />
                 <span>Go to Home</span>
@@ -61,7 +61,7 @@ export default class ErrorBoundary extends React.Component {
               <button
                 type="button"
                 onClick={this.handleReload}
-                className="flex-1 py-2.5 bg-brand-accent hover:bg-indigo-600 text-xs font-bold text-white shadow-lg shadow-brand-accent/25 rounded-xl transition flex items-center justify-center space-x-1.5"
+                className="flex-1 py-2.5 bg-brand-accent hover:bg-purple-700 text-xs font-bold text-white shadow-lg shadow-brand-accent/25 rounded-xl transition flex items-center justify-center space-x-1.5"
               >
                 <RefreshCw className="w-4 h-4" />
                 <span>Reload App</span>

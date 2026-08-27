@@ -273,7 +273,7 @@ export default function Collection() {
                 <button
                   onClick={() => handleWhatsApp(reminderModal.phone, reminderModal.text)}
                   disabled={!reminderModal.text}
-                  className="flex-1 py-2.5 rounded-xl bg-brand-bg hover:bg-brand-border text-xs font-bold text-white disabled:opacity-40 transition border border-brand-border"
+                  className="flex-1 py-2.5 rounded-xl bg-brand-bg hover:bg-brand-border text-xs font-bold text-brand-text disabled:opacity-40 transition border border-brand-border"
                 >
                   Send Manually (Direct Link)
                 </button>

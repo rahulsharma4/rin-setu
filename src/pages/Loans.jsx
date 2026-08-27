@@ -37,10 +37,6 @@ export default function Loans() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, filter, minPrincipal, maxPrincipal, collateralFilter, overdueDaysFilter]);
-
   const [viewMode, setViewMode] = useState(() => localStorage.getItem('loans_view_mode') || 'grid');
 
   const handleToggleViewMode = (mode) => {
@@ -59,6 +55,10 @@ export default function Loans() {
   const [maxPrincipal, setMaxPrincipal] = useState('');
   const [collateralFilter, setCollateralFilter] = useState('all');
   const [overdueDaysFilter, setOverdueDaysFilter] = useState('all');
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filter, minPrincipal, maxPrincipal, collateralFilter, overdueDaysFilter]);
 
   // Print modal states
   const [printType, setPrintType] = useState('no_dues');

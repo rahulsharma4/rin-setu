@@ -19,7 +19,7 @@ export default function StatsCard({ label, value, subtext, icon: Icon, glowType 
     <div className={`glass-panel glass-panel-hover p-6 rounded-2xl border ${glowClasses[glowType] || glowClasses.indigo} flex items-center justify-between`}>
       <div className="space-y-2">
         <span className="text-xs font-semibold text-brand-dim uppercase tracking-wider block">{label}</span>
-        <div className="text-2xl font-bold tracking-tight text-white">{value}</div>
+        <div className="text-2xl font-bold tracking-tight text-brand-text">{value}</div>
         {subtext && <p className="text-[11px] text-brand-dim font-medium">{subtext}</p>}
       </div>
       <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${iconColors[glowType] || iconColors.indigo}`}>
