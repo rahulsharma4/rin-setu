@@ -156,10 +156,21 @@ export default function LoginPage() {
           <br />Credentials ke liye system administrator se sampark karein.
         </p>
 
-        {/* Bottom tag */}
-        <p className="text-center text-[10px] text-brand-dim/40 mt-5 font-medium">
-          RinSetu v1.0 — Secure Admin Portal
-        </p>
+        {/* Bottom tag & Compliance Links */}
+        <div className="text-center mt-6 space-y-3">
+          <p className="text-[10px] text-brand-dim/40 font-medium">
+            RinSetu v1.0 — Secure Admin Portal
+          </p>
+          <div className="flex flex-wrap justify-center items-center gap-x-3 gap-y-1 text-[10px] font-bold uppercase tracking-wider text-brand-dim/60">
+            <button onClick={() => navigate('/privacy-policy')} className="hover:text-brand-accent transition outline-none">Privacy Policy</button>
+            <span className="text-brand-border/40">•</span>
+            <button onClick={() => navigate('/terms-and-conditions')} className="hover:text-brand-accent transition outline-none">Terms & Conditions</button>
+            <span className="text-brand-border/40">•</span>
+            <button onClick={() => navigate('/refund-policy')} className="hover:text-brand-accent transition outline-none">Refund Policy</button>
+            <span className="text-brand-border/40">•</span>
+            <button onClick={() => navigate('/contact-us')} className="hover:text-brand-accent transition outline-none">Contact Us</button>
+          </div>
+        </div>
       </div>
     </div>
   );

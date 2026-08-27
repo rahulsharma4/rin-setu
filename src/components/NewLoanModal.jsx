@@ -178,6 +178,48 @@ function generateLocalPreviewSchedule(loan) {
     }
   }
 
+  if (loan.doubleCollectionOnMonday) {
+    const adjustedList = [];
+    let pendingMerge = null;
+
+    for (const inst of list) {
+      const date = new Date(inst.dueDate);
+      const isSunday = date.getDay() === 0;
+
+      if (isSunday) {
+        if (pendingMerge) {
+          pendingMerge.principalComponent += inst.principalComponent;
+          pendingMerge.interestComponent += inst.interestComponent;
+          pendingMerge.totalAmount += inst.totalAmount;
+        } else {
+          pendingMerge = inst;
+        }
+      } else {
+        if (pendingMerge) {
+          inst.principalComponent += pendingMerge.principalComponent;
+          inst.interestComponent += pendingMerge.interestComponent;
+          inst.totalAmount += pendingMerge.totalAmount;
+          pendingMerge = null;
+        }
+        adjustedList.push(inst);
+      }
+    }
+
+    if (pendingMerge) {
+      pendingMerge.dueDate.setDate(pendingMerge.dueDate.getDate() + 1); // Move to Monday
+      adjustedList.push(pendingMerge);
+    }
+
+    adjustedList.forEach((inst, idx) => {
+      inst.installmentNumber = idx + 1;
+      inst.principalComponent = Math.round(inst.principalComponent * 100) / 100;
+      inst.interestComponent = Math.round(inst.interestComponent * 100) / 100;
+      inst.totalAmount = Math.round(inst.totalAmount * 100) / 100;
+    });
+
+    return adjustedList;
+  }
+
   return list;
 }
 
@@ -201,6 +243,10 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
     lateFeeType: 'daily',
     gracePeriodDays: '0',
     holidayRule: 'none',
+    upfrontDeduction: false,
+    deductionType: 'flat',
+    deductionAmount: '',
+    doubleCollectionOnMonday: false,
     remarks: '',
     isExistingLoan: false,
     alreadyPaidInstallments: '0',
@@ -230,7 +276,20 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
   useEffect(() => {
     const list = generateLocalPreviewSchedule(formData);
     setPreviewSchedule(list);
-  }, [formData.principalAmount, formData.interestRate, formData.tenure, formData.rateType, formData.interestType, formData.paymentFrequency, formData.startDate, formData.calculationMode, formData.installmentAmount, formData.dayCountBasis]);
+  }, [
+    formData.principalAmount,
+    formData.interestRate,
+    formData.tenure,
+    formData.rateType,
+    formData.interestType,
+    formData.paymentFrequency,
+    formData.startDate,
+    formData.calculationMode,
+    formData.installmentAmount,
+    formData.dayCountBasis,
+    formData.doubleCollectionOnMonday,
+    formData.holidayRule
+  ]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -500,6 +559,57 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                   />
                 </div>
 
+                {/* Upfront Deduction Setup */}
+                <div className="space-y-3.5 md:col-span-2 bg-brand-bg/30 border border-brand-border p-4 rounded-xl">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-bold text-white uppercase tracking-wider block">
+                      Upfront Interest Deduction (ब्याज कटौती / एडवांस ब्याज)
+                    </label>
+                    <input
+                      type="checkbox"
+                      name="upfrontDeduction"
+                      checked={formData.upfrontDeduction}
+                      onChange={handleChange}
+                      className="w-4 h-4 rounded border-brand-border text-brand-accent focus:ring-0 bg-brand-card cursor-pointer"
+                    />
+                  </div>
+
+                  {formData.upfrontDeduction && (
+                    <div className="grid grid-cols-2 gap-4 pt-2.5 border-t border-brand-border/40 animate-fade-in">
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-bold text-brand-dim uppercase">Deduction Type</label>
+                        <select
+                          name="deductionType"
+                          value={formData.deductionType}
+                          onChange={handleChange}
+                          className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2 text-xs text-brand-text dark:text-white outline-none transition"
+                        >
+                          <option value="flat">Flat Cash Value (₹)</option>
+                          <option value="percent">Percentage of Principal (%)</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-bold text-brand-dim uppercase">Amount / Percentage *</label>
+                        <input
+                          type="number"
+                          name="deductionAmount"
+                          value={formData.deductionAmount}
+                          onChange={handleChange}
+                          placeholder={formData.deductionType === 'percent' ? 'e.g. 10' : 'e.g. 1000'}
+                          className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2 text-xs text-brand-text dark:text-white outline-none transition"
+                          required
+                          min="0.1"
+                        />
+                      </div>
+
+                      <div className="col-span-2 text-[10px] text-brand-dim italic">
+                        * Borrower will receive cash: <strong className="text-brand-emerald">₹{Math.max(0, (parseFloat(formData.principalAmount || 0) - (formData.deductionType === 'percent' ? (parseFloat(formData.principalAmount || 0) * (parseFloat(formData.deductionAmount || 0) / 100)) : parseFloat(formData.deductionAmount || 0)))).toLocaleString('en-IN')}</strong> (Deducted ₹{(formData.deductionType === 'percent' ? (parseFloat(formData.principalAmount || 0) * (parseFloat(formData.deductionAmount || 0) / 100)) : parseFloat(formData.deductionAmount || 0)).toLocaleString('en-IN')} upfront).
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 {/* Interest rate / Installment Amount field based on calculationMode */}
                 {formData.calculationMode === 'percent' ? (
                   <div className="space-y-1.5">
@@ -738,6 +848,21 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                         <option value="prev_working_day">Move to Saturday (पिछले कार्यदिवस)</option>
                       </select>
                       <p className="text-[9px] text-brand-dim italic">Kist ka din Sunday hone par kya ho?</p>
+                    </div>
+
+                    {/* Double Collection on Monday */}
+                    <div className="space-y-1.5 md:col-span-2 flex items-center space-x-2 bg-brand-bg/50 p-3 border border-brand-border rounded-xl">
+                      <input
+                        type="checkbox"
+                        id="doubleCollectionOnMonday"
+                        name="doubleCollectionOnMonday"
+                        checked={formData.doubleCollectionOnMonday}
+                        onChange={handleChange}
+                        className="w-4 h-4 rounded border-brand-border text-brand-accent focus:ring-0 bg-brand-card cursor-pointer"
+                      />
+                      <label htmlFor="doubleCollectionOnMonday" className="text-xs font-semibold text-brand-text dark:text-white cursor-pointer select-none">
+                        Double Collection on Monday (सोमवार को डबल किस्त वसूली - रविवार का हिस्सा सोमवार में जोड़ें)
+                      </label>
                     </div>
                   </div>
 

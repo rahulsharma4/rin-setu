@@ -811,12 +811,24 @@ export default function CustomerDetails() {
                                 Existing / पुराना
                               </span>
                             )}
-                            {loan.processingFee > 0 && (
-                              <span className="text-[9px] bg-brand-border px-1.5 py-0.5 rounded text-brand-dim">+₹{loan.processingFee} Fee</span>
+                            {loan.upfrontDeduction && (
+                              <span className="text-[9px] bg-brand-amber/10 text-brand-amber border border-brand-amber/20 px-1.5 py-0.5 rounded font-bold">
+                                Upfront Deduct / ब्याज-कटी
+                              </span>
+                            )}
+                            {loan.doubleCollectionOnMonday && (
+                              <span className="text-[9px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-1.5 py-0.5 rounded font-bold">
+                                Skip Sunday / सोमवार डबल
+                              </span>
                             )}
                           </div>
                           <span className="text-[9px] font-semibold text-brand-dim uppercase tracking-wider block mt-0.5">
                             Issued: {new Date(loan.startDate).toLocaleDateString('en-IN')}
+                            {loan.upfrontDeduction && (
+                              <span className="text-brand-dim">
+                                {' '}| Cash Disbursed: <strong className="text-brand-emerald">₹{(loan.principalAmount - (loan.deductionType === 'percent' ? (loan.principalAmount * (loan.deductionAmount / 100)) : loan.deductionAmount)).toLocaleString('en-IN')}</strong>
+                              </span>
+                            )}
                           </span>
                         </div>
                       </div>

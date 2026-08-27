@@ -24,6 +24,10 @@ const SuperAdminDashboard = lazy(() => import('./pages/SuperAdminDashboard'));
 const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
 const BorrowerDashboard = lazy(() => import('./pages/BorrowerDashboard'));
 const PublicPaymentPage = lazy(() => import('./pages/PublicPaymentPage'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const TermsConditions = lazy(() => import('./pages/TermsConditions'));
+const RefundPolicy = lazy(() => import('./pages/RefundPolicy'));
+const ContactUs = lazy(() => import('./pages/ContactUs'));
 
 const PageLoader = () => (
   <div className="h-full flex flex-col items-center justify-center py-24 space-y-4 animate-fade-in font-sans select-none">
@@ -190,6 +194,12 @@ export default function App() {
           <Routes>
             {/* Public Route - Login */}
             <Route path="/login" element={<LoginPage />} />
+
+            {/* Public Compliance Pages */}
+            <Route path="/privacy-policy" element={<Suspense fallback={<PageLoader />}><PrivacyPolicy /></Suspense>} />
+            <Route path="/terms-and-conditions" element={<Suspense fallback={<PageLoader />}><TermsConditions /></Suspense>} />
+            <Route path="/refund-policy" element={<Suspense fallback={<PageLoader />}><RefundPolicy /></Suspense>} />
+            <Route path="/contact-us" element={<Suspense fallback={<PageLoader />}><ContactUs /></Suspense>} />
 
             {/* Public Route - Direct VPA Repayment Page */}
             <Route path="/pay/loan/:loanId" element={<Suspense fallback={<PageLoader />}><PublicPaymentPage /></Suspense>} />
