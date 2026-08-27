@@ -10,6 +10,16 @@ export default function CashBook() {
   const [btnLoading, setBtnLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Filtering & Pagination states
+  const [searchQuery, setSearchQuery] = useState('');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, typeFilter]);
+
   // Form states for manual entry
   const [form, setForm] = useState({
     type: 'opening_balance',
@@ -114,6 +124,23 @@ export default function CashBook() {
 
   const { summary, entries } = data;
 
+  const filteredEntries = (entries || []).filter((entry) => {
+    const matchesType = typeFilter === 'all' || entry.type === typeFilter;
+    const notesStr = entry.notes || '';
+    const amountStr = String(entry.amount || '');
+    const matchesSearch = 
+      notesStr.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      amountStr.includes(searchQuery) ||
+      (entry.paymentMode && entry.paymentMode.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    return matchesType && matchesSearch;
+  });
+
+  const totalItems = filteredEntries.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedEntries = filteredEntries.slice(startIndex, startIndex + itemsPerPage);
+
   const getSubcategoryBadge = (notes) => {
     const match = notes?.match(/^\[(.*?)\]/);
     return match ? match[1] : null;
@@ -180,7 +207,7 @@ export default function CashBook() {
           <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-brand-border/40 pb-3 flex-wrap gap-2">
               <h3 className="text-xs font-bold text-white uppercase tracking-wide">Cash Book Journal Table</h3>
-              {entries.length > 0 && (
+              {filteredEntries.length > 0 && (
                 <button
                   onClick={exportToCSV}
                   className="px-2.5 py-1 bg-brand-accent/10 hover:bg-brand-accent/20 text-brand-accent text-[9px] font-bold uppercase rounded-lg border border-brand-accent/25 transition"
@@ -189,8 +216,33 @@ export default function CashBook() {
                 </button>
               )}
             </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
+              <div className="w-full sm:flex-1 relative flex items-center bg-brand-bg border border-brand-border rounded-xl px-3 py-2">
+                <input
+                  type="text"
+                  placeholder="Search notes or amount..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bg-transparent border-none text-xs text-brand-text placeholder-brand-dim/50 outline-none w-full focus:ring-0 focus:outline-none"
+                />
+              </div>
+
+              <select
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                className="w-full sm:w-44 bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2 text-xs text-brand-text outline-none transition"
+              >
+                <option value="all">All Entries</option>
+                <option value="collection">Collections</option>
+                <option value="disbursement">Disbursements</option>
+                <option value="opening_balance">Opening Balance</option>
+                <option value="expense">Expenses</option>
+                <option value="penalty_charge">Penalty Charges</option>
+              </select>
+            </div>
             
-            {entries.length === 0 ? (
+            {filteredEntries.length === 0 ? (
               <div className="h-48 flex items-center justify-center text-xs text-brand-dim">
                 No entries logged. Add opening balance to start.
               </div>
@@ -207,8 +259,8 @@ export default function CashBook() {
                       <th className="p-3.5 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-brand-border/40">
-                    {entries.map((entry) => (
+                  <tbody className="divide-y divide-brand-border/40 font-medium text-brand-text dark:text-slate-300">
+                    {paginatedEntries.map((entry) => (
                       <tr key={entry._id} className="hover:bg-brand-border/10 transition">
                         <td className="p-3.5 text-brand-dim">
                           {new Date(entry.paymentDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
@@ -254,6 +306,68 @@ export default function CashBook() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            )}
+
+            {/* Premium Pagination Control Footer */}
+            {totalItems > 0 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-brand-border/40 text-xs text-brand-dim">
+                <div className="flex items-center space-x-2">
+                  <span>Show:</span>
+                  <select
+                    value={itemsPerPage}
+                    onChange={(e) => {
+                      setItemsPerPage(parseInt(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                    className="bg-brand-card border border-brand-border rounded-lg px-2 py-1 text-xs text-brand-text outline-none cursor-pointer focus:ring-0 focus:border-brand-accent/50"
+                  >
+                    {[10, 25, 50, 100].map((size) => (
+                      <option key={size} value={size}>
+                        {size} rows
+                      </option>
+                    ))}
+                  </select>
+                  <span className="text-[11px] text-brand-dim/80">
+                    Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, totalItems)} of {totalItems} items
+                  </span>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1.5 rounded-lg bg-brand-card border border-brand-border hover:bg-brand-bg disabled:opacity-40 disabled:hover:bg-brand-card text-brand-text transition font-bold"
+                  >
+                    Previous
+                  </button>
+                  
+                  <div className="flex items-center space-x-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .slice(Math.max(0, currentPage - 3), Math.min(totalPages, currentPage + 2))
+                      .map((page) => (
+                        <button
+                          key={page}
+                          onClick={() => setCurrentPage(page)}
+                          className={`w-8 h-8 rounded-lg text-xs font-bold transition ${
+                            currentPage === page
+                              ? 'bg-brand-accent text-white shadow shadow-brand-accent/20'
+                              : 'bg-brand-card border border-brand-border hover:bg-brand-bg text-brand-text'
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      ))}
+                  </div>
+
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1.5 rounded-lg bg-brand-card border border-brand-border hover:bg-brand-bg disabled:opacity-40 disabled:hover:bg-brand-card text-brand-text transition font-bold"
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
             )}
           </div>

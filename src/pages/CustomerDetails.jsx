@@ -67,6 +67,9 @@ export default function CustomerDetails() {
   const [showDraftModal, setShowDraftModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const [selectedLoanForDraft, setSelectedLoanForDraft] = useState(null);
+  const [whatsappMode, setWhatsappMode] = useState('manual');
+  const [whatsappEnabled, setWhatsappEnabled] = useState(false);
+  const [autoSending, setAutoSending] = useState(false);
 
   // Modals trigger states
   const [selectedLoan, setSelectedLoan] = useState(null);
@@ -231,10 +234,38 @@ export default function CustomerDetails() {
     }
   };
 
+  const fetchWhatsappSettings = async () => {
+    try {
+      const res = await api.get('auth/whatsapp-settings');
+      setWhatsappMode(res.data.whatsappMode || 'manual');
+      setWhatsappEnabled(!!res.data.whatsappEnabled);
+    } catch (err) {
+      console.warn('Failed to load whatsapp settings:', err.message);
+    }
+  };
+
+  const handleSendAuto = async () => {
+    if (!draftText || !customer?.phone) return;
+    setAutoSending(true);
+    try {
+      await api.post('whatsapp/send-test', {
+        phone: customer.phone,
+        message: draftText
+      });
+      alert('Reminder sent successfully via Automated Gateway!');
+      setShowDraftModal(false);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to send message. Please verify gateway connection.');
+    } finally {
+      setAutoSending(false);
+    }
+  };
+
   useEffect(() => {
     fetchCustomerData();
     fetchCollateral();
     fetchPrediction();
+    fetchWhatsappSettings();
   }, [id]);
 
   const handleViewSchedule = async (loanId) => {
@@ -1306,23 +1337,35 @@ export default function CustomerDetails() {
               )}
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-end space-x-3 pt-4 border-t border-brand-border">
-                <button
-                  onClick={handleCopyText}
-                  disabled={drafting || !draftText}
-                  className="flex items-center space-x-1.5 px-4 py-2 rounded-xl border border-brand-border hover:bg-brand-border/30 text-xs font-semibold text-white transition"
-                >
-                  {copied ? <Check className="w-3.5 h-3.5 text-brand-emerald" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copied ? 'Copied!' : 'Copy Text'}</span>
-                </button>
-                <button
-                  onClick={handleSendWhatsApp}
-                  disabled={drafting || !draftText}
-                  className="flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-brand-emerald hover:bg-emerald-600 text-xs font-bold text-white shadow-lg shadow-brand-emerald/10 transition"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>Send on WhatsApp</span>
-                </button>
+              <div className="flex flex-col space-y-2.5 pt-4 border-t border-brand-border">
+                <div className="flex space-x-3">
+                  <button
+                    onClick={handleCopyText}
+                    disabled={drafting || !draftText}
+                    className="flex-1 flex items-center justify-center space-x-1.5 px-4 py-2 rounded-xl border border-brand-border hover:bg-brand-border/30 text-xs font-semibold text-white transition"
+                  >
+                    {copied ? <Check className="w-3.5 h-3.5 text-brand-emerald" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copied ? 'Copied!' : 'Copy Text'}</span>
+                  </button>
+                  <button
+                    onClick={handleSendWhatsApp}
+                    disabled={drafting || !draftText}
+                    className="flex-1 flex items-center justify-center space-x-1.5 px-4 py-2 rounded-xl bg-brand-bg hover:bg-brand-border text-xs font-bold text-white shadow-lg transition border border-brand-border"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Send Manually</span>
+                  </button>
+                </div>
+
+                {whatsappEnabled && whatsappMode !== 'manual' && (
+                  <button
+                    onClick={handleSendAuto}
+                    disabled={drafting || !draftText || autoSending}
+                    className="w-full flex items-center justify-center space-x-1.5 px-4 py-2.5 rounded-xl bg-brand-emerald hover:bg-emerald-600 text-xs font-bold text-white shadow-lg shadow-brand-emerald/10 transition"
+                  >
+                    <span>{autoSending ? 'Sending via Gateway...' : 'Send Automatically (API Gateway)'}</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>

@@ -11,8 +11,8 @@
   --brand-border-rgb: 232, 236, 244;
   --brand-text: #111625;
   --brand-dim: #5c6479;
-  --brand-accent: #7c3aed;
-  --brand-accent-rgb: 124, 58, 237;
+  --brand-accent: #9c27b0;
+  --brand-accent-rgb: 156, 39, 176;
   --brand-emerald: #059669;
   --brand-emerald-rgb: 5, 150, 105;
   --brand-amber: #d97706;
@@ -30,8 +30,8 @@
   --brand-border-rgb: 20, 25, 53;
   --brand-text: #f8fafc;
   --brand-dim: #94a3b8;
-  --brand-accent: #a78bfa;
-  --brand-accent-rgb: 167, 139, 250;
+  --brand-accent: #c084fc;
+  --brand-accent-rgb: 192, 132, 252;
   --brand-emerald: #10b981;
   --brand-emerald-rgb: 16, 185, 129;
   --brand-amber: #f59e0b;
@@ -338,7 +338,7 @@ html:not(.dark) .hover\:text-white:hover *:not([class*="bg-brand-accent"]):not([
 
 /* Logo Gradient Text styling */
 .logo-gradient-text {
-  background: linear-gradient(to right, #7c3aed, #a78bfa) !important;
+  background: linear-gradient(to right, #9c27b0, #c084fc) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   font-weight: 800 !important;
@@ -371,8 +371,8 @@ html:not(.dark) button.bg-indigo-600,
 html:not(.dark) a.bg-indigo-600,
 html:not(.dark) button.bg-indigo-600 *,
 html:not(.dark) a.bg-indigo-600 * {
-  background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%) !important;
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25) !important;
+  background: linear-gradient(135deg, #9c27b0 0%, #ab47bc 100%) !important;
+  box-shadow: 0 4px 12px rgba(156, 39, 176, 0.25) !important;
   color: #ffffff !important;
   stroke: #ffffff !important;
 }
@@ -380,7 +380,7 @@ html:not(.dark) button.bg-brand-accent:hover,
 html:not(.dark) a.bg-brand-accent:hover,
 html:not(.dark) button.bg-indigo-600:hover,
 html:not(.dark) a.bg-indigo-600:hover {
-  background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%) !important;
+  background: linear-gradient(135deg, #8e24aa 0%, #9c27b0 100%) !important;
 }
 
 html:not(.dark) button.bg-brand-emerald,
@@ -416,9 +416,9 @@ html:not(.dark) textarea {
 html:not(.dark) input:focus,
 html:not(.dark) select:focus,
 html:not(.dark) textarea:focus {
-  border-color: #7c3aed !important;
+  border-color: #9c27b0 !important;
   background-color: #ffffff !important;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12) !important;
+  box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.12) !important;
 }
 
 html:not(.dark) input::placeholder,
@@ -514,8 +514,8 @@ html:not(.dark) [class*="bg-brand-amber/10"] {
 }
 html:not(.dark) .bg-brand-accent\/10,
 html:not(.dark) [class*="bg-brand-accent/10"] {
-  background-color: rgba(124, 58, 237, 0.12) !important;
-  color: #7c3aed !important;
+  background-color: rgba(156, 39, 176, 0.12) !important;
+  color: #9c27b0 !important;
 }
 
 /* Highlight Girvi Panel details in light mode (warm cream boxes) */
@@ -535,15 +535,15 @@ html:not(.dark) .glass-panel [class*="bg-brand-bg/50"] * {
 @keyframes logoPulse {
   0%, 100% {
     transform: translateY(0) scale(1) rotate(0deg);
-    box-shadow: 0 10px 25px rgba(124, 58, 237, 0.2);
+    box-shadow: 0 10px 25px rgba(156, 39, 176, 0.2);
   }
   33% {
     transform: translateY(-8px) scale(1.04) rotate(3deg);
-    box-shadow: 0 20px 35px rgba(124, 58, 237, 0.35);
+    box-shadow: 0 20px 35px rgba(156, 39, 176, 0.35);
   }
   66% {
     transform: translateY(4px) scale(0.96) rotate(-3deg);
-    box-shadow: 0 5px 15px rgba(124, 58, 237, 0.15);
+    box-shadow: 0 5px 15px rgba(156, 39, 176, 0.15);
   }
 }
 @keyframes percentIconAnim {

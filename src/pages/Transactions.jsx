@@ -24,6 +24,14 @@ export default function Transactions() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, typeFilter, showReversed]);
+
   const headers = { Authorization: `Bearer ${token}` };
 
   const fetchTransactions = async () => {
@@ -87,6 +95,11 @@ export default function Transactions() {
                           (tx.notes && tx.notes.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesType && matchesSearch;
   });
+
+  const totalItems = filteredTransactions.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedTransactions = filteredTransactions.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -180,8 +193,8 @@ export default function Transactions() {
                   <th className="p-4 text-right">Revert Log</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-brand-border/40">
-                {filteredTransactions.map((tx) => (
+              <tbody className="divide-y divide-brand-border/40 font-medium text-brand-text dark:text-slate-300">
+                {paginatedTransactions.map((tx) => (
                   <tr key={tx._id} className={`hover:bg-brand-border/10 transition ${tx.isReversed ? 'bg-brand-rose/5 opacity-60 line-through' : ''}`}>
                     <td className="p-4 text-brand-dim">
                       {new Date(tx.paymentDate).toLocaleDateString('en-IN', { 
@@ -238,6 +251,68 @@ export default function Transactions() {
             </table>
           </div>
         </div>
+
+        {/* Premium Pagination Control Footer */}
+        {totalItems > 0 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-brand-border/40 text-xs text-brand-dim">
+            <div className="flex items-center space-x-2">
+              <span>Show:</span>
+              <select
+                value={itemsPerPage}
+                onChange={(e) => {
+                  setItemsPerPage(parseInt(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="bg-brand-card border border-brand-border rounded-lg px-2 py-1 text-xs text-brand-text outline-none cursor-pointer focus:ring-0 focus:border-brand-accent/50"
+              >
+                {[10, 25, 50, 100].map((size) => (
+                  <option key={size} value={size}>
+                    {size} rows
+                  </option>
+                ))}
+              </select>
+              <span className="text-[11px] text-brand-dim/80">
+                Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, totalItems)} of {totalItems} items
+              </span>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1.5 rounded-lg bg-brand-card border border-brand-border hover:bg-brand-bg disabled:opacity-40 disabled:hover:bg-brand-card text-brand-text transition font-bold"
+              >
+                Previous
+              </button>
+              
+              <div className="flex items-center space-x-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .slice(Math.max(0, currentPage - 3), Math.min(totalPages, currentPage + 2))
+                  .map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`w-8 h-8 rounded-lg text-xs font-bold transition ${
+                        currentPage === page
+                          ? 'bg-brand-accent text-white shadow shadow-brand-accent/20'
+                          : 'bg-brand-card border border-brand-border hover:bg-brand-bg text-brand-text'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+              </div>
+
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1.5 rounded-lg bg-brand-card border border-brand-border hover:bg-brand-bg disabled:opacity-40 disabled:hover:bg-brand-card text-brand-text transition font-bold"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       )}
 
     </div>

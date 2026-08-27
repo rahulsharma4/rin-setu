@@ -33,7 +33,24 @@ export default function Collection() {
     }
   };
 
-  useEffect(() => { fetchAll(); }, []);
+  const [whatsappMode, setWhatsappMode] = useState('manual');
+  const [whatsappEnabled, setWhatsappEnabled] = useState(false);
+  const [autoSending, setAutoSending] = useState(false);
+
+  const fetchWhatsappSettings = async () => {
+    try {
+      const res = await api.get('auth/whatsapp-settings');
+      setWhatsappMode(res.data.whatsappMode || 'manual');
+      setWhatsappEnabled(!!res.data.whatsappEnabled);
+    } catch (err) {
+      console.warn('Failed to load whatsapp settings:', err.message);
+    }
+  };
+
+  useEffect(() => { 
+    fetchAll(); 
+    fetchWhatsappSettings();
+  }, []);
 
   const handleDraftReminder = async (item) => {
     setReminderModal({ open: true, text: '', phone: item.customer?.phone, name: item.customer?.name });
@@ -60,6 +77,23 @@ export default function Collection() {
     const clean = phone?.replace(/\D/g, '');
     const target = clean?.length === 10 ? `91${clean}` : clean;
     window.open(`https://wa.me/${target}?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
+  const handleSendAuto = async () => {
+    if (!reminderModal.text || !reminderModal.phone) return;
+    setAutoSending(true);
+    try {
+      await api.post('whatsapp/send-test', {
+        phone: reminderModal.phone,
+        message: reminderModal.text
+      });
+      alert('Reminder sent successfully via Automated Gateway!');
+      setReminderModal({ open: false, text: '', phone: '', name: '' });
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to send message via gateway. Please verify connection.');
+    } finally {
+      setAutoSending(false);
+    }
   };
 
   const tabs = [
@@ -225,20 +259,35 @@ export default function Collection() {
               </div>
             )}
 
-            <div className="flex space-x-3 pt-2">
-              <button
-                onClick={() => navigator.clipboard.writeText(reminderModal.text)}
-                className="flex-1 py-2.5 rounded-xl border border-brand-border text-xs font-semibold text-brand-dim hover:text-white transition"
-              >
-                Copy Text
-              </button>
-              <button
-                onClick={() => handleWhatsApp(reminderModal.phone, reminderModal.text)}
-                disabled={!reminderModal.text}
-                className="flex-1 py-2.5 rounded-xl bg-brand-emerald hover:bg-emerald-600 text-xs font-bold text-white disabled:opacity-40 transition"
-              >
-                Send on WhatsApp
-              </button>
+            <div className="flex flex-col space-y-2.5 pt-2">
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(reminderModal.text);
+                    alert('Copied to clipboard!');
+                  }}
+                  className="flex-1 py-2.5 rounded-xl border border-brand-border text-xs font-semibold text-brand-dim hover:text-white transition"
+                >
+                  Copy Text
+                </button>
+                <button
+                  onClick={() => handleWhatsApp(reminderModal.phone, reminderModal.text)}
+                  disabled={!reminderModal.text}
+                  className="flex-1 py-2.5 rounded-xl bg-brand-bg hover:bg-brand-border text-xs font-bold text-white disabled:opacity-40 transition border border-brand-border"
+                >
+                  Send Manually (Direct Link)
+                </button>
+              </div>
+              
+              {whatsappEnabled && whatsappMode !== 'manual' && (
+                <button
+                  onClick={handleSendAuto}
+                  disabled={!reminderModal.text || autoSending}
+                  className="w-full py-2.5 rounded-xl bg-brand-emerald hover:bg-emerald-600 text-xs font-bold text-white disabled:opacity-40 transition"
+                >
+                  {autoSending ? 'Sending via Gateway...' : 'Send Automatically (API Gateway)'}
+                </button>
+              )}
             </div>
           </div>
         </div>,

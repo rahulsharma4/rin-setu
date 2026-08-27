@@ -79,7 +79,7 @@ export default function SubscriptionPage() {
           email: res.data.userEmail,
         },
         theme: {
-          color: '#7c3aed', // Purple accent
+          color: '#9c27b0', // Purple accent
         },
         handler: async function (paymentResponse) {
           try {

@@ -107,6 +107,7 @@ export default function Settings() {
     whatsappAccessToken: '',
     whatsappPhoneNumberId: '',
     whatsappEnabled: false,
+    whatsappMode: 'manual', // 'manual' | 'automated_qr' | 'cloud'
     whatsappTemplates: {
       upcomingDue: 'upcoming_due',
       dueToday: 'due_today',
@@ -115,6 +116,10 @@ export default function Settings() {
     }
   });
   const [whatsappLoading, setWhatsappLoading] = useState(false);
+  const [qrState, setQrState] = useState({ status: 'disconnected', phone: null, qr: null });
+  const [testPhone, setTestPhone] = useState('');
+  const [testMsg, setTestMsg] = useState('RinSetu secure gateway reminder message test!');
+  const [testLoading, setTestLoading] = useState(false);
 
   const fetchWhatsappSettings = async () => {
     try {
@@ -123,15 +128,33 @@ export default function Settings() {
         whatsappAccessToken: res.data.whatsappAccessToken || '',
         whatsappPhoneNumberId: res.data.whatsappPhoneNumberId || '',
         whatsappEnabled: !!res.data.whatsappEnabled,
+        whatsappMode: res.data.whatsappMode || 'manual',
         whatsappTemplates: {
-          upcomingDue: res.data.whatsappTemplates?.upcomingDue || 'upcoming_due',
-          dueToday: res.data.whatsappTemplates?.dueToday || 'due_today',
-          paymentReceived: res.data.whatsappTemplates?.paymentReceived || 'payment_received',
-          overdueWarning: res.data.whatsappTemplates?.overdueWarning || 'overdue_warning'
+          upcomingDue: res.data.whatsappTemplates?.upcomingDue || '',
+          dueToday: res.data.whatsappTemplates?.dueToday || '',
+          paymentReceived: res.data.whatsappTemplates?.paymentReceived || '',
+          overdueWarning: res.data.whatsappTemplates?.overdueWarning || ''
         }
       });
     } catch (_) {}
   };
+
+  const fetchQRStatus = async () => {
+    try {
+      const res = await api.get('whatsapp/status');
+      setQrState(res.data);
+    } catch (_) {}
+  };
+
+  // Poll WhatsApp Web QR status when settings tab is active
+  useEffect(() => {
+    let timer;
+    if (activeTab === 'whatsapp' && whatsappData.whatsappMode === 'automated_qr') {
+      fetchQRStatus();
+      timer = setInterval(fetchQRStatus, 5000);
+    }
+    return () => clearInterval(timer);
+  }, [activeTab, whatsappData.whatsappMode]);
 
   const handleSaveWhatsapp = async (e) => {
     e.preventDefault();
@@ -140,13 +163,44 @@ export default function Settings() {
     setError('');
     try {
       await api.put('auth/whatsapp-settings', whatsappData);
-      setSuccess('WhatsApp Cloud API settings saved successfully!');
-      setTimeout(() => setSuccess(''), 4000);
+      setSuccess('WhatsApp settings saved successfully!');
       fetchWhatsappSettings();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to save WhatsApp settings.');
     } finally {
       setWhatsappLoading(false);
+    }
+  };
+
+  const handleDisconnectWA = async () => {
+    if (!window.confirm('Are you sure you want to disconnect and delete your active WhatsApp session?')) return;
+    setWhatsappLoading(true);
+    setSuccess('');
+    setError('');
+    try {
+      const res = await api.post('whatsapp/logout');
+      setSuccess(res.data.message || 'WhatsApp session cleared.');
+      fetchQRStatus();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to disconnect WhatsApp.');
+    } finally {
+      setWhatsappLoading(false);
+    }
+  };
+
+  const handleSendTestWA = async (e) => {
+    e.preventDefault();
+    if (!testPhone || !testMsg) return;
+    setTestLoading(true);
+    setSuccess('');
+    setError('');
+    try {
+      const res = await api.post('whatsapp/send-test', { phone: testPhone, message: testMsg });
+      setSuccess(res.data.message || 'Test message sent successfully!');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to send test message.');
+    } finally {
+      setTestLoading(false);
     }
   };
 
@@ -1154,50 +1208,62 @@ export default function Settings() {
       {activeTab === 'whatsapp' && (
         <form onSubmit={handleSaveWhatsapp} className="space-y-6">
 
-          {/* Status Banner */}
-          <div className={`flex items-center space-x-3 p-4 rounded-2xl border ${
-            whatsappData.whatsappEnabled
-              ? 'bg-brand-emerald/10 border-brand-emerald/30 text-brand-emerald'
-              : 'bg-brand-amber/10 border-brand-amber/30 text-brand-amber'
-          }`}>
-            <MessageSquare className="w-5 h-5 shrink-0" />
-            <div>
-              <p className="text-xs font-bold">
-                {whatsappData.whatsappEnabled ? '✅ Meta WhatsApp Cloud API is Active' : '⚙️ WhatsApp Automation is Disabled'}
-              </p>
-              <p className="text-[10px] mt-0.5 opacity-80">
-                {whatsappData.whatsappEnabled
-                  ? 'Automated WhatsApp alerts will go out to borrowers on loan creation, payments, and dues.'
-                  : 'Toggle WhatsApp Automation ON and fill in credentials to send direct messages.'}
-              </p>
-            </div>
-          </div>
-
-          {/* Credentials Card */}
-          <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-5">
+          {/* Mode Selector Card */}
+          <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-4">
             <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
-              <Key className="w-4 h-4 text-brand-accent" />
-              <h3 className="text-xs font-bold text-brand-text dark:text-white uppercase tracking-wider">Meta WhatsApp API Settings</h3>
+              <MessageSquare className="w-4 h-4 text-brand-accent" />
+              <h3 className="text-xs font-bold text-brand-text dark:text-white uppercase tracking-wider">Select WhatsApp Mode</h3>
             </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {/* Option 1: Manual reminders */}
+              <button
+                type="button"
+                onClick={() => setWhatsappData(prev => ({ ...prev, whatsappMode: 'manual' }))}
+                className={`p-4 border rounded-xl flex flex-col items-start text-left transition ${
+                  whatsappData.whatsappMode === 'manual'
+                    ? 'border-brand-accent bg-brand-accent/5'
+                    : 'border-brand-border hover:border-brand-border/80 bg-brand-bg/20'
+                }`}
+              >
+                <span className="text-xs font-bold text-brand-text dark:text-white">Option C: Manual Link</span>
+                <span className="text-[10px] text-brand-dim mt-1">Zero configuration. Click to send reminders instantly via WhatsApp Web/App client-side.</span>
+              </button>
 
-            {/* Setup Instructions */}
-            <div className="p-4 bg-brand-bg/60 border border-brand-border rounded-xl space-y-2 text-[10px] text-brand-dim leading-relaxed">
-              <p className="font-bold text-brand-text dark:text-white text-[11px]">📋 How to set up your WhatsApp Business Cloud API:</p>
-              <ol className="list-decimal list-inside space-y-1">
-                <li>Go to <strong className="text-brand-accent">developers.facebook.com</strong> → Create a Meta Developer Account</li>
-                <li>Add the <strong>WhatsApp</strong> product to your App in the console</li>
-                <li>Verify your Business details and Phone Number in Meta Business Manager</li>
-                <li>Copy the <strong>Permanent Access Token</strong> and paste it below</li>
-                <li>Copy the <strong>Phone Number ID</strong> from Meta WhatsApp settings panel and paste it below</li>
-                <li>Create and register templates (upcoming_due, due_today, payment_received, overdue_warning) on Meta Manager</li>
-              </ol>
+              {/* Option 2: Automated QR Gateway */}
+              <button
+                type="button"
+                onClick={() => setWhatsappData(prev => ({ ...prev, whatsappMode: 'automated_qr' }))}
+                className={`p-4 border rounded-xl flex flex-col items-start text-left transition ${
+                  whatsappData.whatsappMode === 'automated_qr'
+                    ? 'border-brand-accent bg-brand-accent/5'
+                    : 'border-brand-border hover:border-brand-border/80 bg-brand-bg/20'
+                }`}
+              >
+                <span className="text-xs font-bold text-brand-text dark:text-white">Option A: QR Code scan</span>
+                <span className="text-[10px] text-brand-dim mt-1">Local automated gateway. Scan QR code locally from your phone to link. Free & Safe.</span>
+              </button>
+
+              {/* Option 3: Meta Cloud API */}
+              <button
+                type="button"
+                onClick={() => setWhatsappData(prev => ({ ...prev, whatsappMode: 'cloud' }))}
+                className={`p-4 border rounded-xl flex flex-col items-start text-left transition ${
+                  whatsappData.whatsappMode === 'cloud'
+                    ? 'border-brand-accent bg-brand-accent/5'
+                    : 'border-brand-border hover:border-brand-border/80 bg-brand-bg/20'
+                }`}
+              >
+                <span className="text-xs font-bold text-brand-text dark:text-white">Option B: Meta Enterprise API</span>
+                <span className="text-[10px] text-brand-dim mt-1">Official cloud hosting via Facebook Developers console. Secure templates with paid API.</span>
+              </button>
             </div>
 
             {/* Toggle Enable */}
             <div className="flex items-center justify-between p-3.5 bg-brand-bg/40 border border-brand-border rounded-xl">
               <div>
-                <p className="text-xs font-bold text-brand-text dark:text-white">Enable Automated WhatsApp Alerts</p>
-                <p className="text-[10px] text-brand-dim mt-0.5">Toggle WhatsApp messages in background on/off</p>
+                <p className="text-xs font-bold text-brand-text dark:text-white">Master WhatsApp Trigger Switch</p>
+                <p className="text-[10px] text-brand-dim mt-0.5">Toggle WhatsApp notifications ON/OFF completely</p>
               </div>
               <button
                 type="button"
@@ -1209,34 +1275,155 @@ export default function Settings() {
                 {whatsappData.whatsappEnabled ? 'ENABLED' : 'DISABLED'}
               </button>
             </div>
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Access Token */}
-              <div className="space-y-1.5 md:col-span-2">
-                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Meta WhatsApp Permanent Token *</label>
-                <input
-                  type="password"
-                  value={whatsappData.whatsappAccessToken}
-                  onChange={(e) => setWhatsappData(prev => ({ ...prev, whatsappAccessToken: e.target.value }))}
-                  placeholder="Paste EAAB... Meta Permanent Access Token"
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
-                  autoComplete="new-password"
-                />
+          {/* Mode details */}
+          {whatsappData.whatsappMode === 'manual' && (
+            <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-3">
+              <span className="text-xs font-bold text-brand-text dark:text-white block">ℹ️ Manual Click Redirection (Option C)</span>
+              <p className="text-[10px] text-brand-dim leading-relaxed">
+                No credentials or API setup required. WhatsApp automation buttons will be added next to agreements and collections. 
+                Clicking the button will open <strong className="text-brand-accent">wa.me/number?text=message</strong> directly in a new tab, allowing you to review and send reminders instantly using your own WhatsApp client.
+              </p>
+            </div>
+          )}
+
+          {whatsappData.whatsappMode === 'automated_qr' && (
+            <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-5">
+              <div className="flex items-center justify-between border-b border-brand-border pb-3">
+                <span className="text-xs font-bold text-brand-text dark:text-white">🔗 Local WhatsApp Gateway Console</span>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                  qrState.status === 'connected' ? 'bg-emerald-500/10 text-brand-emerald' : 'bg-amber-500/10 text-brand-amber'
+                }`}>
+                  Status: {qrState.status.toUpperCase()}
+                </span>
               </div>
 
-              {/* Phone Number ID */}
-              <div className="space-y-1.5 md:col-span-2">
-                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">WhatsApp Phone Number ID *</label>
-                <input
-                  type="text"
-                  value={whatsappData.whatsappPhoneNumberId}
-                  onChange={(e) => setWhatsappData(prev => ({ ...prev, whatsappPhoneNumberId: e.target.value }))}
-                  placeholder="e.g. 1098654215467"
-                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
-                />
+              {qrState.status === 'connected' ? (
+                <div className="space-y-4">
+                  <div className="p-4 bg-brand-emerald/10 border border-brand-emerald/20 text-brand-emerald rounded-xl flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-bold">✅ Connected Successfully!</p>
+                      <p className="text-[10px] mt-0.5 opacity-90">Your CRM is linked with WhatsApp number: <strong>+{qrState.phone}</strong></p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleDisconnectWA}
+                      className="px-3.5 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-[9px] font-bold transition"
+                    >
+                      Disconnect Device
+                    </button>
+                  </div>
+
+                  {/* Send Test WhatsApp Box */}
+                  <div className="bg-brand-bg/50 border border-brand-border p-4 rounded-xl space-y-3">
+                    <span className="text-[10px] font-bold text-brand-dim uppercase tracking-wider block">🧪 Send Test WhatsApp Message</span>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-bold text-brand-dim">Recipient Phone (with country code)</label>
+                        <input
+                          type="text"
+                          value={testPhone}
+                          onChange={(e) => setTestPhone(e.target.value)}
+                          placeholder="e.g. 917891449044"
+                          className="w-full bg-brand-bg border border-brand-border rounded-lg px-3 py-1.5 text-xs outline-none focus:border-brand-accent/50 text-white"
+                        />
+                      </div>
+                      <div className="space-y-1 md:col-span-2 flex gap-2 items-end">
+                        <div className="flex-1 space-y-1">
+                          <label className="text-[9px] font-bold text-brand-dim">Message Content</label>
+                          <input
+                            type="text"
+                            value={testMsg}
+                            onChange={(e) => setTestMsg(e.target.value)}
+                            className="w-full bg-brand-bg border border-brand-border rounded-lg px-3 py-1.5 text-xs outline-none focus:border-brand-accent/50 text-white"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleSendTestWA}
+                          disabled={testLoading || !testPhone}
+                          className="px-4 py-2 bg-brand-accent hover:bg-brand-accent/90 text-white rounded-lg text-xs font-bold transition disabled:opacity-50 h-[34px] shrink-0"
+                        >
+                          {testLoading ? 'Sending...' : 'Send Test'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : qrState.status === 'qr_ready' && qrState.qr ? (
+                <div className="flex flex-col md:flex-row items-center gap-6 p-4">
+                  <div className="bg-white p-3.5 rounded-xl shrink-0 shadow-lg border border-brand-border">
+                    <img src={qrState.qr} alt="Scan WhatsApp QR" className="w-44 h-44" />
+                  </div>
+                  <div className="space-y-2.5">
+                    <p className="text-xs font-bold text-brand-text dark:text-white">📲 Link your WhatsApp Account</p>
+                    <ol className="list-decimal list-inside text-[10px] text-brand-dim space-y-1.5 leading-relaxed">
+                      <li>Open <strong className="text-brand-text dark:text-white">WhatsApp</strong> on your mobile phone</li>
+                      <li>Tap <strong className="text-brand-text dark:text-white">Menu</strong> (three dots) or <strong className="text-brand-text dark:text-white">Settings</strong></li>
+                      <li>Select <strong className="text-brand-text dark:text-white">Linked Devices</strong></li>
+                      <li>Tap <strong className="text-brand-accent">Link a Device</strong> and point your camera to this QR code</li>
+                    </ol>
+                    <p className="text-[9px] text-brand-emerald font-bold animate-pulse mt-2">🔄 Polling for connection... Scan to link instantly</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8 space-y-2">
+                  <div className="w-8 h-8 border-2 border-brand-accent border-t-transparent rounded-full animate-spin mx-auto" />
+                  <p className="text-[10px] text-brand-dim">Initializing local WhatsApp container session...</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {whatsappData.whatsappMode === 'cloud' && (
+            <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-5">
+              <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
+                <Key className="w-4 h-4 text-brand-accent" />
+                <h3 className="text-xs font-bold text-brand-text dark:text-white uppercase tracking-wider">Meta WhatsApp API Settings</h3>
+              </div>
+
+              {/* Setup Instructions */}
+              <div className="p-4 bg-brand-bg/60 border border-brand-border rounded-xl space-y-2 text-[10px] text-brand-dim leading-relaxed">
+                <p className="font-bold text-brand-text dark:text-white text-[11px]">📋 How to set up your WhatsApp Business Cloud API:</p>
+                <ol className="list-decimal list-inside space-y-1">
+                  <li>Go to <strong className="text-brand-accent">developers.facebook.com</strong> → Create a Meta Developer Account</li>
+                  <li>Add the <strong>WhatsApp</strong> product to your App in the console</li>
+                  <li>Verify your Business details and Phone Number in Meta Business Manager</li>
+                  <li>Copy the <strong>Permanent Access Token</strong> and paste it below</li>
+                  <li>Copy the <strong>Phone Number ID</strong> from Meta WhatsApp settings panel and paste it below</li>
+                  <li>Create and register templates (upcoming_due, due_today, payment_received, overdue_warning) on Meta Manager</li>
+                </ol>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Access Token */}
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Meta WhatsApp Permanent Token *</label>
+                  <input
+                    type="password"
+                    value={whatsappData.whatsappAccessToken}
+                    onChange={(e) => setWhatsappData(prev => ({ ...prev, whatsappAccessToken: e.target.value }))}
+                    placeholder="Paste EAAB... Meta Permanent Access Token"
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
+                    autoComplete="new-password"
+                  />
+                </div>
+
+                {/* Phone Number ID */}
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">WhatsApp Phone Number ID *</label>
+                  <input
+                    type="text"
+                    value={whatsappData.whatsappPhoneNumberId}
+                    onChange={(e) => setWhatsappData(prev => ({ ...prev, whatsappPhoneNumberId: e.target.value }))}
+                    placeholder="e.g. 1098654215467"
+                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Templates Card */}
           <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-5">

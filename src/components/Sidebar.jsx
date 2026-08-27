@@ -57,11 +57,8 @@ export default function Sidebar({ isOpen, onClose }) {
       }`}>
         <div className="flex items-center justify-between px-2 pb-4 border-b border-brand-border/30 shrink-0">
           <div className="flex items-center space-x-3 cursor-pointer" onClick={() => { if(onClose) onClose(); navigate('/'); }}>
-            <div 
-              className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-brand-accent/25 shrink-0"
-              style={{ backgroundColor: 'var(--brand-accent)' }}
-            >
-              <Percent className="w-5 h-5" style={{ color: '#ffffff' }} />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-brand-accent/25 shrink-0 overflow-hidden bg-black">
+              <img src="/Logo.png" alt="RinSetu Logo" className="w-full h-full object-cover" />
             </div>
             <div>
               <h1 className="text-lg font-extrabold text-brand-text dark:text-white tracking-wide leading-none max-w-[150px] truncate">

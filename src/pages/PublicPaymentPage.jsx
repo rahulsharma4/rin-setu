@@ -38,6 +38,9 @@ export default function PublicPaymentPage() {
       setError('');
       const res = await publicApi.get(`public/pay-details/${loanId}`);
       setDetails(res.data);
+      if (!requestedAmount) {
+        setAmount(res.data.nextDueAmount || res.data.totalOutstanding || '');
+      }
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || 'Failed to load payment details. Please check the URL.');
@@ -118,8 +121,8 @@ export default function PublicPaymentPage() {
         
         {/* Brand header */}
         <div className="flex items-center justify-center space-x-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/25">
-            <Percent className="w-4.5 h-4.5 text-white" />
+          <div className="w-9 h-9 rounded-xl shadow-lg shadow-brand-accent/25 flex items-center justify-center overflow-hidden bg-black border border-brand-border">
+            <img src="/Logo.png" alt="RinSetu Logo" className="w-full h-full object-cover" />
           </div>
           <span className="text-lg font-black text-brand-text dark:text-white tracking-tight">Rin<span className="text-brand-accent">Setu</span></span>
         </div>
@@ -128,11 +131,29 @@ export default function PublicPaymentPage() {
         <div className="bg-brand-card border border-brand-border rounded-2xl p-6 shadow-2xl space-y-5">
           
           {/* Header */}
-          <div className="text-center pb-4 border-b border-brand-border/40">
-            <span className="text-[9px] uppercase font-bold text-brand-emerald tracking-widest block bg-brand-emerald/10 px-3 py-1 rounded-full w-fit mx-auto mb-2">Direct VPA UPI payment (0% Fee)</span>
-            <h2 className="text-sm font-bold text-brand-dim uppercase tracking-wider">Repayment Request</h2>
-            <h3 className="text-base font-black text-brand-text dark:text-white mt-1">{details?.borrowerName}</h3>
-            <p className="text-[10px] text-brand-dim mt-0.5">Agreement File: <strong className="text-brand-text dark:text-white font-extrabold">{details?.loanNumber}</strong></p>
+          <div className="text-center pb-4 border-b border-brand-border/40 space-y-2">
+            <span className="text-[9px] uppercase font-bold text-brand-emerald tracking-widest block bg-brand-emerald/10 px-3 py-1 rounded-full w-fit mx-auto mb-1">Direct VPA UPI payment (0% Fee)</span>
+            <div>
+              <h3 className="text-base font-black text-brand-text dark:text-white">{details?.borrowerName}</h3>
+              <p className="text-[10px] text-brand-dim">Agreement File: <strong className="text-brand-text dark:text-white font-extrabold">{details?.loanNumber}</strong></p>
+            </div>
+            
+            {/* Live Dues display */}
+            <div className="grid grid-cols-2 gap-2.5 pt-2 text-left">
+              <div className="bg-brand-bg/50 border border-brand-border/60 rounded-xl p-2.5">
+                <span className="text-[8px] font-bold text-brand-dim uppercase tracking-wider block">Total Remaining</span>
+                <span className="text-xs font-extrabold text-brand-text dark:text-white">₹{details?.totalOutstanding?.toLocaleString('en-IN') || '0'}</span>
+              </div>
+              <div className="bg-brand-bg/50 border border-brand-border/60 rounded-xl p-2.5">
+                <span className="text-[8px] font-bold text-brand-dim uppercase tracking-wider block">Next Installment Dues</span>
+                <span className="text-xs font-extrabold text-brand-emerald">₹{details?.nextDueAmount?.toLocaleString('en-IN') || '0'}</span>
+              </div>
+            </div>
+            {details?.nextDueDate && (
+              <p className="text-[9px] text-brand-dim text-right font-semibold">
+                Due Date: {new Date(details.nextDueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+              </p>
+            )}
           </div>
 
           {/* Form / Success States */}
