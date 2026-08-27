@@ -35,10 +35,6 @@ export default function Customers() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, collateralFilter, statusFilter, loanCountFilter]);
-  
   const [viewMode, setViewMode] = useState(() => localStorage.getItem('customers_view_mode') || 'table');
 
   const handleToggleViewMode = (mode) => {
@@ -51,6 +47,10 @@ export default function Customers() {
   const [collateralFilter, setCollateralFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [loanCountFilter, setLoanCountFilter] = useState('all');
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, collateralFilter, statusFilter, loanCountFilter]);
 
   const fetchCustomers = async () => {
     setLoading(true);
