@@ -231,6 +231,7 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
     customerId: preselectedCustomerId || '',
     principalAmount: '',
     processingFee: '',
+    processingFeeMode: 'deduct',
     interestRate: '',
     rateType: 'monthly',
     interestType: 'simple',
@@ -373,6 +374,20 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
   const totalInterestExpected = previewSchedule.reduce((acc, i) => acc + i.interestComponent, 0);
   const totalRepayExpected = parseFloat(formData.principalAmount || 0) + totalInterestExpected;
   
+  const principal = parseFloat(formData.principalAmount || 0);
+  const fee = parseFloat(formData.processingFee || 0);
+  const isDeduct = formData.processingFeeMode === 'deduct';
+  let upfrontInterest = 0;
+  if (formData.upfrontDeduction) {
+    const dAmt = parseFloat(formData.deductionAmount || 0);
+    if (formData.deductionType === 'percent') {
+      upfrontInterest = principal * (dAmt / 100);
+    } else {
+      upfrontInterest = dAmt;
+    }
+  }
+  const cashInHand = Math.max(0, principal - (isDeduct ? fee : 0) - upfrontInterest);
+
   const numPaid = formData.isExistingLoan ? Math.min(previewSchedule.length, Math.max(0, parseInt(formData.alreadyPaidInstallments || 0))) : 0;
   const historicalPrincipalPaid = previewSchedule.slice(0, numPaid).reduce((acc, i) => acc + i.principalComponent, 0);
   const historicalInterestPaid = previewSchedule.slice(0, numPaid).reduce((acc, i) => acc + i.interestComponent, 0);
@@ -546,18 +561,33 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                   </div>
                 </div>
 
-                {/* Processing Fee */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Processing Fee</label>
-                  <input
-                    type="number"
-                    name="processingFee"
-                    value={formData.processingFee}
-                    onChange={handleChange}
-                    placeholder="e.g. 1000"
-                    className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
-                    min="0"
-                  />
+                {/* Processing Fee & Mode */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:col-span-2 bg-brand-bg/15 border border-brand-border/40 p-4 rounded-xl">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Processing Fee</label>
+                    <input
+                      type="number"
+                      name="processingFee"
+                      value={formData.processingFee}
+                      onChange={handleChange}
+                      placeholder="e.g. 200"
+                      className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
+                      min="0"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Processing Fee Mode</label>
+                    <select
+                      name="processingFeeMode"
+                      value={formData.processingFeeMode}
+                      onChange={handleChange}
+                      className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition font-sans"
+                    >
+                      <option value="deduct">Deduct Upfront (मूल राशि से काटना)</option>
+                      <option value="collect">Collect Separately (अलग से नकद लेना)</option>
+                    </select>
+                  </div>
                 </div>
 
                 {/* Upfront Deduction Setup */}
@@ -958,6 +988,15 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                     ₹{Math.round(formData.isExistingLoan ? remainingPrincipalBalance : totalRepayExpected).toLocaleString('en-IN')}
                   </p>
                 </div>
+                {!formData.isExistingLoan && (
+                  <div>
+                    <span className="text-[9px] uppercase font-bold text-brand-dim block">In-Hand Cash (हाथ में देने वाली नकद)</span>
+                    <p className="text-base font-extrabold text-brand-amber mt-0.5">₹{Math.round(cashInHand).toLocaleString('en-IN')}</p>
+                    <span className="text-[8.5px] text-brand-dim block mt-0.5 font-medium leading-none">
+                      {isDeduct && fee > 0 ? `(₹${fee} fee deducted upfront)` : `(Full principal given)`}
+                    </span>
+                  </div>
+                )}
                 {formData.isExistingLoan && (
                   <div>
                     <span className="text-[9px] uppercase font-bold text-brand-dim block">Already Received (कुल प्राप्त)</span>

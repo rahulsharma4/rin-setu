@@ -32,6 +32,15 @@ export default function PublicPaymentPage() {
   const [utrNumber, setUtrNumber] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
+  // Dynamic Checkout states
+  const [checkoutData, setCheckoutData] = useState(null);
+  const [generatingCheckout, setGeneratingCheckout] = useState(false);
+
+  // Clear checkout QR if amount changes
+  useEffect(() => {
+    setCheckoutData(null);
+  }, [amount]);
+
   const fetchPublicDetails = async () => {
     try {
       setLoading(true);
@@ -52,6 +61,49 @@ export default function PublicPaymentPage() {
   useEffect(() => {
     fetchPublicDetails();
   }, [loanId]);
+
+  const handleGenerateCheckout = async () => {
+    if (!amount || parseFloat(amount) <= 0) {
+      alert('Please enter a valid amount.');
+      return;
+    }
+    try {
+      setGeneratingCheckout(true);
+      setError('');
+      const res = await publicApi.post('public/generate-checkout', {
+        loanId,
+        amount: Number(amount)
+      });
+      setCheckoutData(res.data);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to generate online payment checkout.');
+    } finally {
+      setGeneratingCheckout(false);
+    }
+  };
+
+  // Poll status of dynamic QR/payment link
+  useEffect(() => {
+    if (!checkoutData?.qrCodeId) return;
+
+    let active = true;
+    const interval = setInterval(async () => {
+      try {
+        const res = await publicApi.get(`public/check-status/${checkoutData.qrCodeId}`);
+        if (res.data.status === 'captured' && active) {
+          setSuccess(`Payment of ₹${amount} received & verified automatically via webhook! ✅`);
+          clearInterval(interval);
+        }
+      } catch (err) {
+        console.error('Status check failed:', err);
+      }
+    }, 4000);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
+  }, [checkoutData, amount]);
 
   const handleSubmitReference = async (e) => {
     e.preventDefault();
@@ -132,7 +184,11 @@ export default function PublicPaymentPage() {
           
           {/* Header */}
           <div className="text-center pb-4 border-b border-brand-border/40 space-y-2">
-            <span className="text-[9px] uppercase font-bold text-brand-emerald tracking-widest block bg-brand-emerald/10 px-3 py-1 rounded-full w-fit mx-auto mb-1">Direct VPA UPI payment (0% Fee)</span>
+            {details?.paymentPreference === 'central_split' ? (
+              <span className="text-[9px] uppercase font-bold text-brand-accent tracking-widest block bg-brand-accent/10 px-3 py-1 rounded-full w-fit mx-auto mb-1">Auto-Verify Checkout (Secured)</span>
+            ) : (
+              <span className="text-[9px] uppercase font-bold text-brand-emerald tracking-widest block bg-brand-emerald/10 px-3 py-1 rounded-full w-fit mx-auto mb-1">Direct VPA UPI payment (0% Fee)</span>
+            )}
             <div>
               <h3 className="text-base font-black text-brand-text dark:text-white">{details?.borrowerName}</h3>
               <p className="text-[10px] text-brand-dim">Agreement File: <strong className="text-brand-text dark:text-white font-extrabold">{details?.loanNumber}</strong></p>
@@ -163,12 +219,82 @@ export default function PublicPaymentPage() {
                 <CheckCircle className="w-8 h-8 text-brand-emerald" />
               </div>
               <div className="space-y-1.5 px-2">
-                <h3 className="text-sm font-black text-brand-text dark:text-white uppercase tracking-wider">UTR Submitted!</h3>
+                <h3 className="text-sm font-black text-brand-text dark:text-white uppercase tracking-wider">Payment Verified!</h3>
                 <p className="text-xs text-brand-dim leading-relaxed">{success}</p>
               </div>
               <div className="text-[9px] text-brand-dim pt-2">
-                Aap is page ko close kar sakte hain. Verification update hote hi notification send kiya jayega.
+                Aap is page ko close kar sakte hain. Loan account update ho gaya hai.
               </div>
+            </div>
+          ) : details?.paymentPreference === 'central_split' ? (
+            <div className="space-y-4">
+              {/* Error Alert */}
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-semibold px-4 py-3 rounded-xl text-center">
+                  {error}
+                </div>
+              )}
+
+              {/* Amount Input */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider block">Repayment Amount (₹) *</label>
+                <input
+                  type="number"
+                  required
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="Enter amount to pay"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                />
+              </div>
+
+              {!checkoutData ? (
+                <button
+                  type="button"
+                  onClick={handleGenerateCheckout}
+                  disabled={generatingCheckout || !amount || parseFloat(amount) <= 0}
+                  className="w-full py-3 bg-brand-accent hover:bg-indigo-600 disabled:bg-indigo-400 text-xs font-bold text-white rounded-xl shadow-lg shadow-brand-accent/25 transition flex items-center justify-center space-x-1.5 cursor-pointer mt-2"
+                >
+                  {generatingCheckout ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Generating Checkout Order...</span>
+                    </>
+                  ) : (
+                    <span>Generate Secure QR & Pay (₹{amount})</span>
+                  )}
+                </button>
+              ) : (
+                <div className="space-y-4 py-2 text-center animate-fade-in">
+                  <div className="bg-white p-3 rounded-2xl w-fit mx-auto shadow-md border border-slate-100">
+                    <img src={checkoutData.qrImageUrl} alt="Secure Checkout QR" className="w-40 h-40 mx-auto" />
+                  </div>
+                  
+                  <p className="text-[10px] text-brand-dim">Scan QR above, or click below to pay via mobile app</p>
+
+                  <div className="px-2">
+                    <a
+                      href={checkoutData.imageContent}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-full py-2.5 bg-brand-emerald hover:bg-emerald-600 active:bg-emerald-700 text-xs font-bold text-white rounded-xl shadow-md shadow-brand-emerald/15 transition flex items-center justify-center space-x-1.5"
+                    >
+                      <ArrowUpRight className="w-4 h-4 text-white" />
+                      <span>Proceed to Online Repayment</span>
+                    </a>
+                  </div>
+                  
+                  <div className="bg-brand-bg/50 border border-brand-border/40 rounded-xl p-3 text-left space-y-1">
+                    <p className="text-[10px] text-brand-emerald font-semibold flex items-center space-x-1.5">
+                      <span className="w-2 h-2 bg-brand-emerald rounded-full animate-ping" />
+                      <span>Auto-Verifying Repayment...</span>
+                    </p>
+                    <p className="text-[9px] text-brand-dim leading-relaxed">
+                      Repayment detect hote hi system automatically verify kar dega. Isme aapko koi UTR type karne ki zarurat nahi hai.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <form onSubmit={handleSubmitReference} className="space-y-4">
@@ -237,7 +363,7 @@ export default function PublicPaymentPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full py-2.5 bg-brand-accent hover:bg-indigo-600 disabled:bg-indigo-400 text-xs font-bold text-white rounded-xl shadow-lg shadow-brand-accent/25 transition flex items-center justify-center space-x-1"
+                  className="w-full py-2.5 bg-brand-accent hover:bg-indigo-600 disabled:bg-indigo-400 text-xs font-bold text-white rounded-xl shadow-lg shadow-brand-accent/25 transition flex items-center justify-center space-x-1 cursor-pointer"
                 >
                   {submitting ? (
                     <>
@@ -255,7 +381,11 @@ export default function PublicPaymentPage() {
           {/* Secure disclaimer */}
           <div className="flex items-center justify-center space-x-2 text-[9px] text-brand-dim border-t border-brand-border/40 pt-4">
             <Lock className="w-3 h-3 text-brand-emerald" />
-            <span>Direct P2P bank-to-bank ledger clearing. No processing charges.</span>
+            <span>
+              {details?.paymentPreference === 'central_split'
+                ? 'Secured Razorpay checkout routing. Auto-reconciliation enabled.'
+                : 'Direct P2P bank-to-bank ledger clearing. No processing charges.'}
+            </span>
           </div>
         </div>
 
