@@ -57,8 +57,18 @@ export default function Sidebar({ isOpen, onClose }) {
       }`}>
         <div className="flex items-center justify-between px-2 pb-4 border-b border-brand-border/30 shrink-0">
           <div className="flex items-center space-x-3 cursor-pointer" onClick={() => { if(onClose) onClose(); navigate('/'); }}>
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-brand-accent/25 shrink-0 overflow-hidden bg-transparent">
-              <img src="/Logo.png" alt="RinSetu Logo" className="w-full h-full object-contain" />
+            <div className="w-9 h-9 flex items-center justify-center shrink-0 bg-transparent">
+              <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8 text-brand-accent drop-shadow-[0_2px_6px_rgba(156,39,176,0.35)]">
+                <defs>
+                  <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="var(--brand-accent)" />
+                    <stop offset="100%" stopColor="#db2777" />
+                  </linearGradient>
+                </defs>
+                <line x1="19" y1="5" x2="5" y2="19" stroke="url(#logo-grad)" strokeWidth="3.2" strokeLinecap="round" />
+                <circle cx="6.5" cy="6.5" r="2.2" stroke="url(#logo-grad)" strokeWidth="3.2" />
+                <circle cx="17.5" cy="17.5" r="2.2" stroke="url(#logo-grad)" strokeWidth="3.2" />
+              </svg>
             </div>
             <div>
               <h1 className="text-lg font-extrabold text-brand-text dark:text-white tracking-wide leading-none max-w-[150px] truncate">
