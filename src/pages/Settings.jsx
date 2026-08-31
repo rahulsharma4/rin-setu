@@ -1261,7 +1261,7 @@ export default function Settings() {
                         type="button"
                         onClick={handleSendTestWA}
                         disabled={testLoading || !testPhone}
-                        className="px-4 py-2 bg-brand-accent hover:bg-brand-accent/90 text-white rounded-lg text-xs font-bold transition disabled:opacity-50 h-[34px] shrink-0"
+                        className="px-4 py-2 rounded-xl text-xs font-extrabold transition-all duration-150 h-[34px] shrink-0 flex items-center justify-center bg-brand-accent hover:bg-purple-700 text-white disabled:bg-brand-border disabled:text-brand-dim disabled:shadow-none shadow-sm shadow-brand-accent/15 border border-brand-accent/10 disabled:border-transparent cursor-pointer disabled:cursor-not-allowed"
                       >
                         {testLoading ? 'Sending...' : 'Send Test'}
                       </button>
