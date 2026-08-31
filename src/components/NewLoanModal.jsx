@@ -1023,10 +1023,10 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                           </div>
                           <div className="text-right">
                             <p className={`font-bold ${isPastPaid ? 'text-emerald-400' : 'text-brand-text dark:text-white'}`}>
-                              ₹{Math.round(item.totalAmount).toLocaleString('en-IN')}
+                              ₹{item.totalAmount % 1 !== 0 ? item.totalAmount.toFixed(2) : Math.round(item.totalAmount).toLocaleString('en-IN')}
                             </p>
                             <span className="text-[10px] text-brand-dim block mt-0.5">
-                              ₹{Math.round(item.principalComponent)} asal / ₹{Math.round(item.interestComponent)} byaj
+                              ₹{item.principalComponent % 1 !== 0 ? item.principalComponent.toFixed(2) : Math.round(item.principalComponent)} asal / ₹{item.interestComponent % 1 !== 0 ? item.interestComponent.toFixed(2) : Math.round(item.interestComponent)} byaj
                             </span>
                           </div>
                         </div>
