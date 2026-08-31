@@ -1326,7 +1326,7 @@ export default function Settings() {
                           value={testPhone}
                           onChange={(e) => setTestPhone(e.target.value)}
                           placeholder="e.g. 917891449044"
-                          className="w-full bg-brand-bg border border-brand-border rounded-lg px-3 py-1.5 text-xs outline-none focus:border-brand-accent/50 text-white"
+                          className="w-full bg-brand-bg border border-brand-border rounded-lg px-3 py-1.5 text-xs outline-none focus:border-brand-accent/50 text-brand-text dark:text-white"
                         />
                       </div>
                       <div className="space-y-1 md:col-span-2 flex gap-2 items-end">
@@ -1336,7 +1336,7 @@ export default function Settings() {
                             type="text"
                             value={testMsg}
                             onChange={(e) => setTestMsg(e.target.value)}
-                            className="w-full bg-brand-bg border border-brand-border rounded-lg px-3 py-1.5 text-xs outline-none focus:border-brand-accent/50 text-white"
+                            className="w-full bg-brand-bg border border-brand-border rounded-lg px-3 py-1.5 text-xs outline-none focus:border-brand-accent/50 text-brand-text dark:text-white"
                           />
                         </div>
                         <button
