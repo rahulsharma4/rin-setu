@@ -858,7 +858,7 @@ export default function Settings() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* BYOK Selection card */}
+              {/* P2P Selection card */}
               <div 
                 onClick={async () => {
                   const updated = { ...payoutData, paymentModePreference: 'byok' };
@@ -874,7 +874,7 @@ export default function Settings() {
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-white">Custom Gateway (BYOK)</span>
+                  <span className="text-xs font-bold text-white">Direct P2P UPI (0% Fee)</span>
                   <input 
                     type="radio" 
                     checked={payoutData.paymentModePreference === 'byok'} 
@@ -883,7 +883,7 @@ export default function Settings() {
                   />
                 </div>
                 <p className="text-[10px] text-brand-dim leading-relaxed">
-                  Use your own Razorpay merchant credentials. 100% of the funds settle directly to your merchant account. Requires manual configuration.
+                  Direct bank-to-bank transfer. 0% transaction fee. Borrower scans your QR code and submits UTR number. Requires admin manual approval.
                 </p>
               </div>
 
@@ -903,7 +903,7 @@ export default function Settings() {
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-white">Central Split Payouts (Zero Setup)</span>
+                  <span className="text-xs font-bold text-white">Central Split Payouts (Auto-Verify)</span>
                   <input 
                     type="radio" 
                     checked={payoutData.paymentModePreference === 'central_split'} 
@@ -912,7 +912,7 @@ export default function Settings() {
                   />
                 </div>
                 <p className="text-[10px] text-brand-dim leading-relaxed">
-                  Zero gateway setup. Enter your bank details, and client payments will split and settle directly to your bank account automatically.
+                  Automatic verification. Settle payments automatically to your bank account using platform's central gateway. No manual approval needed.
                 </p>
               </div>
             </div>
@@ -920,163 +920,54 @@ export default function Settings() {
 
           {/* Conditional Layouts based on Mode Preference */}
           {payoutData.paymentModePreference === 'byok' ? (
-            /* ================= BYOK CUSTOM GATEPAY FORM ================= */
+            /* ================= DIRECT P2P UPI CONFIGURATION ================= */
             <form onSubmit={handleSaveGateway} className="space-y-6">
-              {/* Status Banner */}
-              {gatewayInfo && (
-                <div className={`flex items-center space-x-3 p-4 rounded-2xl border ${
-                  gatewayInfo.isConfigured
-                    ? 'bg-brand-emerald/10 border-brand-emerald/30 text-brand-emerald'
-                    : 'bg-brand-amber/10 border-brand-amber/30 text-brand-amber'
-                }`}>
-                  <Wallet className="w-5 h-5 shrink-0" />
-                  <div>
-                    <p className="text-xs font-bold">
-                      {gatewayInfo.isConfigured ? '✅ Razorpay UPI QR is Active & Ready' : '⚙️ Payment Gateway Not Configured'}
-                    </p>
-                    <p className="text-[10px] mt-0.5 opacity-80">
-                      {gatewayInfo.isConfigured
-                        ? 'Borrowers can now pay via UPI QR Code and entries will be logged automatically.'
-                        : 'Fill in your Razorpay credentials below to enable automatic UPI payment recording.'}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Main Credentials Card */}
+              {/* Direct P2P UPI VPA Section */}
               <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-5">
                 <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
-                  <Key className="w-4 h-4 text-brand-accent" />
-                  <h3 className="text-xs font-bold text-white uppercase tracking-wider">Razorpay API Credentials</h3>
+                  <Wallet className="w-4 h-4 text-brand-emerald" />
+                  <h3 className="text-xs font-bold text-white uppercase tracking-wider">Direct VPA P2P UPI Settings (0% Commission)</h3>
                 </div>
 
                 <div className="p-4 bg-brand-bg/60 border border-brand-border rounded-xl space-y-2 text-[10px] text-brand-dim leading-relaxed">
-                  <p className="font-bold text-brand-text dark:text-white text-[11px]">📋 How to get your Razorpay credentials:</p>
-                  <ol className="list-decimal list-inside space-y-1">
-                    <li>Go to <strong className="text-brand-accent">razorpay.com</strong> → Create a business account (free) → Complete KYC</li>
-                    <li>Navigate to <strong>Dashboard → Settings → API Keys → Generate Key</strong></li>
-                    <li>Copy the <strong>Key ID</strong> (starts with <code>rzp_</code>) and <strong>Key Secret</strong> and paste below</li>
-                    <li>Go to <strong>Settings → Webhooks → Add New Webhook</strong></li>
-                    <li>Paste your unique Webhook URL (shown below) and select the <strong>payment.captured</strong> event</li>
-                    <li>Copy the <strong>Webhook Secret</strong> from Razorpay and paste it below</li>
-                  </ol>
+                  <p className="font-bold text-brand-text dark:text-white text-[11px]">📋 How Direct P2P UPI works:</p>
+                  <ul className="list-disc list-inside space-y-1">
+                    <li>Configure your personal or business UPI VPA ID below (e.g., your UPI phone number or business VPA).</li>
+                    <li>When a borrower clicks pay, a QR code pointing directly to your UPI ID is generated.</li>
+                    <li>The borrower transfers funds directly bank-to-bank (0% fees, instant settlement).</li>
+                    <li>Borrower submits the 12-digit UTR transaction number on the payment page.</li>
+                    <li>You review the UTR in your Admin Dashboard under "Pending P2P Payments" and approve it manually to record it.</li>
+                  </ul>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Key ID */}
+                  {/* UPI VPA ID */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Razorpay Key ID *</label>
+                    <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Lender UPI VPA ID *</label>
                     <input
                       type="text"
-                      value={gatewayData.gatewayKeyId}
-                      onChange={(e) => setGatewayData(prev => ({ ...prev, gatewayKeyId: e.target.value }))}
-                      placeholder="rzp_live_xxxxxxxxxxxxxxxx"
-                      className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
+                      required
+                      value={gatewayData.upiId}
+                      onChange={(e) => setGatewayData(prev => ({ ...prev, upiId: e.target.value }))}
+                      placeholder="e.g. rahulsharma@oksbi or 9876543210@paytm"
+                      className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
                     />
                   </div>
 
-                  {/* Key Secret */}
+                  {/* UPI Display Name */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Razorpay Key Secret *</label>
-                    <div className="relative">
-                      <input
-                        type={showSecret ? 'text' : 'password'}
-                        value={gatewayData.gatewayKeySecret}
-                        onChange={(e) => setGatewayData(prev => ({ ...prev, gatewayKeySecret: e.target.value }))}
-                        placeholder={gatewayInfo?.hasKeySecret ? "•••••••• (Saved - enter new secret to change)" : "Enter Razorpay Key Secret"}
-                        className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl pl-4 pr-10 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
-                        autoComplete="new-password"
-                      />
-                      <button type="button" onClick={() => setShowSecret(s => !s)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-dim hover:text-white transition">
-                        {showSecret ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Webhook Secret */}
-                  <div className="space-y-1.5 md:col-span-2">
-                    <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Razorpay Webhook Secret</label>
+                    <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Lender UPI Display Name (Business Name) *</label>
                     <input
-                      type="password"
-                      value={gatewayData.gatewayWebhookSecret}
-                      onChange={(e) => setGatewayData(prev => ({ ...prev, gatewayWebhookSecret: e.target.value }))}
-                      placeholder="Paste Webhook Secret from Razorpay dashboard"
-                      className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition font-mono"
-                      autoComplete="new-password"
+                      type="text"
+                      required
+                      value={gatewayData.upiName}
+                      onChange={(e) => setGatewayData(prev => ({ ...prev, upiName: e.target.value }))}
+                      placeholder="e.g. RinSetu CRM or Advika Enterprises"
+                      className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
                     />
-                    <p className="text-[9px] text-brand-dim">This is used to verify that payment notifications truly come from Razorpay (prevents fraud).</p>
-                  </div>
-                </div>
-
-                {/* Direct P2P UPI VPA Section */}
-                <div className="border-t border-brand-border/40 pt-5 mt-5 space-y-4">
-                  <div>
-                    <h4 className="text-xs font-bold text-brand-text dark:text-white uppercase tracking-wider">Direct VPA P2P UPI Settings (0% Commission)</h4>
-                    <p className="text-[10px] text-brand-dim mt-0.5">
-                      Configure your personal or business UPI ID. When borrower scans this QR, 100% of the payment goes directly bank-to-bank without any gateway fees. 
-                      Borrower will submit UTR transaction number which you can approve below to mark as paid.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* UPI VPA ID */}
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Lender UPI VPA ID</label>
-                      <input
-                        type="text"
-                        value={gatewayData.upiId}
-                        onChange={(e) => setGatewayData(prev => ({ ...prev, upiId: e.target.value }))}
-                        placeholder="e.g. rahulsharma@oksbi or 9876543210@paytm"
-                        className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
-                      />
-                    </div>
-
-                    {/* UPI Display Name */}
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Lender UPI Display Name (Business Name)</label>
-                      <input
-                        type="text"
-                        value={gatewayData.upiName}
-                        onChange={(e) => setGatewayData(prev => ({ ...prev, upiName: e.target.value }))}
-                        placeholder="e.g. RinSetu CRM or Advika Enterprises"
-                        className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white placeholder-brand-dim/40 outline-none transition"
-                      />
-                    </div>
                   </div>
                 </div>
               </div>
-
-              {/* Webhook URL Card */}
-              {gatewayInfo?.webhookUrl && (
-                <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-4">
-                  <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
-                    <Webhook className="w-4 h-4 text-brand-accent" />
-                    <h3 className="text-xs font-bold text-white uppercase tracking-wider">Your Unique Webhook URL</h3>
-                  </div>
-                  <p className="text-[10px] text-brand-dim leading-relaxed">
-                    Copy this URL and add it to your <strong className="text-brand-text dark:text-white">Razorpay → Settings → Webhooks</strong> panel. 
-                    This is unique to your account — Razorpay will call it automatically whenever a borrower pays.
-                  </p>
-                  <div className="flex items-center space-x-2">
-                    <code className="flex-1 text-[10px] font-mono bg-brand-bg border border-brand-border rounded-xl px-4 py-3 text-brand-accent overflow-x-auto whitespace-nowrap">
-                      {gatewayInfo.webhookUrl}
-                    </code>
-                    <button
-                      type="button"
-                      onClick={handleCopyWebhook}
-                      className={`flex items-center space-x-1.5 px-4 py-3 rounded-xl border text-[10px] font-bold transition ${
-                        copied
-                          ? 'bg-brand-emerald/20 border-brand-emerald/40 text-brand-emerald'
-                          : 'border-brand-border text-brand-dim hover:text-white hover:bg-brand-border/30'
-                      }`}
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>{copied ? 'Copied!' : 'Copy'}</span>
-                    </button>
-                  </div>
-                </div>
-              )}
 
               {/* Save Button */}
               <div className="flex justify-end pt-2">
@@ -1086,7 +977,7 @@ export default function Settings() {
                   className="flex items-center space-x-1.5 px-6 py-3.5 rounded-xl bg-brand-accent hover:bg-indigo-600 disabled:opacity-40 text-xs font-bold text-white shadow-lg shadow-brand-accent/25 transition-all duration-200"
                 >
                   <Save className="w-4 h-4" />
-                  <span>{gatewayLoading ? 'Saving...' : 'Save Payment Gateway Settings'}</span>
+                  <span>{gatewayLoading ? 'Saving...' : 'Save UPI Settings'}</span>
                 </button>
               </div>
             </form>
