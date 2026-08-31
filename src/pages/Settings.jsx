@@ -990,12 +990,12 @@ export default function Settings() {
                   ? 'bg-brand-emerald/10 border-brand-emerald/30 text-brand-emerald'
                   : 'bg-brand-amber/10 border-brand-amber/30 text-brand-amber'
               }`}>
-                <Wallet className="w-5 h-5 shrink-0" />
+                <Wallet className="w-5 h-5 shrink-0" style={{ color: 'inherit' }} />
                 <div>
-                  <p className="text-xs font-bold text-white uppercase tracking-wider">
+                  <p className="text-xs font-bold uppercase tracking-wider" style={{ color: 'inherit' }}>
                     {payoutData.payoutEnabled ? '✅ Central Split Payout Mode is ACTIVE' : '⚙️ Central Split Mode is PENDING Linkage Activation'}
                   </p>
-                  <p className="text-[10px] mt-0.5 text-slate-300">
+                  <p className="text-[10px] mt-0.5 font-medium opacity-90" style={{ color: 'inherit' }}>
                     {payoutData.payoutEnabled
                       ? `Payments will split automatically and route to Linked Bank Account.`
                       : 'Your bank details are saved. The platform administrator will activate your linked account shortly.'}
