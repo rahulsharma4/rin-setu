@@ -1267,8 +1267,8 @@ export default function Settings() {
                             : 'hover:opacity-90 active:scale-[0.98] cursor-pointer'
                         }`}
                         style={{
-                          backgroundColor: (testLoading || !testPhone) ? '#f1f5f9' : '#9c27b0',
-                          color: (testLoading || !testPhone) ? '#94a3b8' : '#ffffff',
+                          backgroundColor: (testLoading || !testPhone) ? '#f1f5f9' : '#ffffff',
+                          color: (testLoading || !testPhone) ? '#94a3b8' : '#9c27b0',
                           borderColor: (testLoading || !testPhone) ? '#e2e8f0' : '#9c27b0'
                         }}
                       >
