@@ -18,7 +18,10 @@ import {
   ExternalLink,
   Webhook,
   Eye,
-  EyeOff
+  EyeOff,
+  Users,
+  UserCheck,
+  Trash2
 } from 'lucide-react';
 import api from '../api';
 import { useAuth } from '../context/AuthContext';
@@ -264,6 +267,52 @@ export default function Settings() {
   const [auditLogs, setAuditLogs] = useState([]);
   const [loadingAudits, setLoadingAudits] = useState(false);
 
+  // ── Staff Management State ───────────────────────────────
+  const [staff, setStaff] = useState([]);
+  const [staffLoading, setStaffLoading] = useState(false);
+  const [staffForm, setStaffForm] = useState({ name: '', username: '', password: '', role: 'collector' });
+  const [staffError, setStaffError] = useState('');
+  const [staffSuccess, setStaffSuccess] = useState('');
+
+  const fetchStaff = async () => {
+    setStaffLoading(true);
+    try {
+      const res = await api.get('auth/staff');
+      setStaff(res.data);
+    } catch (err) {
+      console.warn('Failed to load staff list:', err.message);
+    } finally {
+      setStaffLoading(false);
+    }
+  };
+
+  const handleCreateStaff = async (e) => {
+    e.preventDefault();
+    setStaffError('');
+    setStaffSuccess('');
+    try {
+      const res = await api.post('auth/staff', staffForm);
+      setStaffSuccess(res.data.message || 'Staff member added successfully!');
+      setStaffForm({ name: '', username: '', password: '', role: 'collector' });
+      fetchStaff();
+    } catch (err) {
+      setStaffError(err.response?.data?.message || 'Failed to create staff user.');
+    }
+  };
+
+  const handleDeleteStaff = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this staff member? They will lose access immediately.')) return;
+    setStaffError('');
+    setStaffSuccess('');
+    try {
+      await api.delete(`auth/staff/${id}`);
+      setStaffSuccess('Staff member deleted successfully.');
+      fetchStaff();
+    } catch (err) {
+      setStaffError(err.response?.data?.message || 'Failed to delete staff user.');
+    }
+  };
+
   const headers = { Authorization: `Bearer ${token}` };
 
   const handleProfileSave = async (e) => {
@@ -316,6 +365,9 @@ export default function Settings() {
   useEffect(() => {
     if (activeTab === 'audit') {
       fetchAuditLogs();
+    }
+    if (activeTab === 'staff') {
+      fetchStaff();
     }
     if (activeTab === 'payment') {
       fetchGatewaySettings();
@@ -436,8 +488,7 @@ export default function Settings() {
         `}} />
         {[
           { id: 'config', label: '⚙️ Rules & Automation' },
-          { id: 'audit', label: '🛡️ Audit Trail' },
-          { id: 'backup', label: '💾 Backups & Exports' },
+          { id: 'staff', label: '👥 Staff & Collectors' },
           { id: 'profile', label: '👤 Profile Settings' },
           { id: 'payment', label: '💳 Payment Gateway' },
           { id: 'whatsapp', label: '💬 WhatsApp Gateway' }
@@ -637,131 +688,156 @@ export default function Settings() {
         </form>
       )}
 
-      {/* 2. Tab Audit: Security logs trail list */}
-      {activeTab === 'audit' && (
-        <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-5">
-          <div className="flex items-center justify-between border-b border-brand-border pb-3">
-            <div className="flex items-center space-x-2">
-              <Terminal className="w-4 h-4 text-brand-rose" />
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider">System Audit Trail Ledger</h3>
-            </div>
-            <button 
-              onClick={fetchAuditLogs}
-              disabled={loadingAudits}
-              className="flex items-center space-x-1 px-3 py-1.5 rounded-lg border border-brand-border text-[10px] font-bold text-brand-dim hover:text-white transition"
-            >
-              <RefreshCw className="w-3 h-3" />
-              <span>{loadingAudits ? 'Syncing...' : 'Reload Trail'}</span>
-            </button>
-          </div>
-
-          {loadingAudits ? (
-            <div className="h-48 flex items-center justify-center">
-              <div className="w-6 h-6 border-2 border-brand-accent border-t-transparent rounded-full animate-spin" />
-            </div>
-          ) : auditLogs.length === 0 ? (
-            <div className="h-48 flex items-center justify-center text-xs text-brand-dim">
-              No audit logs captured yet.
-            </div>
-          ) : (
-            <div className="overflow-x-auto border border-brand-border rounded-xl">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="border-b border-brand-border bg-brand-bg/50 text-[9px] uppercase font-bold text-brand-dim">
-                    <th className="p-3.5">Timestamp</th>
-                    <th className="p-3.5">User</th>
-                    <th className="p-3.5">Action</th>
-                    <th className="p-3.5">Summary Details</th>
-                    <th className="p-3.5">IP Address</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-brand-border/40 font-mono text-[11px]">
-                  {auditLogs.map((log) => (
-                    <tr key={log._id} className="hover:bg-brand-border/10 transition text-brand-dim hover:text-white">
-                      <td className="p-3.5 whitespace-nowrap">
-                        {new Date(log.createdAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                      </td>
-                      <td className="p-3.5 font-bold text-white">{log.userId}</td>
-                      <td className="p-3.5">
-                        <span className={`px-2 py-0.5 rounded text-[9px] font-extrabold uppercase border ${
-                          log.action?.includes('CREATED') ? 'bg-brand-emerald/10 text-brand-emerald border-brand-emerald/20' :
-                          log.action?.includes('REVERSED') || log.action?.includes('DELETED') ? 'bg-brand-rose/10 text-brand-rose border-brand-rose/20' :
-                          'bg-brand-accent/10 text-brand-accent border-brand-accent/20'
-                        }`}>
-                          {log.action?.replace('_', ' ')}
-                        </span>
-                      </td>
-                      <td className="p-3.5 font-sans font-medium">{log.details}</td>
-                      <td className="p-3.5">{log.ipAddress || '127.0.0.1'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* 3. Tab Backup: CSV & JSON Backup Exports */}
-      {activeTab === 'backup' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          {/* JSON Full Backup */}
-          <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-4">
+      {/* 2. Tab Staff: Manage Managers and Collectors */}
+      {activeTab === 'staff' && (
+        <div className="space-y-6">
+          {/* Add Staff Member Form */}
+          <form onSubmit={handleCreateStaff} className="glass-panel border border-brand-border rounded-2xl p-6 space-y-4">
             <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
-              <FolderSync className="w-4 h-4 text-brand-accent" />
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider">JSON Full DB Backup</h3>
+              <UserCheck className="w-4 h-4 text-brand-accent" />
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider">Add New Staff Member</h3>
             </div>
             
             <p className="text-[11px] text-brand-dim leading-relaxed">
-              Downloads a complete snapshot of all collections (Borrowers directory, Loan schedule sheets, timelines, payment receipt items, and audit trails) in a structured JSON file.
+              Create login credentials for your collectors or managers. They will be able to log in to the CRM with their own username and manage collections or loans according to their role.
             </p>
 
-            <button
-              onClick={handleDownloadBackup}
-              className="flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-brand-accent hover:bg-indigo-600 text-xs font-bold text-white shadow shadow-brand-accent/20 transition w-full justify-center"
-            >
-              <Download className="w-4 h-4" />
-              <span>Download JSON Database Dump</span>
-            </button>
-          </div>
+            {staffError && (
+              <div className="p-3 bg-brand-rose/10 border border-brand-rose/20 rounded-xl text-brand-rose text-xs font-semibold">
+                ⚠️ {staffError}
+              </div>
+            )}
 
-          {/* CSV Exporters Directory */}
+            {staffSuccess && (
+              <div className="p-3 bg-brand-emerald/10 border border-brand-emerald/20 rounded-xl text-brand-emerald text-xs font-semibold">
+                ✓ {staffSuccess}
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Full Name */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Staff Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={staffForm.name}
+                  onChange={(e) => setStaffForm(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="e.g. Amit Sharma"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                />
+              </div>
+
+              {/* Login Username */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Login Username *</label>
+                <input
+                  type="text"
+                  required
+                  value={staffForm.username}
+                  onChange={(e) => setStaffForm(prev => ({ ...prev, username: e.target.value }))}
+                  placeholder="e.g. amit_collector"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                />
+              </div>
+
+              {/* Password */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Secure Password *</label>
+                <input
+                  type="password"
+                  required
+                  value={staffForm.password}
+                  onChange={(e) => setStaffForm(prev => ({ ...prev, password: e.target.value }))}
+                  placeholder="Enter login password"
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                />
+              </div>
+
+              {/* Role Select */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Staff Role / Level *</label>
+                <select
+                  value={staffForm.role}
+                  onChange={(e) => setStaffForm(prev => ({ ...prev, role: e.target.value }))}
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                >
+                  <option value="collector">Collector (किस्त वसूल करने वाला - Limited View)</option>
+                  <option value="manager">Manager (मैनेजर - Full View, No Delete)</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <button
+                type="submit"
+                className="flex items-center space-x-1.5 px-5 py-3 rounded-xl bg-brand-accent hover:bg-indigo-600 text-xs font-bold text-white shadow-lg shadow-brand-accent/25 transition-all duration-200"
+              >
+                <UserCheck className="w-4 h-4" />
+                <span>Onboard Staff User</span>
+              </button>
+            </div>
+          </form>
+
+          {/* Active Staff List */}
           <div className="glass-panel border border-brand-border rounded-2xl p-6 space-y-4">
-            <div className="flex items-center space-x-2 border-b border-brand-border pb-3">
-              <FileCheck className="w-4 h-4 text-brand-emerald" />
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider">CSV Data Portability</h3>
+            <div className="flex items-center justify-between border-b border-brand-border pb-3">
+              <div className="flex items-center space-x-2">
+                <Users className="w-4 h-4 text-brand-emerald" />
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider">Active Staff & Collectors</h3>
+              </div>
             </div>
 
-            <p className="text-[11px] text-brand-dim leading-relaxed">
-              Export specific sheets to edit inside Microsoft Excel or Google Sheets.
-            </p>
-
-            <div className="space-y-2 pt-1.5">
-              <button
-                onClick={() => handleExportCSV('customers')}
-                className="flex items-center justify-between px-4 py-2.5 bg-brand-bg hover:bg-brand-border/40 border border-brand-border rounded-xl text-xs font-bold text-brand-text dark:text-white transition w-full"
-              >
-                <span>Export Borrowers Directory</span>
-                <span className="text-[10px] text-brand-emerald uppercase">Download CSV</span>
-              </button>
-              <button
-                onClick={() => handleExportCSV('loans')}
-                className="flex items-center justify-between px-4 py-2.5 bg-brand-bg hover:bg-brand-border/40 border border-brand-border rounded-xl text-xs font-bold text-brand-text dark:text-white transition w-full"
-              >
-                <span>Export Loan Agreements Sheet</span>
-                <span className="text-[10px] text-brand-emerald uppercase">Download CSV</span>
-              </button>
-              <button
-                onClick={() => handleExportCSV('payments')}
-                className="flex items-center justify-between px-4 py-2.5 bg-brand-bg hover:bg-brand-border/40 border border-brand-border rounded-xl text-xs font-bold text-brand-text dark:text-white transition w-full"
-              >
-                <span>Export Repayments Timeline Log</span>
-                <span className="text-[10px] text-brand-emerald uppercase">Download CSV</span>
-              </button>
-            </div>
+            {staffLoading ? (
+              <div className="h-24 flex items-center justify-center">
+                <div className="w-6 h-6 border-2 border-brand-accent border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : staff.length === 0 ? (
+              <div className="p-6 text-center text-xs text-brand-dim bg-brand-bg/30 rounded-xl border border-brand-border">
+                No staff users configured yet. Collectors or managers can be added above.
+              </div>
+            ) : (
+              <div className="overflow-x-auto border border-brand-border rounded-xl">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="border-b border-brand-border bg-brand-bg/50 text-[10px] uppercase font-bold text-brand-dim">
+                      <th className="p-3.5">Name</th>
+                      <th className="p-3.5">Username</th>
+                      <th className="p-3.5">Role</th>
+                      <th className="p-3.5 text-right pr-4">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-brand-border/40 font-medium">
+                    {staff.map((user) => (
+                      <tr key={user._id} className="hover:bg-brand-border/10 transition text-brand-dim hover:text-white">
+                        <td className="p-3.5 font-bold text-white">{user.name}</td>
+                        <td className="p-3.5">{user.username}</td>
+                        <td className="p-3.5">
+                          <span className={`px-2 py-0.5 rounded text-[9px] font-extrabold uppercase border ${
+                            user.role === 'manager'
+                              ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+                              : 'bg-teal-500/10 text-teal-400 border-teal-500/20'
+                          }`}>
+                            {user.role}
+                          </span>
+                        </td>
+                        <td className="p-3.5 text-right pr-4">
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteStaff(user._id)}
+                            className="p-1.5 rounded-lg bg-brand-rose/5 hover:bg-brand-rose text-brand-rose hover:text-white border border-brand-rose/10 transition"
+                            title="Delete Staff Access"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
-
         </div>
       )}
 
