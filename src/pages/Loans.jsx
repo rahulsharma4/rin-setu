@@ -108,7 +108,8 @@ export default function Loans() {
     setEditingLoan(loan);
     setEditForm({
       status: loan.status,
-      remarks: loan.remarks || ''
+      remarks: loan.remarks || '',
+      paymentPreference: loan.paymentPreference || 'p2p_upi'
     });
   };
 
@@ -680,6 +681,18 @@ export default function Loans() {
                   placeholder="Update loan documentation comments"
                   className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
                 />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider">Payment Collection Mode</label>
+                <select
+                  value={editForm.paymentPreference}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, paymentPreference: e.target.value }))}
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition"
+                >
+                  <option value="p2p_upi">Direct P2P UPI (0% Fee - Manual Verify)</option>
+                  <option value="central_split">Central Split Payouts (Auto-Verify)</option>
+                </select>
               </div>
 
               <div className="flex items-center justify-end space-x-3 pt-4 border-t border-brand-border">

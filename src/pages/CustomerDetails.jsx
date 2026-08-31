@@ -997,16 +997,33 @@ export default function CustomerDetails() {
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                       {!isSettled && (
-                        <button
-                          onClick={() => {
-                            setSelectedLoan(loan);
-                            setIsPaymentModalOpen(true);
-                          }}
-                          className="flex items-center space-x-1 px-4 py-2 rounded-xl bg-brand-emerald hover:bg-emerald-600 text-xs font-bold text-white shadow-lg shadow-brand-emerald/10 transition"
-                        >
-                          <Receipt className="w-3.5 h-3.5" />
-                          <span>Record Repayment</span>
-                        </button>
+                        <>
+                          <button
+                            onClick={() => {
+                              const message = `Namaste *${customer.name}* ji, aap apne loan details aur repayment history is link par dekh sakte hain aur repayment bhi kar sakte hain:
+Link: ${window.location.origin}/pay/loan/${loan._id}`;
+                              const encodedText = encodeURIComponent(message);
+                              const cleanPhone = customer.phone.replace(/[^0-9]/g, '').slice(-10);
+                              window.open(`https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodedText}`, '_blank');
+                            }}
+                            className="flex items-center space-x-1 px-3 py-2 rounded-xl bg-green-600 hover:bg-green-700 text-xs font-bold text-white shadow-lg shadow-green-600/10 transition"
+                          >
+                            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.967C16.588 1.974 14.128.951 11.49.951c-5.438 0-9.863 4.372-9.866 9.802-.001 2.015.523 3.987 1.517 5.714L2.09 20.25l3.882-1.018c1.66.909 3.327 1.344 4.675 1.353z" />
+                            </svg>
+                            <span>Share Link</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSelectedLoan(loan);
+                              setIsPaymentModalOpen(true);
+                            }}
+                            className="flex items-center space-x-1 px-4 py-2 rounded-xl bg-brand-emerald hover:bg-emerald-600 text-xs font-bold text-white shadow-lg shadow-brand-emerald/10 transition"
+                          >
+                            <Receipt className="w-3.5 h-3.5" />
+                            <span>Record Repayment</span>
+                          </button>
+                        </>
                       )}
                     </div>
                   </div>
@@ -1063,6 +1080,7 @@ export default function CustomerDetails() {
                     <th className="p-3.5">Total Installment</th>
                     <th className="p-3.5">Amount Paid</th>
                     <th className="p-3.5">Status</th>
+                    <th className="p-3.5 text-right pr-4">Reminder</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-brand-border/40">
@@ -1092,6 +1110,26 @@ export default function CustomerDetails() {
                         }`}>
                           {inst.status === 'paid' ? 'Paid' : inst.status === 'partially_paid' ? 'Partial' : inst.status}
                         </span>
+                      </td>
+                      <td className="p-3.5 text-right pr-4" onClick={(e) => e.stopPropagation()}>
+                        {inst.status !== 'paid' && (
+                          <button
+                            onClick={() => {
+                              const message = `Namaste *${customer.name}* ji, RinSetu CRM se reminder. Aapki loan ki EMI #${inst.installmentNumber} (Rashi: *₹${inst.totalAmount}*) ki due date *${new Date(inst.dueDate).toLocaleDateString('en-IN')}* hai. Kripya samay par bhugtan karein.
+Bhugtan karne ke liye is link par click karein: ${window.location.origin}/pay/loan/${activeScheduleLoanId}`;
+                              const encodedText = encodeURIComponent(message);
+                              const cleanPhone = customer.phone.replace(/[^0-9]/g, '').slice(-10);
+                              window.open(`https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodedText}`, '_blank');
+                            }}
+                            className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-green-600/10 hover:bg-green-600/25 text-green-500 hover:text-white border border-green-500/20 text-[10px] font-bold transition-all"
+                            title="Send Manual WhatsApp Reminder"
+                          >
+                            <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.967C16.588 1.974 14.128.951 11.49.951c-5.438 0-9.863 4.372-9.866 9.802-.001 2.015.523 3.987 1.517 5.714L2.09 20.25l3.882-1.018c1.66.909 3.327 1.344 4.675 1.353z" />
+                            </svg>
+                            <span>Share</span>
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}
