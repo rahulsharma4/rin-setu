@@ -254,6 +254,7 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
     calculationMode: 'percent',
     installmentAmount: '',
     dayCountBasis: '30_360',
+    paymentPreference: 'p2p_upi',
   });
 
   const [loading, setLoading] = useState(false);
@@ -909,6 +910,25 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                     </div>
                   )}
                 </div>
+              </div>
+
+              {/* Payment Collection Mode Selection */}
+              <div className="space-y-1.5 bg-brand-bg/30 border border-brand-border p-4 rounded-xl">
+                <label className="text-[10px] font-bold text-brand-dim uppercase tracking-wider block">
+                  Payment Collection Mode (भुगतान संग्रह का तरीका)
+                </label>
+                <select
+                  name="paymentPreference"
+                  value={formData.paymentPreference}
+                  onChange={handleChange}
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-2.5 text-xs text-brand-text dark:text-white outline-none transition font-sans mt-1.5"
+                >
+                  <option value="p2p_upi">Direct P2P UPI (0% Fee - Manual Verify)</option>
+                  <option value="central_split">Central Split Payouts (Auto-Verify)</option>
+                </select>
+                <p className="text-[9px] text-brand-dim italic mt-1">
+                  * Choose how payments for this specific loan file will be collected and verified.
+                </p>
               </div>
 
               {/* Remarks */}

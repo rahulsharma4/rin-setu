@@ -871,6 +871,13 @@ export default function CustomerDetails() {
                       }`}>
                         {loan.status}
                       </span>
+                      <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                        loan.paymentPreference === 'central_split'
+                          ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+                          : 'bg-teal-500/10 text-teal-400 border border-teal-500/20'
+                      }`}>
+                        {loan.paymentPreference === 'central_split' ? 'Auto-Verify' : 'P2P UPI'}
+                      </span>
                     </div>
 
                     {/* Rules details */}

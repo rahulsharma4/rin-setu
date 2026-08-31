@@ -390,6 +390,13 @@ export default function Loans() {
                           }`}>
                             {loan.status === 'paid' ? 'Settled' : loan.status}
                           </span>
+                          <span className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${
+                            loan.paymentPreference === 'central_split'
+                              ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+                              : 'bg-teal-500/10 text-teal-400 border border-teal-500/20'
+                          }`}>
+                            {loan.paymentPreference === 'central_split' ? 'Auto-Verify' : 'P2P UPI'}
+                          </span>
                         </div>
                       </td>
                       <td className="py-3.5 font-extrabold text-brand-accent">
@@ -477,6 +484,13 @@ export default function Loans() {
                           : 'bg-brand-accent/10 text-brand-accent border border-brand-accent/20'
                       }`}>
                         {loan.status === 'paid' ? 'Settled' : loan.status}
+                      </span>
+                      <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                        loan.paymentPreference === 'central_split'
+                          ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+                          : 'bg-teal-500/10 text-teal-400 border border-teal-500/20'
+                      }`}>
+                        {loan.paymentPreference === 'central_split' ? 'Auto-Verify' : 'P2P UPI'}
                       </span>
                     </div>
                   </div>
