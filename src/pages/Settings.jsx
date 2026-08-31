@@ -424,67 +424,40 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* Tabs Selector Navigation */}
-      <div className="flex border-b border-brand-border/60 pb-px space-x-6 text-xs font-bold">
-        <button 
-          onClick={() => setActiveTab('config')}
-          className={`pb-3 relative transition outline-none ${
-            activeTab === 'config' ? 'text-brand-accent' : 'text-brand-dim hover:text-white'
-          }`}
-        >
-          <span>Repayment & WhatsApp Rules</span>
-          {activeTab === 'config' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-accent animate-scale-x" />}
-        </button>
-        
-        <button 
-          onClick={() => setActiveTab('audit')}
-          className={`pb-3 relative transition outline-none ${
-            activeTab === 'audit' ? 'text-brand-accent' : 'text-brand-dim hover:text-white'
-          }`}
-        >
-          <span>Security Audit Trail</span>
-          {activeTab === 'audit' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-accent animate-scale-x" />}
-        </button>
-
-        <button 
-          onClick={() => setActiveTab('backup')}
-          className={`pb-3 relative transition outline-none ${
-            activeTab === 'backup' ? 'text-brand-accent' : 'text-brand-dim hover:text-white'
-          }`}
-        >
-          <span>Backup & Data Exports</span>
-          {activeTab === 'backup' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-accent animate-scale-x" />}
-        </button>
-
-        <button 
-          onClick={() => setActiveTab('profile')}
-          className={`pb-3 relative transition outline-none ${
-            activeTab === 'profile' ? 'text-brand-accent' : 'text-brand-dim hover:text-white'
-          }`}
-        >
-          <span>Admin Profile Settings</span>
-          {activeTab === 'profile' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-accent animate-scale-x" />}
-        </button>
-
-        <button 
-          onClick={() => setActiveTab('payment')}
-          className={`pb-3 relative transition outline-none ${
-            activeTab === 'payment' ? 'text-brand-accent' : 'text-brand-dim hover:text-white'
-          }`}
-        >
-          <span>💳 Payment Settings</span>
-          {activeTab === 'payment' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-accent animate-scale-x" />}
-        </button>
-
-        <button 
-          onClick={() => setActiveTab('whatsapp')}
-          className={`pb-3 relative transition outline-none ${
-            activeTab === 'whatsapp' ? 'text-brand-accent' : 'text-brand-dim hover:text-white'
-          }`}
-        >
-          <span>💬 WhatsApp Settings</span>
-          {activeTab === 'whatsapp' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-accent animate-scale-x" />}
-        </button>
+      {/* Tabs Selector Navigation (Mobile Responsive & Scrollable Pills) */}
+      <div 
+        className="flex items-center space-x-2.5 overflow-x-auto pb-3 -mx-4 px-4 sm:mx-0 sm:px-0 border-b border-brand-border/40 text-xs font-bold scrollbar-none"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
+        <style dangerouslySetInnerHTML={{__html: `
+          .scrollbar-none::-webkit-scrollbar {
+            display: none;
+          }
+        `}} />
+        {[
+          { id: 'config', label: '⚙️ Rules & Automation' },
+          { id: 'audit', label: '🛡️ Audit Trail' },
+          { id: 'backup', label: '💾 Backups & Exports' },
+          { id: 'profile', label: '👤 Profile Settings' },
+          { id: 'payment', label: '💳 Payment Gateway' },
+          { id: 'whatsapp', label: '💬 WhatsApp Gateway' }
+        ].map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-4 py-2.5 rounded-xl border shrink-0 transition-all duration-200 outline-none ${
+                isActive 
+                  ? 'bg-brand-accent/10 border-brand-accent/30 text-brand-accent shadow-sm shadow-brand-accent/5 scale-[1.02]' 
+                  : 'bg-brand-card border-brand-border text-brand-dim hover:text-brand-text dark:hover:text-white hover:bg-brand-bg/50'
+              }`}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
 
       {success && (
