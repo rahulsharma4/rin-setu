@@ -47,12 +47,12 @@ export default function Sidebar({ isOpen, onClose }) {
       {/* Backdrop overlay for mobile screens */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[35] md:hidden"
+          className="fixed inset-0 bg-black/70 z-[95] md:hidden"
           onClick={onClose}
         />
       )}
 
-      <aside className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] bg-white dark:bg-[#0b0e1b] border-r border-brand-border flex flex-col h-[100dvh] md:h-screen py-5 px-4 shrink-0 transition-transform duration-300 shadow-2xl md:sticky md:top-0 md:translate-x-0 ${
+      <aside className={`fixed inset-y-0 left-0 z-[100] w-72 max-w-[85vw] bg-white dark:bg-[#0b0e1b] border-r border-brand-border flex flex-col h-[100dvh] md:h-screen pt-5 pb-20 md:pb-5 px-4 shrink-0 transition-transform duration-300 shadow-2xl overflow-y-auto md:overflow-y-visible md:sticky md:top-0 md:translate-x-0 ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         {/* Header: Business Logo & Title */}
@@ -114,7 +114,7 @@ export default function Sidebar({ isOpen, onClose }) {
           })}
         </nav>
 
-        {/* Footer: Admin Info + Logout (Always Visible at Bottom) */}
+        {/* Footer: Admin Info + Logout (Always Visible & Pinned Above Bottom Bar) */}
         <div className="space-y-2.5 border-t border-brand-border pt-3.5 px-1 shrink-0 mt-auto">
           {/* Admin Badge */}
           <div className="flex items-center space-x-3 px-2 py-2 bg-brand-bg/50 rounded-xl border border-brand-border">
