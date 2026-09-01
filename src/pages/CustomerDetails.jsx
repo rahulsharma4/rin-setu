@@ -1133,9 +1133,17 @@ Link: ${window.location.origin}/pay/loan/${loan._id}`;
                             ? 'bg-brand-rose/10 text-brand-rose border border-brand-rose/20'
                             : inst.status === 'partially_paid'
                             ? 'bg-brand-accent/10 text-brand-accent border border-brand-accent/20'
+                            : inst.status === 'due_today'
+                            ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30 font-extrabold'
                             : 'bg-brand-border text-brand-dim'
                         }`}>
-                          {inst.status === 'paid' ? 'Paid' : inst.status === 'partially_paid' ? 'Partial' : inst.status}
+                          {inst.status === 'paid' 
+                            ? 'Paid' 
+                            : inst.status === 'partially_paid' 
+                            ? 'Partial' 
+                            : inst.status === 'due_today'
+                            ? 'Due Today'
+                            : inst.status}
                         </span>
                       </td>
                       <td className="p-3.5 text-right pr-4" onClick={(e) => e.stopPropagation()}>
