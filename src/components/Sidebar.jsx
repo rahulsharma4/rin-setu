@@ -52,10 +52,11 @@ export default function Sidebar({ isOpen, onClose }) {
         />
       )}
 
-      <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-brand-card border-r border-brand-border flex flex-col h-screen py-6 px-4 shrink-0 transition-transform duration-300 md:sticky md:top-0 md:translate-x-0 ${
+      <aside className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] bg-white dark:bg-[#0b0e1b] border-r border-brand-border flex flex-col h-[100dvh] md:h-screen py-5 px-4 shrink-0 transition-transform duration-300 shadow-2xl md:sticky md:top-0 md:translate-x-0 ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
-        <div className="flex items-center justify-between px-2 pb-4 border-b border-brand-border/30 shrink-0">
+        {/* Header: Business Logo & Title */}
+        <div className="flex items-center justify-between px-2 pb-3.5 border-b border-brand-border/40 shrink-0">
           <div className="flex items-center space-x-3 cursor-pointer" onClick={() => { if(onClose) onClose(); navigate('/'); }}>
             <div className="w-9 h-9 flex items-center justify-center shrink-0 bg-transparent">
               <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8 text-brand-accent drop-shadow-[0_2px_6px_rgba(156,39,176,0.35)]">
@@ -89,7 +90,7 @@ export default function Sidebar({ isOpen, onClose }) {
         </div>
 
         {/* Scrollable Center Area for Navigation Links */}
-        <nav className="flex-1 overflow-y-auto my-4 space-y-1 pr-1 scrollbar-thin">
+        <nav className="flex-1 overflow-y-auto min-h-0 my-3 space-y-1 pr-1 scrollbar-thin">
           {links.map((link) => {
             const Icon = link.icon;
             return (
@@ -113,31 +114,31 @@ export default function Sidebar({ isOpen, onClose }) {
           })}
         </nav>
 
-        {/* Footer: Admin Info + Logout (Fixed Bottom) */}
-        <div className="space-y-3 border-t border-brand-border pt-4 px-1 shrink-0">
-        {/* Admin Badge */}
-        <div className="flex items-center space-x-3 px-2 py-2 bg-brand-bg/50 rounded-xl border border-brand-border">
-          <div className="w-8 h-8 rounded-lg bg-brand-accent/15 flex items-center justify-center">
-            <ShieldCheck className="w-4 h-4 text-brand-accent" />
+        {/* Footer: Admin Info + Logout (Always Visible at Bottom) */}
+        <div className="space-y-2.5 border-t border-brand-border pt-3.5 px-1 shrink-0 mt-auto">
+          {/* Admin Badge */}
+          <div className="flex items-center space-x-3 px-2 py-2 bg-brand-bg/50 rounded-xl border border-brand-border">
+            <div className="w-8 h-8 rounded-lg bg-brand-accent/15 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-4 h-4 text-brand-accent" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold text-brand-text dark:text-white truncate">{admin?.username || 'Admin'}</p>
+              <span className="text-[9px] text-brand-emerald font-semibold uppercase tracking-wider">
+                {admin?.role === 'super-admin' ? 'Super Admin' : 'Administrator'}
+              </span>
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-brand-text dark:text-white truncate">{admin?.username || 'Admin'}</p>
-            <span className="text-[9px] text-brand-emerald font-semibold uppercase tracking-wider">
-              {admin?.role === 'super-admin' ? 'Super Admin' : 'Administrator'}
-            </span>
-          </div>
-        </div>
 
-        {/* Logout Button */}
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center space-x-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold text-brand-dim hover:text-brand-rose hover:bg-brand-rose/5 border border-transparent hover:border-brand-rose/20 transition-all duration-200"
-        >
-          <LogOut className="w-4 h-4" />
-          <span>Logout</span>
-        </button>
-      </div>
-    </aside>
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center space-x-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold text-brand-rose hover:text-white bg-brand-rose/10 hover:bg-brand-rose border border-brand-rose/20 transition-all duration-200"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Logout</span>
+          </button>
+        </div>
+      </aside>
     </>
   );
 }

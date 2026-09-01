@@ -142,7 +142,7 @@ export default function Header({ onMenuClick }) {
     : 0;
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between border-b border-brand-border/60 py-4 mb-7 bg-brand-bg/85 backdrop-blur-md">
+    <header className="sticky top-0 z-30 flex items-center justify-between border-b border-brand-border/60 py-4 mb-7 bg-brand-bg shadow-sm">
       
       {/* Mobile Menu Toggle Button */}
       <button
