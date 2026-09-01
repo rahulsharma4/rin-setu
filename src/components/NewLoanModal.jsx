@@ -256,6 +256,7 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
     installmentAmount: '',
     dayCountBasis: '30_360',
     paymentPreference: 'p2p_upi',
+    enableWhatsappAutomation: true,
   });
 
   const [loading, setLoading] = useState(false);
@@ -959,6 +960,20 @@ export default function NewLoanModal({ isOpen, onClose, onRefresh, preselectedCu
                 <p className="text-[9px] text-brand-dim italic mt-1">
                   * Choose how payments for this specific loan file will be collected and verified.
                 </p>
+
+                <div className="flex items-center space-x-2 pt-2 border-t border-brand-border/30 mt-2">
+                  <input
+                    type="checkbox"
+                    id="enableWhatsappAutomationLoan"
+                    name="enableWhatsappAutomation"
+                    checked={formData.enableWhatsappAutomation}
+                    onChange={handleChange}
+                    className="w-4 h-4 rounded text-brand-emerald bg-brand-bg border-brand-border focus:ring-0 cursor-pointer"
+                  />
+                  <label htmlFor="enableWhatsappAutomationLoan" className="text-xs font-semibold text-white cursor-pointer select-none">
+                    Enable Automatic WhatsApp Reminders for this Loan (ऑटो मैसेज चालू रखें)
+                  </label>
+                </div>
               </div>
 
               {/* Remarks */}

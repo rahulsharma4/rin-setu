@@ -22,7 +22,8 @@ import {
   Edit,
   FileCheck,
   Sparkles,
-  Printer
+  Printer,
+  MessageSquare
 } from 'lucide-react';
 import { customerAPI, loanAPI, transactionAPI } from '../api';
 import api from '../api';
@@ -386,7 +387,19 @@ export default function CustomerDetails() {
         handleViewSchedule(activeScheduleLoanId);
       }
     } catch (err) {
-      alert('Failed to revert transaction.');
+      alert(err.response?.data?.message || 'Failed to revert transaction.');
+    }
+  };
+
+  const handleToggleWhatsapp = async () => {
+    try {
+      const res = await api.put(`customers/${id}/toggle-whatsapp`);
+      setCustomer(prev => ({
+        ...prev,
+        enableWhatsappAutomation: res.data.enableWhatsappAutomation
+      }));
+    } catch (err) {
+      alert('Failed to toggle WhatsApp automation for this client.');
     }
   };
 
@@ -449,6 +462,20 @@ export default function CustomerDetails() {
               }`}>
                 {customer.status}
               </span>
+
+              <button
+                type="button"
+                onClick={handleToggleWhatsapp}
+                title={customer.enableWhatsappAutomation !== false ? "WhatsApp Auto Reminders are ENABLED. Click to disable for this client." : "WhatsApp Auto Reminders are DISABLED. Click to enable for this client."}
+                className={`flex items-center space-x-1.5 px-3 py-0.5 rounded-full text-[9px] font-bold border transition cursor-pointer select-none ${
+                  customer.enableWhatsappAutomation !== false
+                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20'
+                    : 'bg-amber-500/10 text-amber-400 border-amber-500/30 hover:bg-amber-500/20'
+                }`}
+              >
+                <MessageSquare className="w-3 h-3" />
+                <span>WhatsApp Auto-Msg: {customer.enableWhatsappAutomation !== false ? 'ON' : 'OFF'}</span>
+              </button>
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-brand-dim mt-1.5 font-medium">
               <span className="flex items-center space-x-1">
@@ -1162,22 +1189,28 @@ Bhugtan karne ke liye is link par click karein: ${window.location.origin}/pay/lo
               </thead>
               <tbody className="divide-y divide-brand-border/40">
                 {allTransactions.map((tx) => (
-                  <tr key={tx._id} className="hover:bg-brand-border/10 transition">
+                  <tr key={tx._id} className={`hover:bg-brand-border/10 transition ${tx.isReversed ? 'opacity-60 bg-brand-rose/5' : ''}`}>
                     <td className="p-3.5 text-brand-dim">
                       {new Date(tx.paymentDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                     </td>
-                    <td className={`p-3.5 font-bold ${tx.paymentType === 'principal' ? 'text-brand-rose' : 'text-brand-emerald'}`}>
+                    <td className={`p-3.5 font-bold ${tx.isReversed ? 'text-brand-dim line-through' : tx.paymentType === 'principal' ? 'text-brand-rose' : 'text-brand-emerald'}`}>
                       ₹{tx.amount.toLocaleString('en-IN')}
                     </td>
                     <td className="p-3.5 text-brand-dim uppercase font-semibold text-[10px]">{tx.paymentMode || 'cash'}</td>
                     <td className="p-3.5">
-                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${
-                        tx.paymentType === 'principal' 
-                          ? 'bg-brand-rose/10 text-brand-rose border border-brand-rose/20' 
-                          : 'bg-brand-emerald/10 text-brand-emerald border border-brand-emerald/20'
-                      }`}>
-                        {tx.paymentType === 'principal' ? 'Asal' : tx.paymentType === 'interest' ? 'Byaj' : 'Waterfall'}
-                      </span>
+                      {tx.isReversed ? (
+                        <span className="px-2 py-0.5 rounded bg-brand-rose/20 text-brand-rose border border-brand-rose/30 text-[9px] font-bold uppercase">
+                          REVERSED
+                        </span>
+                      ) : (
+                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${
+                          tx.paymentType === 'principal' 
+                            ? 'bg-brand-rose/10 text-brand-rose border border-brand-rose/20' 
+                            : 'bg-brand-emerald/10 text-brand-emerald border border-brand-emerald/20'
+                        }`}>
+                          {tx.paymentType === 'principal' ? 'Asal' : tx.paymentType === 'interest' ? 'Byaj' : 'Waterfall'}
+                        </span>
+                      )}
                     </td>
                     <td className="p-3.5 text-brand-dim truncate max-w-[120px]">{tx.loanRemarks || '—'}</td>
                     <td className="p-3.5 text-brand-dim">{tx.notes || '—'}</td>
@@ -1190,14 +1223,16 @@ Bhugtan karne ke liye is link par click karein: ${window.location.origin}/pay/lo
                       >
                         <Printer className="w-3.5 h-3.5" />
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => handleRevertTransaction(tx._id)}
-                        className="p-1.5 rounded-lg bg-brand-rose/5 text-brand-rose/70 hover:text-white hover:bg-brand-rose transition"
-                        title="Revert Payment Log"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      {!tx.isReversed && (
+                        <button
+                          type="button"
+                          onClick={() => handleRevertTransaction(tx._id)}
+                          className="p-1.5 rounded-lg bg-brand-rose/5 text-brand-rose/70 hover:text-white hover:bg-brand-rose transition"
+                          title="Revert Payment Log"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}

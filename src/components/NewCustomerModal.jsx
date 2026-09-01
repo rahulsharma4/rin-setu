@@ -71,6 +71,7 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
         email: editingCustomer.email || '',
         password: '',
         isPortalEnabled: !!editingCustomer.isPortalEnabled,
+        enableWhatsappAutomation: editingCustomer.enableWhatsappAutomation !== undefined ? !!editingCustomer.enableWhatsappAutomation : true,
       });
       setUploadedDocs(editingCustomer.documents || []);
     } else {
@@ -93,6 +94,7 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
         email: '',
         password: '',
         isPortalEnabled: false,
+        enableWhatsappAutomation: true,
       });
       setUploadedDocs([]);
     }
@@ -356,18 +358,34 @@ export default function NewCustomerModal({ isOpen, onClose, onRefresh, editingCu
               <h3 className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Borrower Portal Access</h3>
             </div>
 
-            <div className="flex items-center space-x-2 md:col-span-2 py-1">
-              <input
-                type="checkbox"
-                id="isPortalEnabled"
-                name="isPortalEnabled"
-                checked={formData.isPortalEnabled}
-                onChange={(e) => setFormData(prev => ({ ...prev, isPortalEnabled: e.target.checked }))}
-                className="w-4 h-4 rounded text-brand-accent bg-brand-bg border-brand-border focus:ring-0 focus:ring-offset-0 cursor-pointer"
-              />
-              <label htmlFor="isPortalEnabled" className="text-[10px] font-bold text-brand-dim uppercase tracking-wider select-none cursor-pointer">
-                Enable Client Portal Login
-              </label>
+            <div className="flex flex-col sm:flex-row gap-3 md:col-span-2 py-1">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="isPortalEnabled"
+                  name="isPortalEnabled"
+                  checked={formData.isPortalEnabled}
+                  onChange={(e) => setFormData(prev => ({ ...prev, isPortalEnabled: e.target.checked }))}
+                  className="w-4 h-4 rounded text-brand-accent bg-brand-bg border-brand-border focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                />
+                <label htmlFor="isPortalEnabled" className="text-[10px] font-bold text-brand-dim uppercase tracking-wider select-none cursor-pointer">
+                  Enable Client Portal Login
+                </label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="enableWhatsappAutomation"
+                  name="enableWhatsappAutomation"
+                  checked={formData.enableWhatsappAutomation}
+                  onChange={(e) => setFormData(prev => ({ ...prev, enableWhatsappAutomation: e.target.checked }))}
+                  className="w-4 h-4 rounded text-brand-emerald bg-brand-bg border-brand-border focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                />
+                <label htmlFor="enableWhatsappAutomation" className="text-[10px] font-bold text-brand-emerald uppercase tracking-wider select-none cursor-pointer">
+                  WhatsApp Auto-Reminders (ऑटो मैसेज भेजें)
+                </label>
+              </div>
             </div>
 
             {formData.isPortalEnabled && (

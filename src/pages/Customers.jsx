@@ -282,7 +282,14 @@ export default function Customers() {
                   >
                     <td className="py-3.5 pl-2 font-bold text-brand-text dark:text-white text-xs">{customer.name}</td>
                     <td className="py-3.5">
-                      <div className="font-mono text-brand-dim">{customer.phone}</div>
+                      <div className="flex items-center space-x-1.5 font-mono text-brand-dim">
+                        <span>{customer.phone}</span>
+                        {customer.enableWhatsappAutomation === false ? (
+                          <span className="text-[8px] bg-amber-500/15 text-amber-400 px-1.5 py-0.2 rounded font-bold" title="WhatsApp Auto-Msg Disabled for this client">WA: OFF</span>
+                        ) : (
+                          <span className="text-[8px] bg-emerald-500/15 text-emerald-400 px-1.5 py-0.2 rounded font-bold" title="WhatsApp Auto-Msg Enabled for this client">WA: ON</span>
+                        )}
+                      </div>
                       {customer.email && (
                         <div className="text-[10px] text-brand-accent font-semibold truncate max-w-[150px] mt-0.5 flex items-center gap-1" title={customer.email}>
                           <span>{customer.email}</span>
