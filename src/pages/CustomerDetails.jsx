@@ -23,7 +23,8 @@ import {
   FileCheck,
   Sparkles,
   Printer,
-  MessageSquare
+  MessageSquare,
+  Power
 } from 'lucide-react';
 import { customerAPI, loanAPI, transactionAPI } from '../api';
 import api from '../api';
