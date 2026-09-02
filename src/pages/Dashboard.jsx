@@ -291,18 +291,6 @@ Aap is guide ke zariye poora system manage kar sakte hain! Koi aur doubt ho to b
       
       setChatMessages(prev => [...prev, { sender: 'bot', text: reply }]);
 
-      // Action routing check
-      const lower = msg.toLowerCase();
-      if (lower.includes('overdue') || lower.includes('remind')) {
-        setTimeout(() => {
-          setChatMessages(prev => [...prev, { sender: 'bot', text: '💡 Shortcuts: Overdue collection directory open karu?', action: 'go_collection' }]);
-        }, 1000);
-      }
-      if (lower.includes('cash') || lower.includes('expens')) {
-        setTimeout(() => {
-          setChatMessages(prev => [...prev, { sender: 'bot', text: '💡 Shortcuts: Cash Book balance sheet open karu?', action: 'go_cashbook' }]);
-        }, 1000);
-      }
     } catch (error) {
       setChatMessages(prev => [...prev, { sender: 'bot', text: 'Sorry, AI response failure. Please check if backend is online.' }]);
     } finally {

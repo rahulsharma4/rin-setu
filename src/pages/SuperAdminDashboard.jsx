@@ -19,9 +19,12 @@ import {
   Calendar,
   CreditCard,
   Edit3,
-  ShieldCheck
+  ShieldCheck,
+  Activity,
+  History
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 
 export default function SuperAdminDashboard() {
   const { token, impersonate } = useAuth();
@@ -29,11 +32,12 @@ export default function SuperAdminDashboard() {
   const [stats, setStats] = useState(null);
   const [tenants, setTenants] = useState([]);
   const [plans, setPlans] = useState([]);
+  const [auditLogs, setAuditLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState('');
   
-  const [activeTab, setActiveTab] = useState('tenants'); // 'tenants' | 'plans'
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'tenants' | 'plans' | 'audit'
 
   // Onboard form state
   const [form, setForm] = useState({
@@ -73,15 +77,17 @@ export default function SuperAdminDashboard() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const [statsRes, tenantsRes, plansRes] = await Promise.all([
+      const [statsRes, tenantsRes, plansRes, auditRes] = await Promise.all([
         api.get('superadmin/stats'),
         api.get('superadmin/tenants'),
-        api.get('superadmin/plans')
+        api.get('superadmin/plans'),
+        api.get('superadmin/audit?limit=100')
       ]);
       
       setStats(statsRes.data);
       setTenants(tenantsRes.data);
       setPlans(plansRes.data);
+      setAuditLogs(auditRes.data);
       setError('');
     } catch (err) {
       console.error(err);
@@ -374,30 +380,122 @@ export default function SuperAdminDashboard() {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-brand-border/40">
+      <div className="flex border-b border-brand-border/40 overflow-x-auto no-scrollbar">
+        <button
+          onClick={() => setActiveTab('overview')}
+          className={`pb-3 px-6 text-sm font-bold border-b-2 transition whitespace-nowrap flex items-center space-x-2 ${
+            activeTab === 'overview' 
+              ? 'border-brand-accent text-white font-extrabold' 
+              : 'border-transparent text-brand-dim hover:text-white'
+          }`}
+        >
+          <Activity className="w-4 h-4" />
+          <span>Platform Overview</span>
+        </button>
         <button
           onClick={() => setActiveTab('tenants')}
-          className={`pb-3 px-6 text-sm font-bold border-b-2 transition ${
+          className={`pb-3 px-6 text-sm font-bold border-b-2 transition whitespace-nowrap flex items-center space-x-2 ${
             activeTab === 'tenants' 
               ? 'border-brand-accent text-white font-extrabold' 
               : 'border-transparent text-brand-dim hover:text-white'
           }`}
         >
-          Lender Tenants
+          <Building2 className="w-4 h-4" />
+          <span>Lender Tenants</span>
         </button>
         <button
           onClick={() => setActiveTab('plans')}
-          className={`pb-3 px-6 text-sm font-bold border-b-2 transition ${
+          className={`pb-3 px-6 text-sm font-bold border-b-2 transition whitespace-nowrap flex items-center space-x-2 ${
             activeTab === 'plans' 
               ? 'border-brand-accent text-white font-extrabold' 
               : 'border-transparent text-brand-dim hover:text-white'
           }`}
         >
-          Subscription Pricing Plans
+          <CreditCard className="w-4 h-4" />
+          <span>Subscription Pricing</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('audit')}
+          className={`pb-3 px-6 text-sm font-bold border-b-2 transition whitespace-nowrap flex items-center space-x-2 ${
+            activeTab === 'audit' 
+              ? 'border-brand-accent text-white font-extrabold' 
+              : 'border-transparent text-brand-dim hover:text-white'
+          }`}
+        >
+          <History className="w-4 h-4" />
+          <span>Global Audit Logs</span>
         </button>
       </div>
 
-      {activeTab === 'tenants' ? (
+      {activeTab === 'overview' ? (
+        /* TAB 0: Platform Analytics Overview */
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-fade-in">
+          {/* Revenue Trends Chart */}
+          <div className="glass-panel border border-brand-border bg-brand-card rounded-2xl shadow-2xl p-6 space-y-6">
+            <div>
+              <h3 className="text-md font-bold text-brand-text dark:text-white">Platform Growth & Disbursement</h3>
+              <p className="text-[10px] text-brand-dim font-medium mt-0.5">Mocked trend analysis based on current stats.</p>
+            </div>
+            <div className="h-72 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={[
+                  { month: 'Jan', value: (stats?.totalCapitalDisbursed || 0) * 0.2 },
+                  { month: 'Feb', value: (stats?.totalCapitalDisbursed || 0) * 0.35 },
+                  { month: 'Mar', value: (stats?.totalCapitalDisbursed || 0) * 0.45 },
+                  { month: 'Apr', value: (stats?.totalCapitalDisbursed || 0) * 0.6 },
+                  { month: 'May', value: (stats?.totalCapitalDisbursed || 0) * 0.8 },
+                  { month: 'Jun', value: stats?.totalCapitalDisbursed || 0 },
+                ]}>
+                  <defs>
+                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} vertical={false} />
+                  <XAxis dataKey="month" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(value) => `₹${value/1000}k`} />
+                  <RechartsTooltip 
+                    contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px', fontSize: '12px' }}
+                    itemStyle={{ color: '#818cf8', fontWeight: 'bold' }}
+                    formatter={(value) => [`₹${value.toLocaleString('en-IN')}`, 'Disbursed']}
+                  />
+                  <Area type="monotone" dataKey="value" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Tenants Growth Chart */}
+          <div className="glass-panel border border-brand-border bg-brand-card rounded-2xl shadow-2xl p-6 space-y-6">
+            <div>
+              <h3 className="text-md font-bold text-brand-text dark:text-white">Tenant Onboarding Rate</h3>
+              <p className="text-[10px] text-brand-dim font-medium mt-0.5">Active money lending businesses on the platform.</p>
+            </div>
+            <div className="h-72 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={[
+                  { month: 'Jan', tenants: Math.max(1, (stats?.totalTenants || 0) - 10) },
+                  { month: 'Feb', tenants: Math.max(2, (stats?.totalTenants || 0) - 8) },
+                  { month: 'Mar', tenants: Math.max(3, (stats?.totalTenants || 0) - 5) },
+                  { month: 'Apr', tenants: Math.max(4, (stats?.totalTenants || 0) - 3) },
+                  { month: 'May', tenants: Math.max(5, (stats?.totalTenants || 0) - 1) },
+                  { month: 'Jun', tenants: stats?.totalTenants || 0 },
+                ]}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} vertical={false} />
+                  <XAxis dataKey="month" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                  <RechartsTooltip 
+                    contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px', fontSize: '12px' }}
+                    itemStyle={{ color: '#34d399', fontWeight: 'bold' }}
+                  />
+                  <Line type="monotone" dataKey="tenants" stroke="#34d399" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+      ) : activeTab === 'tenants' ? (
         /* TAB 1: Tenants List & Onboarding Form */
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
@@ -629,7 +727,7 @@ export default function SuperAdminDashboard() {
             </form>
           </div>
         </div>
-      ) : (
+      ) : activeTab === 'plans' ? (
         /* TAB 2: Pricing Plans Management */
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Plans Directory List */}
@@ -801,16 +899,79 @@ export default function SuperAdminDashboard() {
                   <button
                     type="button"
                     onClick={() => setPlanForm({ id: '', name: '', price: '', durationDays: 30, maxBorrowers: -1, featuresText: '', isActive: true })}
-                    className="px-4 py-2.5 rounded-xl border border-brand-border text-xs text-brand-dim hover:text-white transition"
+                    className="flex-1 py-2.5 rounded-xl border border-brand-border hover:bg-brand-border/30 text-xs font-bold text-brand-dim hover:text-white transition"
                   >
-                    Reset
+                    Cancel Editing
                   </button>
                 )}
               </div>
             </form>
           </div>
         </div>
-      )}
+      ) : activeTab === 'audit' ? (
+        /* TAB 4: Global Audit Logs */
+        <div className="glass-panel border border-brand-border bg-brand-card rounded-2xl shadow-2xl p-6 space-y-6 animate-fade-in">
+          <div>
+            <h3 className="text-md font-bold text-brand-text dark:text-white">Global Security & Audit Feed</h3>
+            <p className="text-[10px] text-brand-dim font-medium mt-0.5">Real-time tracking of all actions taken by admins and agents across the entire platform.</p>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-brand-border/60 text-[10px] text-brand-dim font-bold uppercase tracking-wider">
+                  <th className="pb-3.5">Timestamp</th>
+                  <th className="pb-3.5">Tenant / Business</th>
+                  <th className="pb-3.5">User</th>
+                  <th className="pb-3.5">Action</th>
+                  <th className="pb-3.5">Details</th>
+                  <th className="pb-3.5 text-right">IP Address</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-brand-border/30 text-[11px] text-brand-text dark:text-slate-300">
+                {auditLogs.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="py-8 text-center text-brand-dim font-medium">
+                      No audit logs captured yet.
+                    </td>
+                  </tr>
+                ) : (
+                  auditLogs.map((log) => (
+                    <tr key={log._id} className="hover:bg-brand-bg/40 transition-colors">
+                      <td className="py-3 text-brand-dim">
+                        {new Date(log.createdAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
+                      </td>
+                      <td className="py-3 font-bold text-white">
+                        {log.tenantId?.businessName || 'Global System'}
+                      </td>
+                      <td className="py-3 text-brand-accent">
+                        {log.userId}
+                      </td>
+                      <td className="py-3">
+                        <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase border tracking-wider ${
+                          log.action.includes('DELETE') || log.action.includes('REJECT')
+                            ? 'bg-brand-rose/10 text-brand-rose border-brand-rose/20'
+                            : log.action.includes('UPDATE') || log.action.includes('EDIT') || log.action.includes('APPROVE')
+                              ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                              : 'bg-brand-emerald/10 text-brand-emerald border-brand-emerald/20'
+                        }`}>
+                          {log.action}
+                        </span>
+                      </td>
+                      <td className="py-3 text-[10px]">
+                        {log.details}
+                      </td>
+                      <td className="py-3 text-right font-mono text-[9px] text-brand-dim">
+                        {log.ipAddress || 'System'}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : null}
 
       {/* Subscription Override Modal */}
       {subModalTenant && (

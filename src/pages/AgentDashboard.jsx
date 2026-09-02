@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Search, Phone, CreditCard, LogOut, Navigation, CheckCircle2 } from 'lucide-react';
-import api from '../api/axios';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 import { createPortal } from 'react-dom';
 
