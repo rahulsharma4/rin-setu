@@ -132,20 +132,32 @@ export default function CustomerDetails() {
     setLoading(true);
     try {
       const data = await customerAPI.getOne(id);
+      if (!data || !data.customer) {
+        setError('Borrower file not found.');
+        return;
+      }
       setCustomer(data.customer);
       
       const detailedLoans = await Promise.all(
-        data.loans.map(async (l) => {
-          return await loanAPI.getOne(l._id);
+        (data.loans || []).map(async (l) => {
+          try {
+            return await loanAPI.getOne(l._id);
+          } catch (loanErr) {
+            console.warn('Could not load loan details for:', l._id);
+            return l; // fallback to basic loan data
+          }
         })
       );
-      setLoans(detailedLoans);
+      // Filter out any null results
+      const validLoans = detailedLoans.filter(Boolean);
+      setLoans(validLoans);
 
       // Default first loan as active schedule view if available
-      if (detailedLoans.length > 0 && !activeScheduleLoanId) {
-        handleViewSchedule(detailedLoans[0]._id);
+      if (validLoans.length > 0 && !activeScheduleLoanId) {
+        handleViewSchedule(validLoans[0]._id);
       }
     } catch (err) {
+      console.error('fetchCustomerData error:', err);
       setError('Failed to load borrower profile details.');
     } finally {
       setLoading(false);
