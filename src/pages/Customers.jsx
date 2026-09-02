@@ -265,6 +265,7 @@ export default function Customers() {
               <thead>
                 <tr className="border-b border-brand-border/60 text-[9px] text-brand-dim uppercase font-bold tracking-wider">
                   <th className="pb-3.5 pl-2">Borrower Name</th>
+                  <th className="pb-3.5">Risk Score</th>
                   <th className="pb-3.5">Phone Number</th>
                   <th className="pb-3.5">Status</th>
                   <th className="pb-3.5">Active Loans</th>
@@ -281,6 +282,21 @@ export default function Customers() {
                     className="hover:bg-brand-bg/40 transition cursor-pointer"
                   >
                     <td className="py-3.5 pl-2 font-bold text-brand-text dark:text-white text-xs">{customer.name}</td>
+                    <td className="py-3.5">
+                      {customer.riskScore ? (
+                        <span className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider border flex items-center space-x-1 w-max ${
+                          customer.riskScore === 'Green' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' :
+                          customer.riskScore === 'Yellow' ? 'bg-amber-500/10 text-amber-400 border-amber-500/30' :
+                          'bg-rose-500/10 text-rose-400 border-rose-500/30'
+                        }`} title={`Internal Risk Rating: ${customer.riskScore}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${
+                            customer.riskScore === 'Green' ? 'bg-emerald-400' :
+                            customer.riskScore === 'Yellow' ? 'bg-amber-400 animate-pulse' : 'bg-rose-400 animate-pulse'
+                          }`}></span>
+                          <span>{customer.riskScore}</span>
+                        </span>
+                      ) : <span className="text-brand-dim">-</span>}
+                    </td>
                     <td className="py-3.5">
                       <div className="flex items-center space-x-1.5 font-mono text-brand-dim">
                         <span>{customer.phone}</span>

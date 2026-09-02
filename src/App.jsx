@@ -21,6 +21,7 @@ const Reports = lazy(() => import('./pages/Reports'));
 const CashBook = lazy(() => import('./pages/CashBook'));
 const Settings = lazy(() => import('./pages/Settings'));
 const SuperAdminDashboard = lazy(() => import('./pages/SuperAdminDashboard'));
+const AgentDashboard = lazy(() => import('./pages/AgentDashboard'));
 const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
 const BorrowerDashboard = lazy(() => import('./pages/BorrowerDashboard'));
 const PublicPaymentPage = lazy(() => import('./pages/PublicPaymentPage'));
@@ -103,6 +104,11 @@ function CRMLayout() {
                 {isSuper ? (
                   <>
                     <Route path="/" element={<SuperAdminDashboard />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </>
+                ) : admin?.role === 'agent' ? (
+                  <>
+                    <Route path="/" element={<AgentDashboard />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </>
                 ) : (

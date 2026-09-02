@@ -80,6 +80,17 @@ export default function CustomerDetails() {
   const [isCollateralListModalOpen, setIsCollateralListModalOpen] = useState(false);
   const [viewingDoc, setViewingDoc] = useState(null);
 
+  // Foreclosure states
+  const [forecloseLoanItem, setForecloseLoanItem] = useState(null);
+  const [forecloseDiscount, setForecloseDiscount] = useState(0);
+  const [forecloseSaving, setForecloseSaving] = useState(false);
+
+  // E-Sign states
+  const [eSignLoanItem, setESignLoanItem] = useState(null);
+  const [eSignOtpCode, setESignOtpCode] = useState('');
+  const [isESignSending, setIsESignSending] = useState(false);
+  const [isESignVerifying, setIsESignVerifying] = useState(false);
+
   // Print Modal states
   const [printType, setPrintType] = useState('receipt');
   const [printData, setPrintData] = useState(null);
@@ -301,6 +312,55 @@ export default function CustomerDetails() {
       setRestructureLoading(false);
     }
   };
+  const handleForecloseSubmit = async (e) => {
+    e.preventDefault();
+    setForecloseSaving(true);
+    try {
+      await api.put(`loans/${forecloseLoanItem._id}/foreclose`, {
+        settlementDiscount: Number(forecloseDiscount)
+      });
+      setForecloseLoanItem(null);
+      fetchCustomerData();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to foreclose loan.');
+    } finally {
+      setForecloseSaving(false);
+    }
+  };
+
+  const handleESignSend = async (loan) => {
+    setIsESignSending(true);
+    try {
+      const res = await api.put(`loans/${loan._id}/send-otp`);
+      if (res.data.sentViaWhatsapp) {
+         alert('E-Sign OTP sent to borrower\'s WhatsApp successfully.');
+         setESignLoanItem(loan);
+         setESignOtpCode('');
+      } else {
+         alert('Failed to send OTP via WhatsApp. Check Gateway connection.');
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to send E-Sign OTP.');
+    } finally {
+      setIsESignSending(false);
+    }
+  };
+
+  const handleESignVerify = async (e) => {
+    e.preventDefault();
+    setIsESignVerifying(true);
+    try {
+      await api.put(`loans/${eSignLoanItem._id}/verify-otp`, { otp: eSignOtpCode });
+      alert('Document Digitally Signed!');
+      setESignLoanItem(null);
+      fetchCustomerData();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Invalid or Expired OTP.');
+    } finally {
+      setIsESignVerifying(false);
+    }
+  };
+
 
   const handlePrintCertificate = (loan) => {
     setPrintType('no_dues');
@@ -462,6 +522,21 @@ export default function CustomerDetails() {
               }`}>
                 {customer.status}
               </span>
+
+              {/* Internal Risk Score Badge */}
+              {customer.riskScore && (
+                <span className={`flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border ${
+                  customer.riskScore === 'Green' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' :
+                  customer.riskScore === 'Yellow' ? 'bg-amber-500/10 text-amber-400 border-amber-500/30' :
+                  'bg-rose-500/10 text-rose-400 border-rose-500/30'
+                }`} title={`Internal Risk Rating: ${customer.riskScore}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${
+                    customer.riskScore === 'Green' ? 'bg-emerald-400' :
+                    customer.riskScore === 'Yellow' ? 'bg-amber-400 animate-pulse' : 'bg-rose-400 animate-pulse'
+                  }`}></span>
+                  <span>{customer.riskScore} Risk</span>
+                </span>
+              )}
 
               <button
                 type="button"
@@ -995,12 +1070,41 @@ export default function CustomerDetails() {
                             <span>Restructure</span>
                           </button>
                           <button
+                            onClick={() => {
+                              setForecloseLoanItem(loan);
+                              setForecloseDiscount(0);
+                            }}
+                            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 text-[10px] font-bold text-purple-400 transition"
+                          >
+                            <Power className="w-3.5 h-3.5" />
+                            <span>Foreclose</span>
+                          </button>
+                          <button
                             onClick={() => handlePrintAgreement(loan)}
                             className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-[10px] font-bold text-indigo-400 border border-indigo-500/20 transition"
                           >
                             <Printer className="w-3.5 h-3.5" />
                             <span>Print Agreement</span>
                           </button>
+                          {loan.eSignStatus === 'signed' ? (
+                            <span className="flex items-center space-x-1 px-2.5 py-1.5 rounded-xl bg-brand-emerald/15 text-[9px] font-black uppercase text-brand-emerald border border-brand-emerald/20">
+                              <CheckCircle2 className="w-3 h-3" />
+                              <span>Digitally Signed</span>
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                if (window.confirm("An OTP will be sent to the borrower's WhatsApp. Continue?")) {
+                                  handleESignSend(loan);
+                                }
+                              }}
+                              disabled={isESignSending}
+                              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-teal-500/15 hover:bg-teal-500/25 text-[10px] font-bold text-teal-400 border border-teal-500/20 transition disabled:opacity-50"
+                            >
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              <span>{isESignSending ? 'Sending OTP...' : 'E-Sign Agreement'}</span>
+                            </button>
+                          )}
                         </>
                       )}
                       
@@ -1293,6 +1397,122 @@ Bhugtan karne ke liye is link par click karein: ${window.location.origin}/pay/lo
                 <span>₹{Math.max(0, selectedInstallmentDetail.totalAmount - selectedInstallmentDetail.amountPaid)}</span>
               </div>
             </div>
+          </div>
+        </div>,
+        document.body
+      )}
+      {/* 5.1 Foreclosure Loan Modal */}
+      {forecloseLoanItem && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-start justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="w-full max-w-sm bg-brand-card border border-brand-border rounded-2xl shadow-2xl my-auto overflow-hidden animate-slide-up">
+            
+            <div className="flex items-center justify-between px-6 py-4 border-b border-brand-border bg-brand-bg/50">
+              <div className="flex items-center space-x-2">
+                <Power className="w-4 h-4 text-purple-400" />
+                <h2 className="text-xs font-bold text-white uppercase tracking-wider">Foreclose Loan</h2>
+              </div>
+              <button onClick={() => setForecloseLoanItem(null)} className="text-brand-dim hover:text-white">✕</button>
+            </div>
+
+            <form onSubmit={handleForecloseSubmit} className="p-6 space-y-4 text-xs">
+              <p className="text-brand-dim leading-relaxed mb-4">
+                This will calculate the remaining principal and close the loan immediately. Remaining interest will be waived automatically.
+              </p>
+              
+              <div className="flex justify-between font-bold">
+                <span className="text-brand-dim">Outstanding Principal</span>
+                <span className="text-white">₹{forecloseLoanItem.calculations?.outstandingPrincipal || 0}</span>
+              </div>
+
+              <div className="space-y-1.5 pt-2">
+                <label className="text-[10px] font-bold text-brand-dim uppercase">Settlement Discount (₹)</label>
+                <input
+                  type="number"
+                  min="0"
+                  max={forecloseLoanItem.calculations?.outstandingPrincipal || 0}
+                  value={forecloseDiscount}
+                  onChange={(e) => setForecloseDiscount(e.target.value)}
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-3 py-2.5 text-brand-text dark:text-white outline-none"
+                />
+              </div>
+
+              <div className="flex justify-between border-t border-brand-border/40 pt-4 font-extrabold text-sm">
+                <span className="text-white">Final Amount to Pay</span>
+                <span className="text-brand-accent">
+                  ₹{Math.max(0, (forecloseLoanItem.calculations?.outstandingPrincipal || 0) - Number(forecloseDiscount))}
+                </span>
+              </div>
+
+              <div className="pt-4 flex space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setForecloseLoanItem(null)}
+                  className="flex-1 py-3 rounded-xl border border-brand-border text-brand-dim font-bold hover:bg-brand-border/30 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={forecloseSaving}
+                  className="flex-1 py-3 rounded-xl bg-purple-500 hover:bg-purple-600 text-white font-bold disabled:opacity-50 transition"
+                >
+                  {forecloseSaving ? 'Processing...' : 'Confirm Closure'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* 5.2 E-Sign OTP Modal */}
+      {eSignLoanItem && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-start justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="w-full max-w-sm bg-brand-card border border-brand-border rounded-2xl shadow-2xl my-auto overflow-hidden animate-slide-up">
+            
+            <div className="flex items-center justify-between px-6 py-4 border-b border-brand-border bg-brand-bg/50">
+              <div className="flex items-center space-x-2">
+                <CheckCircle2 className="w-4 h-4 text-teal-400" />
+                <h2 className="text-xs font-bold text-white uppercase tracking-wider">Verify E-Sign OTP</h2>
+              </div>
+              <button onClick={() => setESignLoanItem(null)} className="text-brand-dim hover:text-white">✕</button>
+            </div>
+
+            <form onSubmit={handleESignVerify} className="p-6 space-y-4 text-xs">
+              <p className="text-brand-dim leading-relaxed mb-4">
+                An OTP was sent to <strong>{customer.phone}</strong> via WhatsApp. Enter the OTP below to digitally sign this loan agreement.
+              </p>
+              
+              <div className="space-y-1.5 pt-2">
+                <label className="text-[10px] font-bold text-brand-dim uppercase text-center block">6-Digit OTP Code</label>
+                <input
+                  type="text"
+                  maxLength="6"
+                  required
+                  value={eSignOtpCode}
+                  onChange={(e) => setESignOtpCode(e.target.value.replace(/\D/g, ''))}
+                  className="w-full bg-brand-bg border border-brand-border focus:border-brand-accent/50 focus:ring-0 rounded-xl px-4 py-4 text-2xl tracking-[0.5em] text-center font-bold text-white outline-none"
+                  placeholder="------"
+                />
+              </div>
+
+              <div className="pt-4 flex space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setESignLoanItem(null)}
+                  className="flex-1 py-3 rounded-xl border border-brand-border text-brand-dim font-bold hover:bg-brand-border/30 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isESignVerifying || eSignOtpCode.length !== 6}
+                  className="flex-1 py-3 rounded-xl bg-teal-500 hover:bg-teal-600 text-white font-bold disabled:opacity-50 transition"
+                >
+                  {isESignVerifying ? 'Verifying...' : 'Verify & Sign'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>,
         document.body
