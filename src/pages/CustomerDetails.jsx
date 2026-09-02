@@ -12,11 +12,13 @@ import {
   Plus,
   Trash2,
   AlertCircle,
+  AlertTriangle,
   Briefcase,
   Calendar,
   MessageSquareShare,
   Copy,
   Check,
+  CheckCircle2,
   Send,
   Table,
   Edit,
@@ -24,7 +26,18 @@ import {
   Sparkles,
   Printer,
   MessageSquare,
-  Power
+  Power,
+  TrendingUp,
+  TrendingDown,
+  Clock,
+  Star,
+  XCircle,
+  Info,
+  Download,
+  RefreshCw,
+  Shield,
+  CreditCard,
+  Zap
 } from 'lucide-react';
 import { customerAPI, loanAPI, transactionAPI } from '../api';
 import api from '../api';
