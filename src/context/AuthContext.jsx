@@ -32,8 +32,17 @@ export function AuthProvider({ children }) {
         } else {
           logout();
         }
-      } catch {
-        logout();
+      } catch (error) {
+        // ONLY log out if the server explicitly says the token is invalid (401/403)
+        // If it's a network error, timeout, or 500/502 (Render waking up), keep the token
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+          logout();
+        } else {
+          // Trust the existing token to avoid logging out on poor connection
+          setToken(storedToken);
+          const storedAdmin = localStorage.getItem('byaj_admin_info');
+          if (storedAdmin) setAdmin(JSON.parse(storedAdmin));
+        }
       } finally {
         setLoading(false);
       }
