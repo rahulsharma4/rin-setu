@@ -1340,13 +1340,26 @@ Bhugtan karne ke liye is link par click karein: ${window.location.origin}/pay/lo
                         <span className="px-2 py-0.5 rounded bg-brand-rose/20 text-brand-rose border border-brand-rose/30 text-[9px] font-bold uppercase">
                           REVERSED
                         </span>
+                      ) : tx.paymentType === 'both' ? (
+                        <div className="flex flex-col space-y-0.5">
+                          <span className="px-2 py-0.5 rounded-full bg-brand-accent/10 text-brand-accent border border-brand-accent/20 text-[9px] font-bold uppercase self-start">
+                            Waterfall
+                          </span>
+                          <div className="text-[9px] mt-1 space-y-0.5">
+                            {tx.allocatedPrincipal > 0 && <div className="text-brand-emerald flex justify-between"><span className="text-brand-dim pr-2">Asal:</span><span>₹{tx.allocatedPrincipal}</span></div>}
+                            {tx.allocatedInterest > 0 && <div className="text-brand-emerald flex justify-between"><span className="text-brand-dim pr-2">Byaj:</span><span>₹{tx.allocatedInterest}</span></div>}
+                            {tx.allocatedLateFee > 0 && <div className="text-brand-rose flex justify-between"><span className="text-brand-dim pr-2">Fines:</span><span>₹{tx.allocatedLateFee}</span></div>}
+                            {tx.allocatedDueCharges > 0 && <div className="text-amber-500 flex justify-between"><span className="text-brand-dim pr-2">Due Charges:</span><span>₹{tx.allocatedDueCharges}</span></div>}
+                            {tx.excessAdvanceUsed > 0 && <div className="text-blue-400 flex justify-between"><span className="text-brand-dim pr-2">Excess:</span><span>₹{tx.excessAdvanceUsed}</span></div>}
+                          </div>
+                        </div>
                       ) : (
                         <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${
                           tx.paymentType === 'principal' 
                             ? 'bg-brand-rose/10 text-brand-rose border border-brand-rose/20' 
                             : 'bg-brand-emerald/10 text-brand-emerald border border-brand-emerald/20'
                         }`}>
-                          {tx.paymentType === 'principal' ? 'Asal' : tx.paymentType === 'interest' ? 'Byaj' : 'Waterfall'}
+                          {tx.paymentType === 'principal' ? 'Asal' : tx.paymentType === 'interest' ? 'Byaj' : 'Other'}
                         </span>
                       )}
                     </td>
