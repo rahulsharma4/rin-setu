@@ -537,7 +537,7 @@ export default function Loans() {
                     Start: {new Date(loan.startDate).toLocaleDateString('en-IN')}
                   </span>
                   
-                  <div className="flex items-center space-x-2.5">
+                  <div className="flex items-center flex-wrap gap-2.5">
                     <button
                       onClick={() => handleEditClick(loan)}
                       className="p-2 rounded-lg bg-brand-accent/10 text-brand-accent hover:text-white hover:bg-brand-accent transition"

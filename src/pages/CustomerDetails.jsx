@@ -963,7 +963,7 @@ export default function CustomerDetails() {
                           <HandCoins className="w-4.5 h-4.5" />
                         </div>
                         <div>
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center flex-wrap gap-2">
                             <h4 className="text-sm font-bold text-white">₹{loan.principalAmount.toLocaleString('en-IN')}</h4>
                             {loan.isExistingLoan && (
                               <span className="text-[9px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-1.5 py-0.5 rounded font-extrabold">
@@ -1076,7 +1076,7 @@ export default function CustomerDetails() {
                   <div className="flex items-center justify-between border-t border-brand-border/40 pt-4 mt-4 flex-wrap gap-2">
                     
                     {/* Restructure & Closure buttons */}
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center flex-wrap gap-2">
                       {!isSettled && (
                         <>
                           <button
@@ -1145,7 +1145,7 @@ export default function CustomerDetails() {
                       )}
                     </div>
 
-                    <div className="flex items-center space-x-2.5">
+                    <div className="flex items-center flex-wrap gap-2">
                       <button
                         onClick={() => handleDeleteLoan(loan._id)}
                         className="p-2 rounded-lg bg-brand-rose/5 text-brand-rose/70 hover:text-white hover:bg-brand-rose transition text-xs font-semibold"
