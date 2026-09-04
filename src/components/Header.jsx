@@ -173,7 +173,7 @@ export default function Header({ onMenuClick }) {
 
         {/* Global Search Result Dropdown box */}
         {searchResults && (
-          <div className="absolute top-full left-0 w-full mt-2 bg-brand-card border border-brand-border rounded-xl shadow-2xl overflow-hidden max-h-[360px] overflow-y-auto z-[110]">
+          <div className="absolute top-full left-0 w-full mt-2 !bg-white dark:!bg-[#0b0e1b] border border-brand-border rounded-xl shadow-2xl overflow-hidden max-h-[360px] overflow-y-auto z-[120] opacity-100">
             
             {/* Customers category */}
             {searchResults.customers?.length > 0 && (

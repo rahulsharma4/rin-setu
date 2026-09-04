@@ -133,7 +133,7 @@ function CRMLayout() {
 
       {/* Mobile Bottom Tab Bar */}
       {!isSuper && (
-        <div className="fixed bottom-0 left-0 right-0 h-16 bg-white dark:bg-[#0b0e1b] border-t border-brand-border flex items-center justify-around px-2 z-[90] md:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.2)]">
+        <div className="fixed bottom-0 left-0 right-0 h-16 !bg-white dark:!bg-[#0b0e1b] border-t border-brand-border flex items-center justify-around px-2 z-[100] md:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.2)] opacity-100 pointer-events-auto">
           <NavLink
             to="/"
             end
